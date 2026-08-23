@@ -1,0 +1,9 @@
+# Private input data (confidential raw church data)
+.temp/
+.temp/*
+
+# Local environment & scratch
+*.local
+.env
+.env.*
+!.env.example

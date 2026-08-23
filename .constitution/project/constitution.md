@@ -34,9 +34,8 @@ repeated here — one rule, one place.
 
 What is particular to this repo, and therefore lives here:
 
-- Name any extra boundary this product has (a public-repo rule, a ban on `3p.md`,
-  a `.work/` resting state). If there is none, delete this bullet list and the
-  sentence above it.
+- `.temp/` is an untracked, local-only staging directory for raw church inputs, personal data, and confidential background documents. Any real data or sensitive documents in `.temp/` MUST NOT be committed, staged, or published to public repositories.
+- When generating corpus artifacts or test seed data from `.temp/`, agents MUST sanitize, anonymize, or synthesize all data before placing it in `.what/`, `.how/`, or codebase files.
 - `3p.md` MUST NOT be created in a product repo. Operational engagement memory
   lives outside.
 

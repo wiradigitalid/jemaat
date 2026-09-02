@@ -1,0 +1,200 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
+  <style>
+    body { margin: 0; background: #FAF7F2; color: #241E1A; font-family: "Plus Jakarta Sans", "Segoe UI", system-ui, sans-serif; -webkit-font-smoothing: antialiased; text-wrap: pretty; }
+    a { color: #B4562F; text-decoration: none; }
+    a:hover { color: #8E4224; }
+    * { box-sizing: border-box; }
+  </style>
+</helmet>
+
+<div style="width:1440px;height:1180px;background:#FAF7F2;display:flex;flex-direction:column;padding:40px;gap:20px;">
+  <div>
+    <div style="font-family:"Newsreader", Georgia, "Times New Roman", serif;font-size:34px;font-weight:500;letter-spacing:-0.015em;">The shape under the screens</div>
+    <div style="font-size:13px;color:#6B6058;margin-top:8px;line-height:1.55;max-width:940px;">Not a schema &mdash; no types, no indexes, no audit columns. These are the seven expensive decisions written as structure, because prose in a sticky note does not survive week one of development, and each of them costs a migration afterwards.</div>
+  </div>
+
+  <div style="display:flex;gap:20px;flex:1 1 auto;min-height:0;">
+
+    <div style="flex:1 1 0;min-width:0;">
+      <div style="background:#FFFFFF;border:1px solid #E9E1D7;border-radius:14px;">
+        <div style="padding:15px 16px 11px;"><div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#9A8F85;">People, and where they stand</div></div>
+        <div style="padding:11px 16px;border-top:1px solid #F1EAE1;">
+    <div style="display:flex;align-items:center;gap:9px;">
+      <span style="font-size:13px;font-weight:700;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;">person</span>
+      <span style="display:inline-flex;align-items:center;height:18px;padding:0 7px;border-radius:6px;background:#F6EAE3;color:#B4562F;font-size:9px;font-weight:700;letter-spacing:0.04em;">GLOBAL</span>
+    </div>
+    <div style="font-size:11px;color:#6B6058;margin-top:5px;line-height:1.5;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;">id, full_name, date_of_birth, phone, phone_visibility</div>
+    <div style="font-size:11px;color:#9A8F85;margin-top:5px;line-height:1.5;">One row per human, ever. NOT per church - this is what lets someone belong to Surabaya and Bandung at once.</div>
+  </div>
+        <div style="padding:11px 16px;border-top:1px solid #F1EAE1;">
+    <div style="display:flex;align-items:center;gap:9px;">
+      <span style="font-size:13px;font-weight:700;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;">church</span>
+      <span style="display:inline-flex;align-items:center;height:18px;padding:0 7px;border-radius:6px;background:#EAF0EA;color:#4C6B52;font-size:9px;font-weight:700;letter-spacing:0.04em;">PER CHURCH</span>
+    </div>
+    <div style="font-size:11px;color:#6B6058;margin-top:5px;line-height:1.5;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;">id, code, name, city, worship_day, tier_labels</div>
+    <div style="font-size:11px;color:#9A8F85;margin-top:5px;line-height:1.5;">worship_day is a setting. Saturday here, Sunday elsewhere, and no screen hard-codes either.</div>
+  </div>
+        <div style="padding:11px 16px;border-top:1px solid #F1EAE1;">
+    <div style="display:flex;align-items:center;gap:9px;">
+      <span style="font-size:13px;font-weight:700;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;">membership</span>
+      <span style="display:inline-flex;align-items:center;height:18px;padding:0 7px;border-radius:6px;background:#FAF7F2;color:#9A8F85;font-size:9px;font-weight:700;letter-spacing:0.04em;">JOIN</span>
+    </div>
+    <div style="font-size:11px;color:#6B6058;margin-top:5px;line-height:1.5;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;">person_id, church_id, standing, lifecycle, since</div>
+    <div style="font-size:11px;color:#9A8F85;margin-top:5px;line-height:1.5;">standing: guest | community | registered. lifecycle: active | inactive | transferred | deceased. NO ROW AT ALL = not on our roll, which is how a guest speaker exists.</div>
+  </div>
+        <div style="padding:11px 16px;border-top:1px solid #F1EAE1;">
+    <div style="display:flex;align-items:center;gap:9px;">
+      <span style="font-size:13px;font-weight:700;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;">household</span>
+      <span style="display:inline-flex;align-items:center;height:18px;padding:0 7px;border-radius:6px;background:#EAF0EA;color:#4C6B52;font-size:9px;font-weight:700;letter-spacing:0.04em;">PER CHURCH</span>
+    </div>
+    <div style="font-size:11px;color:#6B6058;margin-top:5px;line-height:1.5;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;">id, church_id, name, address, area</div>
+    
+  </div>
+        <div style="padding:11px 16px;border-top:1px solid #F1EAE1;">
+    <div style="display:flex;align-items:center;gap:9px;">
+      <span style="font-size:13px;font-weight:700;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;">household_member</span>
+      <span style="display:inline-flex;align-items:center;height:18px;padding:0 7px;border-radius:6px;background:#FAF7F2;color:#9A8F85;font-size:9px;font-weight:700;letter-spacing:0.04em;">JOIN</span>
+    </div>
+    <div style="font-size:11px;color:#6B6058;margin-top:5px;line-height:1.5;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;">person_id, household_id, role</div>
+    <div style="font-size:11px;color:#9A8F85;margin-top:5px;line-height:1.5;">role: head | spouse | child | other. Four, and no plans for a fifth.</div>
+  </div>
+        <div style="height:8px;"></div></div>
+    </div>
+
+    <div style="flex:1 1 0;min-width:0;">
+      <div style="background:#FFFFFF;border:1px solid #E9E1D7;border-radius:14px;">
+        <div style="padding:15px 16px 11px;"><div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#9A8F85;">What happens, and when</div></div>
+        <div style="padding:11px 16px;border-top:1px solid #F1EAE1;">
+    <div style="display:flex;align-items:center;gap:9px;">
+      <span style="font-size:13px;font-weight:700;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;">service</span>
+      <span style="display:inline-flex;align-items:center;height:18px;padding:0 7px;border-radius:6px;background:#EAF0EA;color:#4C6B52;font-size:9px;font-weight:700;letter-spacing:0.04em;">PER CHURCH</span>
+    </div>
+    <div style="font-size:11px;color:#6B6058;margin-top:5px;line-height:1.5;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;">id, church_id, starts_at, location</div>
+    <div style="font-size:11px;color:#9A8F85;margin-top:5px;line-height:1.5;">AN ENTITY, not a date. Two to four a week above 400 members, and everything below points at one.</div>
+  </div>
+        <div style="padding:11px 16px;border-top:1px solid #F1EAE1;">
+    <div style="display:flex;align-items:center;gap:9px;">
+      <span style="font-size:13px;font-weight:700;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;">service_content</span>
+      <span style="display:inline-flex;align-items:center;height:18px;padding:0 7px;border-radius:6px;background:#EAF0EA;color:#4C6B52;font-size:9px;font-weight:700;letter-spacing:0.04em;">PER CHURCH</span>
+    </div>
+    <div style="font-size:11px;color:#6B6058;margin-top:5px;line-height:1.5;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;">service_id, speaker_person_id, series, part, poster</div>
+    <div style="font-size:11px;color:#9A8F85;margin-top:5px;line-height:1.5;">speaker_person_id is nullable and has no FK to membership. That is the guest speaker.</div>
+  </div>
+        <div style="padding:11px 16px;border-top:1px solid #F1EAE1;">
+    <div style="display:flex;align-items:center;gap:9px;">
+      <span style="font-size:13px;font-weight:700;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;">care_group</span>
+      <span style="display:inline-flex;align-items:center;height:18px;padding:0 7px;border-radius:6px;background:#EAF0EA;color:#4C6B52;font-size:9px;font-weight:700;letter-spacing:0.04em;">PER CHURCH</span>
+    </div>
+    <div style="font-size:11px;color:#6B6058;margin-top:5px;line-height:1.5;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;">id, church_id, name, area, weekday, time, leader_person_id</div>
+    
+  </div>
+        <div style="padding:11px 16px;border-top:1px solid #F1EAE1;">
+    <div style="display:flex;align-items:center;gap:9px;">
+      <span style="font-size:13px;font-weight:700;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;">care_group_member</span>
+      <span style="display:inline-flex;align-items:center;height:18px;padding:0 7px;border-radius:6px;background:#FAF7F2;color:#9A8F85;font-size:9px;font-weight:700;letter-spacing:0.04em;">JOIN</span>
+    </div>
+    <div style="font-size:11px;color:#6B6058;margin-top:5px;line-height:1.5;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;">person_id, care_group_id, since</div>
+    <div style="font-size:11px;color:#9A8F85;margin-top:5px;line-height:1.5;">Its own relation. Joining a group never touches membership, which is the whole promise made to Community Members.</div>
+  </div>
+        <div style="padding:11px 16px;border-top:1px solid #F1EAE1;">
+    <div style="display:flex;align-items:center;gap:9px;">
+      <span style="font-size:13px;font-weight:700;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;">meeting</span>
+      <span style="display:inline-flex;align-items:center;height:18px;padding:0 7px;border-radius:6px;background:#EAF0EA;color:#4C6B52;font-size:9px;font-weight:700;letter-spacing:0.04em;">PER CHURCH</span>
+    </div>
+    <div style="font-size:11px;color:#6B6058;margin-top:5px;line-height:1.5;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;">id, care_group_id, starts_at, host_household_id</div>
+    
+  </div>
+        <div style="padding:11px 16px;border-top:1px solid #F1EAE1;">
+    <div style="display:flex;align-items:center;gap:9px;">
+      <span style="font-size:13px;font-weight:700;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;">rsvp / attendance</span>
+      <span style="display:inline-flex;align-items:center;height:18px;padding:0 7px;border-radius:6px;background:#FAF7F2;color:#9A8F85;font-size:9px;font-weight:700;letter-spacing:0.04em;">JOIN</span>
+    </div>
+    <div style="font-size:11px;color:#6B6058;margin-top:5px;line-height:1.5;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;">person_id, meeting_id, answer | came, marked_by</div>
+    <div style="font-size:11px;color:#9A8F85;margin-top:5px;line-height:1.5;">Two tables, not one. What someone SAID and what actually happened are different facts, and M26 is built on the gap.</div>
+  </div>
+        <div style="height:8px;"></div></div>
+    </div>
+
+    <div style="width:452px;flex:0 0 452px;">
+      <div style="background:#FFFFFF;border:1px solid #E9E1D7;border-radius:14px;border-color:#B4562F55;">
+        <div style="padding:15px 16px 4px;"><div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#9A8F85;">Cheap today, a migration tomorrow</div></div>
+        
+<div style="display:flex;align-items:flex-start;gap:12px;padding:11px 16px;border-top:1px solid #F1EAE1;">
+  <span style="width:20px;height:20px;flex:0 0 20px;border-radius:999px;background:#B4562F;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">1</span>
+  <div style="flex:1 1 auto;min-width:0;">
+    <div style="font-size:12px;font-weight:700;line-height:1.4;">A service is a thing, not a date</div>
+    <div style="font-size:11px;color:#6B6058;margin-top:4px;line-height:1.5;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;">service.id &mdash; attendance, assignment, announcement all FK to it</div>
+  </div>
+</div>
+        
+<div style="display:flex;align-items:flex-start;gap:12px;padding:11px 16px;border-top:1px solid #F1EAE1;">
+  <span style="width:20px;height:20px;flex:0 0 20px;border-radius:999px;background:#B4562F;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">2</span>
+  <div style="flex:1 1 auto;min-width:0;">
+    <div style="font-size:12px;font-weight:700;line-height:1.4;">Standing belongs to the pair, not the person</div>
+    <div style="font-size:11px;color:#6B6058;margin-top:4px;line-height:1.5;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;">membership(person, church) &mdash; never person.standing</div>
+  </div>
+</div>
+        
+<div style="display:flex;align-items:flex-start;gap:12px;padding:11px 16px;border-top:1px solid #F1EAE1;">
+  <span style="width:20px;height:20px;flex:0 0 20px;border-radius:999px;background:#B4562F;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">3</span>
+  <div style="flex:1 1 auto;min-width:0;">
+    <div style="font-size:12px;font-weight:700;line-height:1.4;">Lifecycle is its own column</div>
+    <div style="font-size:11px;color:#6B6058;margin-top:4px;line-height:1.5;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;">membership.lifecycle &ne; membership.standing</div>
+  </div>
+</div>
+        
+<div style="display:flex;align-items:flex-start;gap:12px;padding:11px 16px;border-top:1px solid #F1EAE1;">
+  <span style="width:20px;height:20px;flex:0 0 20px;border-radius:999px;background:#B4562F;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">4</span>
+  <div style="flex:1 1 auto;min-width:0;">
+    <div style="font-size:12px;font-weight:700;line-height:1.4;">Group membership is a relation</div>
+    <div style="font-size:11px;color:#6B6058;margin-top:4px;line-height:1.5;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;">care_group_member &mdash; never person.care_group_id</div>
+  </div>
+</div>
+        
+<div style="display:flex;align-items:flex-start;gap:12px;padding:11px 16px;border-top:1px solid #F1EAE1;">
+  <span style="width:20px;height:20px;flex:0 0 20px;border-radius:999px;background:#B4562F;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">5</span>
+  <div style="flex:1 1 auto;min-width:0;">
+    <div style="font-size:12px;font-weight:700;line-height:1.4;">Assignments point at a person</div>
+    <div style="font-size:11px;color:#6B6058;margin-top:4px;line-height:1.5;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;">assignment.person_id, no FK to membership</div>
+  </div>
+</div>
+        
+<div style="display:flex;align-items:flex-start;gap:12px;padding:11px 16px;border-top:1px solid #F1EAE1;">
+  <span style="width:20px;height:20px;flex:0 0 20px;border-radius:999px;background:#B4562F;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">6</span>
+  <div style="flex:1 1 auto;min-width:0;">
+    <div style="font-size:12px;font-weight:700;line-height:1.4;">Address on the household, standing on the person</div>
+    <div style="font-size:11px;color:#6B6058;margin-top:4px;line-height:1.5;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;">household.address &middot; membership.standing</div>
+  </div>
+</div>
+        
+<div style="display:flex;align-items:flex-start;gap:12px;padding:11px 16px;border-top:1px solid #F1EAE1;">
+  <span style="width:20px;height:20px;flex:0 0 20px;border-radius:999px;background:#B4562F;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">7</span>
+  <div style="flex:1 1 auto;min-width:0;">
+    <div style="font-size:12px;font-weight:700;line-height:1.4;">One global table, everything else scoped</div>
+    <div style="font-size:11px;color:#6B6058;margin-top:4px;line-height:1.5;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;">person is global &middot; church_id on all the rest</div>
+  </div>
+</div>
+        <div style="padding:13px 16px;border-top:1px solid #E9E1D7;display:flex;align-items:flex-start;gap:10px;">
+          <span style="color:#9A7223;display:flex;padding-top:1px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.4"/><path d="M9.8 9.5a2.3 2.3 0 0 1 4.4.8c0 1.5-2.2 1.8-2.2 3.3"/><path d="M12 17.1h.01"/></svg></span>
+          <span style="font-size:11px;color:#6B6058;line-height:1.55;">Decision 7 is the one that looks like over-engineering on day one, when there is a single pilot church. It is also the only one that cannot be retrofitted &mdash; every other table can gain a column later, but making <span style="font-family:ui-monospace,monospace;font-weight:700;">person</span> global after it was per-church means rewriting every row and every join.</span>
+        </div></div>
+    </div>
+  </div>
+
+  <div style="background:#FFFFFF;border:1px solid #E9E1D7;border-radius:14px;"><div style="padding:18px 22px;display:flex;align-items:flex-start;gap:14px;">
+    <span style="color:#9A8F85;display:flex;padding-top:2px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10.6" width="14" height="9.4" rx="2.2"/><path d="M8.4 10.6V8.2a3.6 3.6 0 0 1 7.2 0v2.4"/></svg></span>
+    <div style="flex:1 1 auto;font-size:12px;color:#6B6058;line-height:1.6;max-width:1200px;">Deliberately absent, and each absence is a decision made on a screen: <span style="font-family:ui-monospace,monospace;">no attendance_rate, no engagement_score, no last_seen</span> &mdash; M23 refuses a count, and a column that exists will eventually be shown. <span style="font-family:ui-monospace,monospace;">No dismissed_prompts</span> table &mdash; M23 promised nothing is recorded, and W9 pays that promise when a leader hands over. <span style="font-family:ui-monospace,monospace;">No person.church_id</span> &mdash; that single field would quietly undo decisions 2 and 7 together.</div>
+  </div></div>
+</div>
+</x-dc>
+</body>
+</html>

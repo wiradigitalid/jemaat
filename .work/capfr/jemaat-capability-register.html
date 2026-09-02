@@ -1,0 +1,504 @@
+<title>Jemaat Capability Register</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style id="css">
+:root{
+  --paper:#F7F8FA; --surface:#FFFFFF; --ink:#16202B; --ink2:#4C5A69; --ink3:#8494A3;
+  --rule:#DDE3EA; --rule-soft:#EDF1F5; --accent:#1D4E7E; --accent-soft:#E7EEF5;
+  --oxide:#8C3A2E; --oxide-soft:#F7EBE8; --moss:#2F6B4F; --moss-soft:#E7F0EB;
+  --shade:#F1F4F7;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#111820; --surface:#18212B; --ink:#E6ECF2; --ink2:#A5B3C1; --ink3:#71818F;
+    --rule:#2A3542; --rule-soft:#212B36; --accent:#7FB2DE; --accent-soft:#1B2B3A;
+    --oxide:#D89184; --oxide-soft:#32231F; --moss:#8CC0A4; --moss-soft:#1B2A22;
+    --shade:#141C24;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#111820; --surface:#18212B; --ink:#E6ECF2; --ink2:#A5B3C1; --ink3:#71818F;
+  --rule:#2A3542; --rule-soft:#212B36; --accent:#7FB2DE; --accent-soft:#1B2B3A;
+  --oxide:#D89184; --oxide-soft:#32231F; --moss:#8CC0A4; --moss-soft:#1B2A22;
+  --shade:#141C24;
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--paper); color:var(--ink);
+  font-family:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
+  font-size:15px; line-height:1.6; -webkit-font-smoothing:antialiased;
+}
+.mono{font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace; font-variant-numeric:tabular-nums}
+.wrap{max-width:1160px; margin:0 auto; padding:52px 26px 90px}
+:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:2px}
+
+/* masthead */
+.eyebrow{font-family:"IBM Plex Mono",monospace; font-size:11px; font-weight:600;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--ink3)}
+h1{font-family:"Zilla Slab",Georgia,serif; font-weight:600; font-size:clamp(30px,4.2vw,44px);
+  line-height:1.1; letter-spacing:-.01em; margin:14px 0 0; text-wrap:balance}
+.standfirst{margin:15px 0 0; max-width:66ch; color:var(--ink2); font-size:15.5px}
+.masthead{border-bottom:2px solid var(--ink); padding-bottom:24px}
+
+/* toolbar */
+.bar{position:sticky; top:0; z-index:5; display:flex; flex-wrap:wrap; gap:12px;
+  align-items:center; padding:12px 0; margin-top:8px;
+  background:var(--paper); border-bottom:1px solid var(--rule)}
+.chips{display:flex; flex-wrap:wrap; gap:6px; flex:1 1 auto}
+.chip{font-family:"IBM Plex Sans",sans-serif; font-size:12.5px; font-weight:500;
+  color:var(--ink2); background:var(--surface); border:1px solid var(--rule);
+  border-radius:2px; padding:5px 9px; cursor:pointer; display:inline-flex; gap:7px; align-items:baseline}
+.chip:hover{border-color:var(--ink3)}
+.chip b{font-family:"IBM Plex Mono",monospace; font-size:11px; font-variant-numeric:tabular-nums; color:var(--ink3)}
+.chip.on{background:var(--ink); border-color:var(--ink); color:var(--paper)}
+.chip.on b{color:var(--paper); opacity:.7}
+
+.save{font-family:"IBM Plex Sans",sans-serif; font-size:13px; font-weight:600;
+  padding:8px 16px; border-radius:2px; border:1px solid var(--rule);
+  background:var(--surface); color:var(--ink3); cursor:default}
+.save.on{background:var(--accent); border-color:var(--accent); color:#fff; cursor:pointer}
+.save.ro{border-style:dashed}
+
+/* tally */
+.tally{display:flex; flex-wrap:wrap; gap:1px; background:var(--rule);
+  border:1px solid var(--rule); margin:22px 0 0}
+.tally > div{background:var(--surface); padding:13px 18px; flex:1 1 120px}
+.tally b{display:block; font-family:"Zilla Slab",Georgia,serif; font-size:26px;
+  font-weight:600; line-height:1.1; font-variant-numeric:tabular-nums}
+.tally span{display:block; font-size:12px; color:var(--ink3); margin-top:3px}
+.tally .ox b{color:var(--oxide)}
+.tally .mut b{color:var(--ink3)}
+
+/* capability */
+.cap{margin-top:30px; border:1px solid var(--rule); background:var(--surface)}
+.caphead{display:flex; gap:16px; align-items:flex-start; padding:16px 20px;
+  border-bottom:1px solid var(--rule); background:var(--shade)}
+.capid{font-size:12px; font-weight:600; color:var(--accent); padding-top:3px; white-space:nowrap}
+.capmain{flex:1 1 auto; min-width:0}
+.caphead h3{font-family:"Zilla Slab",Georgia,serif; font-size:18.5px; font-weight:600; margin:0}
+.caphead p{margin:5px 0 0; font-size:13px; color:var(--ink2); max-width:70ch}
+.capcount{margin-left:auto; font-size:11px; color:var(--ink3); white-space:nowrap; padding-top:5px}
+
+/* one requirement */
+.fr{display:grid; grid-template-columns:28px 72px 1fr 62px 118px 26px; gap:14px;
+  padding:11px 20px; border-bottom:1px solid var(--rule-soft); align-items:start}
+.fr:last-child{border-bottom:none}
+.fr.isnot{background:var(--oxide-soft); box-shadow:inset 3px 0 0 var(--oxide)}
+.fr.isoff{opacity:.42}
+.fr.isoff .frtext{text-decoration:line-through; text-decoration-color:var(--ink3)}
+
+.tick{display:inline-flex; align-items:center; justify-content:center;
+  width:28px; height:24px; cursor:pointer}
+.tick input{position:absolute; opacity:0; width:0; height:0}
+.tick span{width:16px; height:16px; border:1.5px solid var(--ink3); border-radius:2px; display:block}
+.tick input:checked + span{background:var(--accent); border-color:var(--accent);
+  background-image:linear-gradient(45deg,transparent 42%,#fff 42%,#fff 52%,transparent 52%),
+                   linear-gradient(-45deg,transparent 60%,#fff 60%,#fff 70%,transparent 70%)}
+.tick input:focus-visible + span{outline:2px solid var(--accent); outline-offset:2px}
+
+.frid{font-size:11.5px; font-weight:600; color:var(--ink3); white-space:nowrap; padding-top:3px}
+.fr.isnot .frid{color:var(--oxide)}
+.frbody{min-width:0}
+.frtext{font-size:14px; line-height:1.55; border-radius:2px; padding:1px 2px; margin:-1px -2px}
+.frtext:focus{background:var(--accent-soft); outline:none}
+.frtext:empty::before{content:"New requirement — write it as one testable sentence"; color:var(--ink3)}
+.nottag{font-family:"IBM Plex Mono",monospace; font-size:9.5px; font-weight:600;
+  letter-spacing:.1em; text-transform:uppercase; color:var(--oxide);
+  border:1px solid var(--oxide); border-radius:2px; padding:1px 5px; margin-right:5px;
+  white-space:nowrap; vertical-align:1px}
+
+.note{display:block; width:100%; margin-top:6px; resize:none; overflow:hidden;
+  font-family:"IBM Plex Sans",sans-serif; font-size:12.5px; line-height:1.5;
+  color:var(--ink2); background:transparent; border:none; border-left:2px solid var(--rule);
+  padding:1px 0 1px 9px}
+.note::placeholder{color:var(--ink3); opacity:.7}
+.note:focus{outline:none; border-left-color:var(--accent); color:var(--ink)}
+.note:not(:placeholder-shown){border-left-color:var(--accent)}
+
+.rel{font-family:"IBM Plex Mono",monospace; font-size:10px; font-weight:600;
+  letter-spacing:.04em; padding:3px 7px; border-radius:2px; border:1px solid transparent;
+  cursor:pointer; white-space:nowrap; margin-top:1px}
+.r0{background:var(--moss-soft); color:var(--moss)}
+.r1{background:var(--accent-soft); color:var(--accent)}
+.r2{background:var(--rule-soft); color:var(--ink2)}
+.rl{border-color:var(--rule); color:var(--ink3); background:transparent}
+.rel:hover{border-color:currentColor}
+
+.frev{font-size:11px; color:var(--ink3); padding-top:3px; border-radius:2px}
+.frev:focus{background:var(--accent-soft); color:var(--ink); outline:none}
+.frev:empty::before{content:"evidence"; opacity:.6}
+
+.kill{border:none; background:transparent; color:var(--ink3); font-size:17px; line-height:1;
+  cursor:pointer; padding:2px 4px; border-radius:2px}
+.kill:hover{color:var(--oxide); background:var(--oxide-soft)}
+
+.addfr{display:block; width:100%; text-align:left; padding:11px 20px;
+  border:none; border-top:1px dashed var(--rule); background:transparent;
+  font-family:"IBM Plex Sans",sans-serif; font-size:12.5px; font-weight:500;
+  color:var(--accent); cursor:pointer}
+.addfr:hover{background:var(--accent-soft)}
+
+.foot{margin-top:40px; padding-top:18px; border-top:1px solid var(--rule);
+  font-size:12.5px; color:var(--ink3); max-width:74ch}
+
+.toast{position:fixed; left:50%; bottom:26px; transform:translateX(-50%);
+  background:var(--ink); color:var(--paper); font-size:13px; padding:10px 16px;
+  border-radius:3px; z-index:20; max-width:min(560px,90vw)}
+
+@media (max-width:860px){
+  .fr{grid-template-columns:28px 1fr 26px; gap:10px}
+  .frid{grid-column:2; color:var(--accent); padding-top:0}
+  .frbody{grid-column:2}
+  .rel{grid-column:2; justify-self:start}
+  .frev{grid-column:2; padding-top:0}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none !important; transition:none !important}}
+</style>
+<script type="application/json" id="state">{"v":1,"savedAt":"2026-08-28","base":"","caps":[{"id":"01","name":"Church tenancy and discovery","what":"One app, many churches. What is written about a person may be written only by that person or by the church writing it — never by a third.","frs":[{"t":"A person record is global and holds two things only: the identity that signs them in — phone number and account — and what the person has stated about themselves. No church ever writes to it.","rel":0,"ev":"S5","not":true,"on":true,"note":"Q: 1 user = 1 aplikasi, data user langsung terlink ke gereja2 (1 SSOT)? — A: one account and one person row, yes. But the global row is written only by the person; everything a church typed lives on that church’s standing row. See FR-01.5 for the invariant that makes the redundancy safe."},{"t":"Everything a church knows about a person hangs off a standing row — one row per person per church — and never off the person.","rel":0,"ev":"S5","not":false,"on":true,"note":""},{"t":"A standing row carries the name and birth date as that church holds them, the standing value, the lifecycle, the date they joined that church, their household and role in it, and who at that church may see their phone number.","rel":0,"ev":"S5","not":false,"on":true,"note":""},{"t":"A household belongs to exactly one church. Two churches recording the same family hold two households, and neither can read or change the other’s.","rel":0,"ev":"S5","not":true,"on":true,"note":""},{"t":"What a church holds about a person may be written by that church, or by the person it describes. There is no third path, and no church is ever the second party to another church’s record.","rel":0,"ev":"S5","not":true,"on":true,"note":""},{"t":"A change made at one church — an address, a name, a household composition — never propagates to another. Church data crosses churches only by a transfer all three parties agreed to.","rel":0,"ev":"S5","not":true,"on":true,"note":""},{"t":"No screen, message or export may carry data belonging to a church other than the one in scope.","rel":0,"ev":"S5","not":true,"on":true,"note":""},{"t":"Two churches holding the same person see two unrelated standing rows. Neither is told the other exists, and no screen, count, search or export reveals where else that person stands.","rel":0,"ev":"S5","not":true,"on":true,"note":""},{"t":"When a number typed into the register already has a person record, the row is reused silently. No message, badge, match hint or duplicate warning tells the office that person is known anywhere else.","rel":0,"ev":"M5 · W5","not":true,"on":true,"note":""},{"t":"Nothing a person states ever changes what a church holds. A church’s record moves only when that church moves it.","rel":0,"ev":"S11 · W14","not":true,"on":true,"note":""},{"t":"A person states their own details once, in one place. The statement is a record of its own, beside every church archive and inside none of them.","rel":1,"ev":"M30 · S11","not":false,"on":true,"note":""},{"t":"A church can look up the stated value for anyone on its roll, see when it was stated, and adopt or keep it — one field at a time, never as a whole record.","rel":1,"ev":"W14 · W15","not":false,"on":true,"note":""},{"t":"Adopting is logged with the field, the value it replaced, the person who adopted it and the moment. The replaced value stays readable.","rel":1,"ev":"W15","not":false,"on":true,"note":""},{"t":"The sign-in number is global; the number a church reaches a person on is that church’s own field. Changing the first does not change the second — the church is shown they differ and decides.","rel":1,"ev":"S11 · W15","not":false,"on":true,"note":""},{"t":"Wherever a household is shown to a person, the church it belongs to is named beside it. Two churches holding different pictures of one family must read as two churches, never as a contradiction.","rel":1,"ev":"M32","not":false,"on":true,"note":""},{"t":"A person may remove a church from their own app without asking it. That church’s register is unchanged by their doing so.","rel":1,"ev":"not drawn","not":false,"on":true,"note":""},{"t":"A person signed in at more than one church switches between them explicitly. Exactly one church is in scope at a time.","rel":1,"ev":"not drawn","not":false,"on":true,"note":""},{"t":"A church is identified by a code of six to twelve characters, case-insensitive, excluding 0, 1, O and I.","rel":1,"ev":"O3","not":false,"on":true,"note":""},{"t":"A valid code shows the church name, city, service pattern and care group count for confirmation before anything is stored.","rel":1,"ev":"O4","not":false,"on":true,"note":""},{"t":"A church can be found by exact full name plus city. No browsable or enumerable list of churches may exist.","rel":1,"ev":"O1 · P10 · S10","not":true,"on":true,"note":""},{"t":"A church may set itself unlisted, after which only the code reaches it.","rel":1,"ev":"W4","not":false,"on":true,"note":""},{"t":"Rotating a code stops it working for new joins and changes nothing for anyone already following.","rel":1,"ev":"W4","not":false,"on":true,"note":""},{"t":"A church administrator edits their own church record without approval. Changes to name or city are logged with a person and a date.","rel":1,"ev":"not drawn","not":false,"on":true,"note":""},{"t":"A QR code encodes the same church code and resolves identically.","rel":"L","ev":"O2","not":false,"on":true,"note":""}]},{"id":"02","name":"Identity, sessions and roles","what":"An account exists because a church recorded a number, never because someone asked for one.","frs":[{"t":"Sign-in is a phone number plus a six-digit code sent over WhatsApp, with SMS as fallback.","rel":0,"ev":"P7 · P8","not":false,"on":true,"note":""},{"t":"There is no self-service account creation. An account exists only for a number the office has recorded.","rel":0,"ev":"P7","not":true,"on":true,"note":""},{"t":"Nobody — not the office, not the operator — can read or reuse another person’s sign-in code.","rel":0,"ev":"P11","not":true,"on":true,"note":""},{"t":"After two undelivered codes the system offers SMS, explains the likely causes, and names a person at that church to contact.","rel":1,"ev":"P11","not":false,"on":true,"note":""},{"t":"A session asks for the code again after twelve idle days.","rel":2,"ev":"M11","not":false,"on":true,"note":""},{"t":"The directory is fetched on demand and is never written to device storage.","rel":2,"ev":"S10","not":true,"on":true,"note":""},{"t":"Roles are granted per person per church: administrator, church office, care group leader.","rel":2,"ev":"W13","not":false,"on":true,"note":""},{"t":"A church must hold at least two administrators; the system refuses to leave exactly one.","rel":2,"ev":"W13","not":false,"on":true,"note":""},{"t":"Only an administrator grants or revokes a role. The church office role cannot.","rel":2,"ev":"W13","not":false,"on":true,"note":""},{"t":"Revoking a role takes effect at once and changes nothing about membership, household or history.","rel":2,"ev":"W13","not":false,"on":true,"note":""},{"t":"The role list shows when each holder last used their access.","rel":2,"ev":"W13","not":false,"on":true,"note":""}]},{"id":"03","name":"People and households","what":"The household holds the address. The person holds their standing. Six fields, two optional.","frs":[{"t":"A person is created from at most six fields — name, household, role in household, birth date, phone, standing — of which only the first three are required.","rel":0,"ev":"M5","not":false,"on":true,"note":""},{"t":"Role in household is one of head, spouse, child, other.","rel":0,"ev":"M4 · M5","not":false,"on":true,"note":""},{"t":"A household carries the address and the area, belongs to one church, and is never shared with another.","rel":0,"ev":"S5","not":false,"on":true,"note":""},{"t":"Changing a household address applies to every person in that household.","rel":0,"ev":"M4","not":false,"on":true,"note":""},{"t":"While a household name is typed, existing matches are offered above the option to create a new one.","rel":0,"ev":"M5","not":false,"on":true,"note":""},{"t":"A person chooses who sees their phone number — their care group, everyone signed in, or the office only — separately for each church they belong to.","rel":2,"ev":"M27","not":false,"on":true,"note":""},{"t":"A person can see everything the church holds about them, attendance included, and correct their own name, birth date and phone.","rel":"L","ev":"M27","not":false,"on":true,"note":""},{"t":"The head or spouse of a household may correct its address at their own church. The change is logged and appears in that church’s list of what changed.","rel":2,"ev":"M32 · W17","not":false,"on":true,"note":""},{"t":"Nobody but the office adds a person to a household or removes one from it.","rel":2,"ev":"W17 · M32","not":true,"on":true,"note":""},{"t":"An office is shown what its own members changed about themselves since it last looked.","rel":2,"ev":"W16","not":false,"on":true,"note":""},{"t":"No member-facing deletion of their own record is offered. The register is the church’s record.","rel":"L","ev":"M27","not":true,"on":true,"note":""}]},{"id":"04","name":"Standing and lifecycle","what":"Two separate fields. What someone is to this church, and whether they are still with it.","frs":[{"t":"The standing value is one of guest, community, registered.","rel":0,"ev":"S5","not":false,"on":true,"note":""},{"t":"The absence of a standing row means the person is not on that roll — and they can still be scheduled.","rel":0,"ev":"S5 · W3","not":false,"on":true,"note":""},{"t":"Displayed standing labels are configurable per church. The stored values are not.","rel":1,"ev":"S5","not":false,"on":true,"note":""},{"t":"Lifecycle is one of active, inactive, transferred out, deceased, and is a field separate from standing.","rel":2,"ev":"W6","not":false,"on":true,"note":""},{"t":"Deceased or transferred out removes the person from birthdays, rosters, open slots, all counts and every outbound message.","rel":2,"ev":"W6","not":false,"on":true,"note":""},{"t":"The same change leaves attendance, hosting and serving history untouched, and the household intact.","rel":2,"ev":"W6","not":false,"on":true,"note":""},{"t":"No record is deleted by a lifecycle change. Only the office may set one, and it is reversible.","rel":2,"ev":"W6","not":true,"on":true,"note":""},{"t":"A deceased person appears to their own household under in memory, with no status badge.","rel":2,"ev":"M4","not":false,"on":true,"note":""}]},{"id":"05","name":"Applications and confirmation","what":"The office is the gate, and the gate has no reject.","frs":[{"t":"An applicant gives a name, a phone number, and what they are asking for — stated as a situation, not as a standing label.","rel":1,"ev":"P5","not":false,"on":true,"note":""},{"t":"The form carries explicit consent to be messaged, scoped to services, care group, and things asked of them.","rel":1,"ev":"P5","not":false,"on":true,"note":""},{"t":"An unconfirmed applicant keeps everything a guest has and is told the application stays open.","rel":1,"ev":"P6 · P9","not":false,"on":true,"note":""},{"t":"Confirming sets the standing, places the person in a household, and optionally in a care group, in one action.","rel":1,"ev":"W1","not":false,"on":true,"note":""},{"t":"No decline action exists. The furthest available is marking an application as needing a conversation.","rel":1,"ev":"W1 · P9","not":true,"on":true,"note":""},{"t":"That state names a person at the church and a way to reach them.","rel":1,"ev":"P9","not":false,"on":true,"note":""}]},{"id":"06","name":"Care groups","what":"Belonging to a group is its own relation. It never touches anyone’s membership.","frs":[{"t":"A care group has a name, an area, a weekday, a time and a leader.","rel":0,"ev":"M6 · M7","not":false,"on":true,"note":""},{"t":"Care group membership is a relation between a person and a group, independent of standing.","rel":0,"ev":"S5","not":false,"on":true,"note":""},{"t":"A person of any standing, guest included, may lead a care group.","rel":0,"ev":"W13","not":false,"on":true,"note":""},{"t":"Handing a group over can be immediate, dated, or preceded by a co-leader period.","rel":2,"ev":"W9","not":false,"on":true,"note":""},{"t":"A handover carries the member list, meeting history and hosting rota — and never dismissed prompts or anything written in confidence.","rel":2,"ev":"W9","not":true,"on":true,"note":""},{"t":"Above roughly fifteen groups, groups are reached by area, each area having a coordinator.","rel":"L","ev":"M25","not":false,"on":true,"note":""},{"t":"The system reports how many people belong to no care group.","rel":"L","ev":"M25","not":false,"on":true,"note":""}]},{"id":"07","name":"Meetings, RSVP and attendance","what":"What someone said and what actually happened are two different facts.","frs":[{"t":"A meeting belongs to a care group and has a date, a time and a host household.","rel":0,"ev":"M7 · M8","not":false,"on":true,"note":""},{"t":"A member answers going, cannot, or not sure — in the app or by replying to a message.","rel":0,"ev":"M8","not":false,"on":true,"note":""},{"t":"The answer and the attendance are stored separately.","rel":0,"ev":"S5","not":false,"on":true,"note":""},{"t":"A leader records attendance at one tap per person, with no typing.","rel":0,"ev":"M14","not":false,"on":true,"note":""},{"t":"A first-time visitor is added to attendance by name alone.","rel":0,"ev":"M14","not":false,"on":true,"note":""},{"t":"A leader may answer on behalf of someone with no phone on file.","rel":0,"ev":"M14","not":false,"on":true,"note":""},{"t":"After saving, the leader is shown who said yes and did not come, who is new, and how the group has grown.","rel":0,"ev":"M26","not":false,"on":true,"note":""},{"t":"No per-person attendance rate, score or percentage is computed or shown to anyone but that person.","rel":0,"ev":"S5 · M23","not":true,"on":true,"note":""}]},{"id":"08","name":"Hosting rota","what":"Open dates are visible to everyone and claimed by the person themselves.","frs":[{"t":"Open hosting dates for a group are visible to every member of it.","rel":0,"ev":"M9","not":false,"on":true,"note":""},{"t":"A member claims an open date directly. No approval step stands in the way.","rel":0,"ev":"M9","not":false,"on":true,"note":""},{"t":"Tasks within a date — the devotion, the food — are claimable separately.","rel":0,"ev":"M9","not":false,"on":true,"note":""},{"t":"Whatever rota rule is in force is displayed as text on the screen.","rel":0,"ev":"M9","not":false,"on":true,"note":""},{"t":"Dates become claimable on a stated day and not before.","rel":0,"ev":"M9","not":false,"on":true,"note":""}]},{"id":"09","name":"Serving teams and assignments","what":"A slot points at a person, which is why a borrowed pianist needs no membership.","frs":[{"t":"A team belongs to a church and has members.","rel":"L","ev":"M10","not":false,"on":true,"note":""},{"t":"A slot belongs to a service or a meeting and names a role.","rel":"L","ev":"W3","not":false,"on":true,"note":""},{"t":"An assignment references a person and never requires a standing row in that church.","rel":"L","ev":"S5 · W3","not":true,"on":true,"note":""},{"t":"Assigning offers team members first, then people on the roll, then past guests with how many times each was used.","rel":"L","ev":"M12","not":false,"on":true,"note":""},{"t":"A typed name with no match is kept as a reusable guest. A name alone is sufficient.","rel":"L","ev":"M13","not":false,"on":true,"note":""},{"t":"A guest is shown distinctly from someone on the roll wherever they appear.","rel":"L","ev":"W2 · W3","not":false,"on":true,"note":""},{"t":"Where a church runs more than one service, an assignment states which, and flags when it is not the one that person attends.","rel":"L","ev":"M24","not":false,"on":true,"note":""}]},{"id":"10","name":"The weekly publication","what":"A church thinks in weeks, not modules. One form on a Thursday feeds four surfaces.","frs":[{"t":"One form per week carries the service, the speaker, the series, the poster, the announcements and last week’s recording.","rel":0,"ev":"W8","not":false,"on":true,"note":""},{"t":"Publishing updates the public screens and every member’s week at once. There are no separate modules to keep in step.","rel":0,"ev":"W8","not":false,"on":true,"note":""},{"t":"The date and time come from the church’s worship-day setting, not from a per-week entry.","rel":0,"ev":"W8 · S5","not":false,"on":true,"note":""},{"t":"A speaker may be someone on the roll or a guest, chosen with the same picker as any assignment.","rel":0,"ev":"W8","not":false,"on":true,"note":""},{"t":"The poster is optional. Without one, the title is rendered instead.","rel":0,"ev":"W8","not":false,"on":true,"note":""},{"t":"An announcement carries an author and an optional expiry; unticked ones persist to the following week.","rel":0,"ev":"W8","not":false,"on":true,"note":""},{"t":"The whole form is operable on a phone, the poster upload excepted.","rel":0,"ev":"S9","not":false,"on":true,"note":""},{"t":"The office is shown whether last week was opened, how many groups recorded attendance, and how many applicants are waiting.","rel":0,"ev":"W8","not":false,"on":true,"note":""},{"t":"No public screen shows member names, member counts or leader names.","rel":0,"ev":"P1 · P2 · P3 · S10","not":true,"on":true,"note":""}]},{"id":"11","name":"Messaging and notifications","what":"If a person has to do something it goes to WhatsApp. If it is only nice to know, push is enough.","frs":[{"t":"A message a person must act on is sent over WhatsApp.","rel":0,"ev":"S7","not":false,"on":true,"note":""},{"t":"Nothing pastoral is sent automatically on any channel.","rel":0,"ev":"S7 · M23","not":true,"on":true,"note":""},{"t":"Times are stored as instants with the church’s zone and rendered local. No date arithmetic happens in the client.","rel":0,"ev":"W12","not":false,"on":true,"note":""},{"t":"A message that is only informational is sent as a push notification.","rel":1,"ev":"S7","not":false,"on":true,"note":""},{"t":"The care group invitation carries reply buttons that record an answer without opening the app.","rel":1,"ev":"S8","not":false,"on":true,"note":""},{"t":"A church may switch WhatsApp off entirely and run on push alone.","rel":1,"ev":"W4","not":false,"on":true,"note":""},{"t":"Setup states plainly that enabling WhatsApp passes member numbers to a messaging provider.","rel":1,"ev":"W4","not":false,"on":true,"note":""},{"t":"A serving duty message carries the call time and a confirm button.","rel":"L","ev":"S8","not":false,"on":true,"note":""}]},{"id":"12","name":"Register intake and hygiene","what":"The data arrives as a spreadsheet and it is never clean. Nothing is rejected; nothing lands half done.","frs":[{"t":"An empty register offers the household concept and a stated order to work in, before anything is typed.","rel":0,"ev":"W11","not":false,"on":true,"note":""},{"t":"An import maps the file’s own column names onto fields, and skips the columns nobody wants.","rel":1,"ev":"W5","not":false,"on":true,"note":""},{"t":"Households are inferred by a stated rule, with a live count shown before anything is committed.","rel":1,"ev":"W5","not":false,"on":true,"note":""},{"t":"No row is rejected. Rows with problems import flagged.","rel":1,"ev":"W5","not":false,"on":true,"note":""},{"t":"If any part of an import fails, none of it lands.","rel":1,"ev":"W5","not":true,"on":true,"note":""},{"t":"An import is reversible for thirty days.","rel":1,"ev":"W5","not":false,"on":true,"note":""},{"t":"Candidate duplicates are surfaced and merged field by field.","rel":2,"ev":"W12","not":false,"on":true,"note":""},{"t":"A merge never replaces a value with an empty one.","rel":2,"ev":"W12","not":true,"on":true,"note":""},{"t":"Merged histories are summed, never chosen between.","rel":2,"ev":"W12","not":false,"on":true,"note":""},{"t":"A merge is reversible for thirty days and keeps both records underneath until then.","rel":2,"ev":"W12","not":false,"on":true,"note":""}]},{"id":"13","name":"Portability and transfer","what":"A church that could always leave is a church that will consider entering.","frs":[{"t":"The office can download the whole register at any moment, with no request and no waiting period.","rel":2,"ev":"W10","not":false,"on":true,"note":""},{"t":"Data leaves as spreadsheets, plus one machine-readable file that holds everything.","rel":2,"ev":"W10","not":false,"on":true,"note":""},{"t":"Addresses are excluded from an export unless they are explicitly asked for.","rel":2,"ev":"W10","not":true,"on":true,"note":""},{"t":"Every download is logged with a person and a date, and only an administrator may perform one.","rel":2,"ev":"W10","not":false,"on":true,"note":""},{"t":"Closing a church stops its code and removes it from members’ apps. Nothing is deleted for thirty days.","rel":2,"ev":"W10","not":false,"on":true,"note":""},{"t":"A membership transfer requires the person, the origin office and the receiving office to agree.","rel":"L","ev":"M22","not":false,"on":true,"note":""},{"t":"A transfer carries name, birth date, household composition, sacrament dates and the original joining date — and never attendance, giving or pastoral records.","rel":"L","ev":"M22 · W7","not":true,"on":true,"note":""},{"t":"A transfer is verifiable whether it arrives as data or as a printed letter with a reference.","rel":"L","ev":"W7","not":false,"on":true,"note":""},{"t":"Where no letter exists at all, the receiving church may confirm the person as community and resolve it afterwards.","rel":"L","ev":"W7","not":false,"on":true,"note":""}]},{"id":"14","name":"Platform operation","what":"Someone has to bring a church into being — and that someone must never be able to read inside one.","frs":[{"t":"A church exists only when a platform operator creates it. Nothing inside the app brings a church into being.","rel":0,"ev":"not drawn","not":true,"on":true,"note":""},{"t":"Platform operator is a role over the whole installation, granted outside every church, and it alone creates, suspends, restores or closes one.","rel":0,"ev":"not drawn","not":false,"on":true,"note":""},{"t":"An operator reads the church record only — name, city, code, status, created date, last active. Never a person, a household, a group, a message, nor a count of any of them.","rel":0,"ev":"not drawn","not":true,"on":true,"note":""},{"t":"A church record carries a status: requested, active, suspended or closed.","rel":0,"ev":"not drawn","not":false,"on":true,"note":""},{"t":"Creating a church takes its name, city, worship-day setting and one contact person, and issues the code.","rel":0,"ev":"not drawn","not":false,"on":true,"note":""},{"t":"The installation refuses to be left with no operator, and granting or revoking the role is itself logged.","rel":0,"ev":"not drawn","not":false,"on":true,"note":""},{"t":"A church is requested on a public form giving church name, city and one contact person.","rel":1,"ev":"not drawn","not":false,"on":true,"note":""},{"t":"A request may be declined with a reason recorded. CAP-05 governs a person asking to belong; this governs an organisation asking for an account, and they are not the same thing.","rel":1,"ev":"not drawn","not":false,"on":true,"note":""},{"t":"Approving a request issues the code to the named contact over the same channel the app signs people in with.","rel":1,"ev":"not drawn","not":false,"on":true,"note":""},{"t":"An operator can suspend a church: its code stops working, its public screens go dark, its members are shown a stated message, and nothing is deleted. It is reversible, and the data is kept at least thirty days.","rel":1,"ev":"not drawn","not":false,"on":true,"note":""},{"t":"Every operator action against a church is logged with the operator, the church and the moment, and no operator can edit that log.","rel":1,"ev":"not drawn","not":true,"on":true,"note":""},{"t":"The operator console is its own surface and is never rendered inside a church’s web office.","rel":1,"ev":"not drawn","not":true,"on":true,"note":""},{"t":"An installation may be configured for a single church, in which case no request form, no operator console and no church switcher is shown.","rel":2,"ev":"not drawn","not":false,"on":true,"note":""}]}]}</script>
+<div id="root"></div>
+<script id="app">
+(function () {
+  'use strict';
+
+  var RELS = [
+    { k: 0,   label: 'R0',    cls: 'r0', title: 'Pilot church' },
+    { k: 1,   label: 'R1',    cls: 'r1', title: 'Open the doors' },
+    { k: 2,   label: 'R2',    cls: 'r2', title: 'Keep the promises' },
+    { k: 'L', label: 'later', cls: 'rl', title: 'Parked, with a reason' }
+  ];
+  var relOf = function (k) { return RELS.find(function (r) { return String(r.k) === String(k); }) || RELS[3]; };
+
+  var root  = document.getElementById('root');
+  var state = JSON.parse(document.getElementById('state').textContent);
+  var api   = null;          // the artifact namespace, once it resolves
+  var mode  = 'unknown';     // unknown | writable | readonly
+  var dirty = false;
+  var filter = 'all';        // local only, never saved
+  var STASH  = 'jemaat-register-stash';
+
+  /* ---------- helpers ---------- */
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+  function fingerprint(o) {
+    var s = JSON.stringify(o), h = 5381;
+    for (var i = 0; i < s.length; i++) { h = ((h << 5) + h + s.charCodeAt(i)) | 0; }
+    return s.length + ':' + h;
+  }
+  var allFrs = function () {
+    return state.caps.reduce(function (a, c) { return a.concat(c.frs); }, []);
+  };
+  var counts = function () {
+    var f = allFrs();
+    var on = f.filter(function (x) { return x.on !== false; });
+    return {
+      total: f.length,
+      on: on.length,
+      off: f.length - on.length,
+      r0: on.filter(function (x) { return String(x.rel) === '0'; }).length,
+      r1: on.filter(function (x) { return String(x.rel) === '1'; }).length,
+      r2: on.filter(function (x) { return String(x.rel) === '2'; }).length,
+      later: on.filter(function (x) { return String(x.rel) === 'L'; }).length,
+      nots: on.filter(function (x) { return x.not; }).length,
+      notes: f.filter(function (x) { return (x.note || '').trim(); }).length
+    };
+  };
+  function passes(fr) {
+    if (filter === 'all') return true;
+    if (filter === 'notes') return !!(fr.note || '').trim();
+    if (filter === 'off') return fr.on === false;
+    if (filter === 'not') return !!fr.not && fr.on !== false;
+    return String(fr.rel) === filter && fr.on !== false;
+  }
+
+  /* ---------- persistence ---------- */
+  var stashTimer = null;
+  function touch() {
+    dirty = true;
+    paintSave();
+    clearTimeout(stashTimer);
+    stashTimer = setTimeout(function () {
+      try {
+        sessionStorage.setItem(STASH, JSON.stringify({ base: state.base, state: state }));
+      } catch (e) { /* private window, quota, or a host that blocks storage */ }
+    }, 500);
+  }
+  function restoreStash() {
+    try {
+      var raw = sessionStorage.getItem(STASH);
+      if (!raw) return false;
+      var s = JSON.parse(raw);
+      if (!s || s.base !== state.base) { sessionStorage.removeItem(STASH); return false; }
+      state = s.state; dirty = true; return true;
+    } catch (e) { return false; }
+  }
+
+  /* ---------- the document this page publishes as its next version ---------- */
+  function renderDocument() {
+    var css = document.getElementById('css').textContent;
+    var app = document.getElementById('app').textContent;
+    var out = JSON.parse(JSON.stringify(state));
+    out.base = fingerprint(out.caps);
+    out.savedAt = new Date().toISOString().slice(0, 10);
+    return '<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n' +
+      '<meta name="viewport" content="width=device-width,initial-scale=1">\n' +
+      '<title>Jemaat Capability Register</title>\n' +
+      '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">\n' +
+      '<style id="css">' + css + '</style>\n</head>\n<body>\n' +
+      '<script type="application/json" id="state">' + JSON.stringify(out) + '<\/script>\n' +
+      '<div id="root"></div>\n' +
+      '<script id="app">' + app + '<\/script>\n</body>\n</html>';
+  }
+
+  /* ---------- save ---------- */
+  function paintSave() {
+    var b = document.getElementById('save');
+    if (!b) return;
+    if (mode === 'readonly') {
+      b.textContent = 'Read only'; b.disabled = true; b.className = 'save ro'; return;
+    }
+    b.disabled = !dirty;
+    b.className = 'save' + (dirty ? ' on' : '');
+    b.textContent = dirty ? 'Save changes' : 'Saved';
+  }
+  function saveNow() {
+    if (!api || !dirty || mode === 'readonly') return;
+    var b = document.getElementById('save');
+    b.disabled = true; b.textContent = 'Saving…';
+    api.publish(renderDocument()).then(function () {
+      try { sessionStorage.removeItem(STASH); } catch (e) {}
+      // this view reloads to the new version; nothing else to do
+    }).catch(function (err) {
+      var code = (err && err.code) || 'upstream_error';
+      if (code === 'not_writer' || code === 'not_granted' || code === 'not_declared' ||
+          code === 'capability_disabled' || code === 'capability_removed' ||
+          code === 'consent_required') {
+        mode = 'readonly'; paintSave(); note('This view can read but not save. Your edits stay on screen.');
+        return;
+      }
+      if (code === 'conflict') { note('Someone saved first — reloading to their version.'); return; }
+      if (code === 'too_large') { note('Too large to save. Remove a few notes and try again.'); }
+      else if (code === 'rate_limited') { note('Saving too often. Wait a moment and press Save again.'); }
+      else { note('Could not save just now. Your edits are still here — try Save again.'); }
+      paintSave();
+    });
+  }
+  function note(msg) {
+    var n = document.getElementById('toast');
+    n.textContent = msg; n.hidden = false;
+    clearTimeout(note._t); note._t = setTimeout(function () { n.hidden = true; }, 6000);
+  }
+
+  /* ---------- render ---------- */
+  function frRow(cap, fr, i) {
+    var r = relOf(fr.rel);
+    var off = fr.on === false;
+    return '' +
+    '<div class="fr' + (fr.not ? ' isnot' : '') + (off ? ' isoff' : '') + '" data-c="' + cap.id + '" data-i="' + i + '">' +
+      '<label class="tick"><input type="checkbox" ' + (off ? '' : 'checked') + ' data-act="toggle" aria-label="Include this requirement"><span></span></label>' +
+      '<div class="frid mono">FR-' + cap.id + '.' + (i + 1) + '</div>' +
+      '<div class="frbody">' +
+        '<div class="frtext" contenteditable="true" spellcheck="false" data-act="text">' +
+          (fr.not ? '<b class="nottag" contenteditable="false">must not</b> ' : '') + esc(fr.t) +
+        '</div>' +
+        '<textarea class="note" rows="1" placeholder="Add a note…" data-act="note">' + esc(fr.note || '') + '</textarea>' +
+      '</div>' +
+      '<button class="rel ' + r.cls + '" data-act="rel" title="' + r.title + ' — click to change">' + r.label + '</button>' +
+      '<div class="frev mono" contenteditable="true" spellcheck="false" data-act="ev">' + esc(fr.ev || '') + '</div>' +
+      '<button class="kill" data-act="kill" title="Remove this requirement" aria-label="Remove">×</button>' +
+    '</div>';
+  }
+  function capBlock(cap) {
+    var rows = cap.frs.map(function (fr, i) { return passes(fr) ? frRow(cap, fr, i) : ''; }).join('');
+    var shown = cap.frs.filter(passes).length;
+    if (!shown && filter !== 'all') return '';
+    return '' +
+    '<section class="cap" data-c="' + cap.id + '">' +
+      '<header class="caphead">' +
+        '<div class="capid mono">CAP-' + cap.id + '</div>' +
+        '<div class="capmain"><h3 contenteditable="true" spellcheck="false" data-act="capname">' + esc(cap.name) + '</h3>' +
+        '<p>' + esc(cap.what) + '</p></div>' +
+        '<div class="capcount mono">' + shown + (shown === cap.frs.length ? '' : ' of ' + cap.frs.length) + ' FR</div>' +
+      '</header>' +
+      '<div class="frs">' + rows + '</div>' +
+      '<button class="addfr" data-act="add">+ Add a requirement to CAP-' + cap.id + '</button>' +
+    '</section>';
+  }
+  function chip(id, label, n) {
+    return '<button class="chip' + (filter === id ? ' on' : '') + '" data-filter="' + id + '">' +
+      label + '<b>' + n + '</b></button>';
+  }
+  function render() {
+    var c = counts();
+    root.innerHTML = '' +
+    '<div class="wrap">' +
+      '<div class="masthead">' +
+        '<div class="eyebrow">Working draft &middot; edit here, then save</div>' +
+        '<h1>Jemaat Capability Register</h1>' +
+        '<p class="standfirst">' + state.caps.length + ' capabilities read off the 70-artboard design, each requirement naming the screen that is its evidence. Untick what does not belong, change a release, leave a note, add what is missing. Saving keeps it for everyone with the link &mdash; and makes it readable back into an SRS.</p>' +
+      '</div>' +
+
+      '<div class="bar">' +
+        '<div class="chips">' +
+          chip('all', 'All', c.total) +
+          chip('0', 'R0', c.r0) + chip('1', 'R1', c.r1) + chip('2', 'R2', c.r2) + chip('L', 'Later', c.later) +
+          chip('not', 'Must not', c.nots) +
+          chip('notes', 'With notes', c.notes) +
+          chip('off', 'Excluded', c.off) +
+        '</div>' +
+        '<button class="save" id="save">Saved</button>' +
+      '</div>' +
+
+      '<div class="tally">' +
+        '<div><b>' + c.on + '</b><span>in scope</span></div>' +
+        '<div><b>' + c.r0 + '</b><span>R0, the pilot</span></div>' +
+        '<div><b>' + c.r1 + '</b><span>R1</span></div>' +
+        '<div><b>' + c.r2 + '</b><span>R2</span></div>' +
+        '<div><b>' + c.later + '</b><span>parked</span></div>' +
+        '<div class="ox"><b>' + c.nots + '</b><span>must not</span></div>' +
+        '<div class="mut"><b>' + c.off + '</b><span>excluded</span></div>' +
+      '</div>' +
+
+      state.caps.map(capBlock).join('') +
+
+      '<p class="foot">Extracted from 70 artboards over 41 design iterations. Nothing here is built. Requirement numbers renumber as rows are added or removed, so they are not stable identifiers until an SRS registers them.' +
+      (state.savedAt ? ' Last saved ' + esc(state.savedAt) + '.' : '') + '</p>' +
+    '</div>' +
+    '<div class="toast" id="toast" hidden></div>';
+    paintSave();
+    sizeNotes();
+  }
+  function sizeNotes() {
+    root.querySelectorAll('textarea.note').forEach(function (t) {
+      t.style.height = 'auto';
+      t.style.height = (t.scrollHeight + 2) + 'px';
+    });
+  }
+
+  /* ---------- locate the model behind a row ---------- */
+  function find(el) {
+    var row = el.closest('.fr');
+    if (!row) return null;
+    var cap = state.caps.find(function (c) { return c.id === row.dataset.c; });
+    return cap ? { cap: cap, i: +row.dataset.i, fr: cap.frs[+row.dataset.i], row: row } : null;
+  }
+
+  /* ---------- events ---------- */
+  root.addEventListener('click', function (e) {
+    var f = e.target.closest('[data-filter]');
+    if (f) { filter = f.dataset.filter; render(); return; }
+    if (e.target.id === 'save') { saveNow(); return; }
+
+    var btn = e.target.closest('[data-act]');
+    if (!btn) return;
+    var act = btn.dataset.act;
+
+    if (act === 'add') {
+      var cid = btn.closest('.cap').dataset.c;
+      var cap = state.caps.find(function (c) { return c.id === cid; });
+      cap.frs.push({ t: '', rel: 0, ev: '', not: false, on: true, note: '' });
+      touch(); filter = 'all'; render();
+      var rows = root.querySelectorAll('.cap[data-c="' + cid + '"] .fr .frtext');
+      var last = rows[rows.length - 1];
+      if (last) { last.focus(); }
+      return;
+    }
+    if (act === 'kill') {
+      var h = find(btn); if (!h) return;
+      h.cap.frs.splice(h.i, 1); touch(); render(); return;
+    }
+    if (act === 'rel') {
+      var g = find(btn); if (!g) return;
+      var idx = RELS.findIndex(function (r) { return String(r.k) === String(g.fr.rel); });
+      g.fr.rel = RELS[(idx + 1) % RELS.length].k;
+      touch();
+      var nr = relOf(g.fr.rel);
+      btn.className = 'rel ' + nr.cls; btn.textContent = nr.label; btn.title = nr.title + ' — click to change';
+      refreshCounts();
+      return;
+    }
+  });
+
+  root.addEventListener('change', function (e) {
+    if (e.target.dataset.act !== 'toggle') return;
+    var h = find(e.target); if (!h) return;
+    h.fr.on = e.target.checked;
+    h.row.classList.toggle('isoff', !e.target.checked);
+    touch(); refreshCounts();
+  });
+
+  root.addEventListener('input', function (e) {
+    var act = e.target.dataset.act;
+    if (act === 'note') {
+      var h = find(e.target); if (!h) return;
+      h.fr.note = e.target.value;
+      e.target.style.height = 'auto'; e.target.style.height = (e.target.scrollHeight + 2) + 'px';
+      touch(); return;
+    }
+    if (act === 'text') {
+      var g = find(e.target); if (!g) return;
+      var clone = e.target.cloneNode(true);
+      var tag = clone.querySelector('.nottag'); if (tag) tag.remove();
+      g.fr.t = clone.textContent.trim();
+      touch(); return;
+    }
+    if (act === 'ev') {
+      var k = find(e.target); if (!k) return;
+      k.fr.ev = e.target.textContent.trim(); touch(); return;
+    }
+    if (act === 'capname') {
+      var cap = state.caps.find(function (c) { return c.id === e.target.closest('.cap').dataset.c; });
+      if (cap) { cap.name = e.target.textContent.trim(); touch(); }
+    }
+  });
+
+  /* keep contenteditable to plain text */
+  root.addEventListener('paste', function (e) {
+    if (!e.target.isContentEditable) return;
+    e.preventDefault();
+    var t = (e.clipboardData || window.clipboardData).getData('text');
+    document.execCommand('insertText', false, t.replace(/\s+/g, ' '));
+  });
+  root.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && e.target.isContentEditable) { e.preventDefault(); e.target.blur(); }
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') { e.preventDefault(); saveNow(); }
+  });
+
+  function refreshCounts() {
+    var c = counts();
+    var t = root.querySelectorAll('.tally b');
+    if (t.length >= 7) {
+      var vals = [c.on, c.r0, c.r1, c.r2, c.later, c.nots, c.off];
+      for (var i = 0; i < 7; i++) t[i].textContent = vals[i];
+    }
+    root.querySelectorAll('.chip').forEach(function (ch) {
+      var m = { all: c.total, '0': c.r0, '1': c.r1, '2': c.r2, L: c.later, not: c.nots, notes: c.notes, off: c.off };
+      var b = ch.querySelector('b'); if (b) b.textContent = m[ch.dataset.filter];
+    });
+  }
+
+  window.addEventListener('beforeunload', function (e) {
+    if (dirty && mode !== 'readonly') { e.preventDefault(); e.returnValue = ''; }
+  });
+
+  /* ---------- boot ---------- */
+  if (!state.base) state.base = fingerprint(state.caps);
+  var restored = restoreStash();
+  render();
+  if (restored) note('Unsaved edits from this session were put back.');
+
+  if (window.claude && typeof window.claude.use === 'function') {
+    window.claude.use('artifact').then(function (ns) {
+      api = ns;
+      if (!ns) { mode = 'readonly'; }
+      else if (mode === 'unknown') { mode = 'writable'; }
+      paintSave();
+    }).catch(function () { mode = 'readonly'; paintSave(); });
+  } else {
+    mode = 'readonly'; paintSave();
+  }
+})();
+</script>

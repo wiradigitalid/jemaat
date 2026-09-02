@@ -1,0 +1,240 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
+  <style>
+    body { margin: 0; background: #FAF7F2; color: #241E1A; font-family: "Plus Jakarta Sans", "Segoe UI", system-ui, sans-serif; -webkit-font-smoothing: antialiased; text-wrap: pretty; }
+    a { color: #B4562F; text-decoration: none; }
+    a:hover { color: #8E4224; }
+    * { box-sizing: border-box; }
+  </style>
+</helmet>
+
+<div style="width:1440px;height:1180px;background:#FAF7F2;display:flex;flex-direction:column;padding:40px;gap:20px;">
+  <div>
+    <div style="font-family:"Newsreader", Georgia, "Times New Roman", serif;font-size:34px;font-weight:500;letter-spacing:-0.015em;">The system, as a build spec</div>
+    <div style="font-size:13px;color:#6B6058;margin-top:8px;line-height:1.55;max-width:940px;">Same values as the canvas, in the form a build needs. Flutter wants a ThemeData, React wants custom properties, and neither wants to read a JavaScript file to find out what a colour is for.</div>
+  </div>
+
+  <div style="display:flex;gap:20px;flex:1 1 auto;min-height:0;">
+
+    <div style="width:472px;flex:0 0 472px;">
+      <div style="background:#FFFFFF;border:1px solid #E9E1D7;border-radius:14px;">
+        <div style="padding:15px 16px 8px;"><div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#9A8F85;">Palette &middot; eleven, and no twelfth</div></div>
+        
+<div style="display:flex;align-items:center;gap:13px;padding:9px 16px;">
+  <div style="width:34px;height:34px;flex:0 0 34px;border-radius:12px;background:#FAF7F2;border:1px solid #E9E1D7;"></div>
+  <div style="width:104px;flex:0 0 104px;font-size:12px;font-weight:700;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;">#FAF7F2</div>
+  <div style="width:96px;flex:0 0 96px;font-size:12px;font-weight:600;">bg</div>
+  <div style="flex:1 1 auto;font-size:11px;color:#6B6058;line-height:1.45;">Every page. Never white - white reads as a form, cream reads as paper</div>
+</div>
+        
+<div style="display:flex;align-items:center;gap:13px;padding:9px 16px;">
+  <div style="width:34px;height:34px;flex:0 0 34px;border-radius:12px;background:#FFFFFF;border:1px solid #E9E1D7;"></div>
+  <div style="width:104px;flex:0 0 104px;font-size:12px;font-weight:700;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;">#FFFFFF</div>
+  <div style="width:96px;flex:0 0 96px;font-size:12px;font-weight:600;">surface</div>
+  <div style="flex:1 1 auto;font-size:11px;color:#6B6058;line-height:1.45;">Cards and inputs only. The contrast with bg IS the card</div>
+</div>
+        
+<div style="display:flex;align-items:center;gap:13px;padding:9px 16px;">
+  <div style="width:34px;height:34px;flex:0 0 34px;border-radius:12px;background:#241E1A;border:1px solid #E9E1D7;"></div>
+  <div style="width:104px;flex:0 0 104px;font-size:12px;font-weight:700;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;">#241E1A</div>
+  <div style="width:96px;flex:0 0 96px;font-size:12px;font-weight:600;">ink</div>
+  <div style="flex:1 1 auto;font-size:11px;color:#6B6058;line-height:1.45;">All primary text</div>
+</div>
+        
+<div style="display:flex;align-items:center;gap:13px;padding:9px 16px;">
+  <div style="width:34px;height:34px;flex:0 0 34px;border-radius:12px;background:#6B6058;border:1px solid #E9E1D7;"></div>
+  <div style="width:104px;flex:0 0 104px;font-size:12px;font-weight:700;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;">#6B6058</div>
+  <div style="width:96px;flex:0 0 96px;font-size:12px;font-weight:600;">ink2</div>
+  <div style="flex:1 1 auto;font-size:11px;color:#6B6058;line-height:1.45;">Secondary lines, meta, body copy inside cards</div>
+</div>
+        
+<div style="display:flex;align-items:center;gap:13px;padding:9px 16px;">
+  <div style="width:34px;height:34px;flex:0 0 34px;border-radius:12px;background:#9A8F85;border:1px solid #E9E1D7;"></div>
+  <div style="width:104px;flex:0 0 104px;font-size:12px;font-weight:700;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;">#9A8F85</div>
+  <div style="width:96px;flex:0 0 96px;font-size:12px;font-weight:600;">ink3</div>
+  <div style="flex:1 1 auto;font-size:11px;color:#6B6058;line-height:1.45;">Labels, hints, disabled, dashed borders</div>
+</div>
+        
+<div style="display:flex;align-items:center;gap:13px;padding:9px 16px;">
+  <div style="width:34px;height:34px;flex:0 0 34px;border-radius:12px;background:#E9E1D7;border:1px solid #E9E1D7;"></div>
+  <div style="width:104px;flex:0 0 104px;font-size:12px;font-weight:700;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;">#E9E1D7</div>
+  <div style="width:96px;flex:0 0 96px;font-size:12px;font-weight:600;">line</div>
+  <div style="flex:1 1 auto;font-size:11px;color:#6B6058;line-height:1.45;">Card borders and dividers between sections</div>
+</div>
+        
+<div style="display:flex;align-items:center;gap:13px;padding:9px 16px;">
+  <div style="width:34px;height:34px;flex:0 0 34px;border-radius:12px;background:#F1EAE1;border:1px solid #E9E1D7;"></div>
+  <div style="width:104px;flex:0 0 104px;font-size:12px;font-weight:700;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;">#F1EAE1</div>
+  <div style="width:96px;flex:0 0 96px;font-size:12px;font-weight:600;">lineSoft</div>
+  <div style="flex:1 1 auto;font-size:11px;color:#6B6058;line-height:1.45;">Dividers INSIDE a card. Softer on purpose</div>
+</div>
+        
+<div style="display:flex;align-items:center;gap:13px;padding:9px 16px;">
+  <div style="width:34px;height:34px;flex:0 0 34px;border-radius:12px;background:#B4562F;border:1px solid #E9E1D7;"></div>
+  <div style="width:104px;flex:0 0 104px;font-size:12px;font-weight:700;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;">#B4562F</div>
+  <div style="width:96px;flex:0 0 96px;font-size:12px;font-weight:600;">accent</div>
+  <div style="flex:1 1 auto;font-size:11px;color:#6B6058;line-height:1.45;">One action per screen, links, the current tab</div>
+</div>
+        
+<div style="display:flex;align-items:center;gap:13px;padding:9px 16px;">
+  <div style="width:34px;height:34px;flex:0 0 34px;border-radius:12px;background:#8E4224;border:1px solid #E9E1D7;"></div>
+  <div style="width:104px;flex:0 0 104px;font-size:12px;font-weight:700;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;">#8E4224</div>
+  <div style="width:96px;flex:0 0 96px;font-size:12px;font-weight:600;">accentDark</div>
+  <div style="flex:1 1 auto;font-size:11px;color:#6B6058;line-height:1.45;">Destructive only - sign out, remove, close a church</div>
+</div>
+        
+<div style="display:flex;align-items:center;gap:13px;padding:9px 16px;">
+  <div style="width:34px;height:34px;flex:0 0 34px;border-radius:12px;background:#4C6B52;border:1px solid #E9E1D7;"></div>
+  <div style="width:104px;flex:0 0 104px;font-size:12px;font-weight:700;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;">#4C6B52</div>
+  <div style="width:96px;flex:0 0 96px;font-size:12px;font-weight:600;">sage</div>
+  <div style="flex:1 1 auto;font-size:11px;color:#6B6058;line-height:1.45;">Confirmed, present, verified. Never decorative</div>
+</div>
+        
+<div style="display:flex;align-items:center;gap:13px;padding:9px 16px;">
+  <div style="width:34px;height:34px;flex:0 0 34px;border-radius:12px;background:#9A7223;border:1px solid #E9E1D7;"></div>
+  <div style="width:104px;flex:0 0 104px;font-size:12px;font-weight:700;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;">#9A7223</div>
+  <div style="width:96px;flex:0 0 96px;font-size:12px;font-weight:600;">amber</div>
+  <div style="flex:1 1 auto;font-size:11px;color:#6B6058;line-height:1.45;">Needs a person. Never an error - errors get amber too, not red</div>
+</div>
+        <div style="padding:11px 16px;border-top:1px solid #E9E1D7;font-size:11px;color:#6B6058;line-height:1.55;">Tints are the same hues at roughly 8 per cent: <span style="font-family:ui-monospace,monospace;">accentTint #F6EAE3 &middot; sageTint #EAF0EA &middot; amberTint #F7EEDD</span>. There is no red in this product. A church app has bad news in it, and bad news should not look like a system failure.</div></div>
+    </div>
+
+    <div style="flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:20px;">
+      <div style="background:#FFFFFF;border:1px solid #E9E1D7;border-radius:14px;">
+        <div style="padding:15px 16px 6px;"><div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#9A8F85;">Type &middot; Plus Jakarta Sans, and Newsreader for display</div></div>
+        
+<div style="display:flex;align-items:baseline;gap:14px;padding:8px 16px;">
+  <div style="width:40px;flex:0 0 40px;font-size:11px;font-weight:700;color:#9A8F85;font-family:ui-monospace,monospace;">27</div>
+  <div style="width:190px;flex:0 0 190px;font-size:27px;font-weight:600;line-height:1.25;">Saturday, 14 March</div>
+  <div style="flex:1 1 auto;font-size:11px;color:#6B6058;line-height:1.45;">Screen title. Newsreader 500, tracking -0.01em</div>
+</div>
+        
+<div style="display:flex;align-items:baseline;gap:14px;padding:8px 16px;">
+  <div style="width:40px;flex:0 0 40px;font-size:11px;font-weight:700;color:#9A8F85;font-family:ui-monospace,monospace;">20</div>
+  <div style="width:190px;flex:0 0 190px;font-size:20px;font-weight:600;line-height:1.25;">Anugerah &middot; Wed 19.30</div>
+  <div style="flex:1 1 auto;font-size:11px;color:#6B6058;line-height:1.45;">Card title. Newsreader</div>
+</div>
+        
+<div style="display:flex;align-items:baseline;gap:14px;padding:8px 16px;">
+  <div style="width:40px;flex:0 0 40px;font-size:11px;font-weight:700;color:#9A8F85;font-family:ui-monospace,monospace;">17</div>
+  <div style="width:190px;flex:0 0 190px;font-size:17px;font-weight:600;line-height:1.25;">Media team</div>
+  <div style="flex:1 1 auto;font-size:11px;color:#6B6058;line-height:1.45;">Emphasis inside a card. Sans 700</div>
+</div>
+        
+<div style="display:flex;align-items:baseline;gap:14px;padding:8px 16px;">
+  <div style="width:40px;flex:0 0 40px;font-size:11px;font-weight:700;color:#9A8F85;font-family:ui-monospace,monospace;">15</div>
+  <div style="width:190px;flex:0 0 190px;font-size:15px;font-weight:600;line-height:1.25;">Save attendance</div>
+  <div style="flex:1 1 auto;font-size:11px;color:#6B6058;line-height:1.45;">Buttons, input values</div>
+</div>
+        
+<div style="display:flex;align-items:baseline;gap:14px;padding:8px 16px;">
+  <div style="width:40px;flex:0 0 40px;font-size:11px;font-weight:700;color:#9A8F85;font-family:ui-monospace,monospace;">14</div>
+  <div style="width:190px;flex:0 0 190px;font-size:14px;font-weight:600;line-height:1.25;">Budi Halim</div>
+  <div style="flex:1 1 auto;font-size:11px;color:#6B6058;line-height:1.45;">Row titles - the most used size in the product</div>
+</div>
+        
+<div style="display:flex;align-items:baseline;gap:14px;padding:8px 16px;">
+  <div style="width:40px;flex:0 0 40px;font-size:11px;font-weight:700;color:#9A8F85;font-family:ui-monospace,monospace;">13</div>
+  <div style="width:190px;flex:0 0 190px;font-size:13px;font-weight:600;line-height:1.25;">Halim household &middot; Sunter</div>
+  <div style="flex:1 1 auto;font-size:11px;color:#6B6058;line-height:1.45;">Body copy and row meta</div>
+</div>
+        
+<div style="display:flex;align-items:baseline;gap:14px;padding:8px 16px;">
+  <div style="width:40px;flex:0 0 40px;font-size:11px;font-weight:700;color:#9A8F85;font-family:ui-monospace,monospace;">12</div>
+  <div style="width:190px;flex:0 0 190px;font-size:12px;font-weight:600;line-height:1.25;">Said going</div>
+  <div style="flex:1 1 auto;font-size:11px;color:#6B6058;line-height:1.45;">Secondary meta, hints under a field</div>
+</div>
+        
+<div style="display:flex;align-items:baseline;gap:14px;padding:8px 16px;">
+  <div style="width:40px;flex:0 0 40px;font-size:11px;font-weight:700;color:#9A8F85;font-family:ui-monospace,monospace;">11</div>
+  <div style="width:190px;flex:0 0 190px;font-size:11px;font-weight:600;line-height:1.25;">YOUR CARE GROUP</div>
+  <div style="flex:1 1 auto;font-size:11px;color:#6B6058;line-height:1.45;">Section labels. 700, uppercase, tracking 0.1em</div>
+</div>
+        <div style="padding:11px 16px;border-top:1px solid #E9E1D7;font-size:11px;color:#6B6058;line-height:1.55;">Fallbacks matter more than the webfonts: <span style="font-family:ui-monospace,monospace;">Georgia</span> for Newsreader, <span style="font-family:ui-monospace,monospace;">Segoe UI / system-ui</span> for Jakarta. On a cheap Android over a weak connection the fallback is what most people will actually read, and the metrics are close enough that the layout does not move.</div></div>
+
+      <div style="background:#FFFFFF;border:1px solid #E9E1D7;border-radius:14px;border-color:#9A722344;">
+        <div style="padding:15px 16px 6px;"><div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#9A8F85;">Geometry</div></div>
+        
+<div style="display:flex;align-items:flex-start;gap:12px;padding:8px 16px;">
+  <div style="width:118px;flex:0 0 118px;font-size:11px;font-weight:700;">Radius</div>
+  <div style="width:112px;flex:0 0 112px;font-size:11px;font-family:ui-monospace,monospace;color:#B4562F;">14 / 12 / 6 / 999</div>
+  <div style="flex:1 1 auto;font-size:11px;color:#6B6058;line-height:1.45;">Cards / controls and inputs / small marks and tags / pills and avatars. Four values, no fifth</div>
+</div>
+        
+<div style="display:flex;align-items:flex-start;gap:12px;padding:8px 16px;">
+  <div style="width:118px;flex:0 0 118px;font-size:11px;font-weight:700;">Control height</div>
+  <div style="width:112px;flex:0 0 112px;font-size:11px;font-family:ui-monospace,monospace;color:#B4562F;">44 48 52 56</div>
+  <div style="flex:1 1 auto;font-size:11px;color:#6B6058;line-height:1.45;">Nothing between. 44 is the floor and it is also the tap-target floor</div>
+</div>
+        
+<div style="display:flex;align-items:flex-start;gap:12px;padding:8px 16px;">
+  <div style="width:118px;flex:0 0 118px;font-size:11px;font-weight:700;">Tap target</div>
+  <div style="width:112px;flex:0 0 112px;font-size:11px;font-family:ui-monospace,monospace;color:#B4562F;">min 44px</div>
+  <div style="flex:1 1 auto;font-size:11px;color:#6B6058;line-height:1.45;">The one rule no phone screen may break, including rows that only look like text</div>
+</div>
+        
+<div style="display:flex;align-items:flex-start;gap:12px;padding:8px 16px;">
+  <div style="width:118px;flex:0 0 118px;font-size:11px;font-weight:700;">Page margin</div>
+  <div style="width:112px;flex:0 0 112px;font-size:11px;font-family:ui-monospace,monospace;color:#B4562F;">20px</div>
+  <div style="flex:1 1 auto;font-size:11px;color:#6B6058;line-height:1.45;">Both edges, every mobile screen</div>
+</div>
+        
+<div style="display:flex;align-items:flex-start;gap:12px;padding:8px 16px;">
+  <div style="width:118px;flex:0 0 118px;font-size:11px;font-weight:700;">Section gap</div>
+  <div style="width:112px;flex:0 0 112px;font-size:11px;font-family:ui-monospace,monospace;color:#B4562F;">18px</div>
+  <div style="flex:1 1 auto;font-size:11px;color:#6B6058;line-height:1.45;">Between the blocks on a screen</div>
+</div>
+        
+<div style="display:flex;align-items:flex-start;gap:12px;padding:8px 16px;">
+  <div style="width:118px;flex:0 0 118px;font-size:11px;font-weight:700;">Label to card</div>
+  <div style="width:112px;flex:0 0 112px;font-size:11px;font-family:ui-monospace,monospace;color:#B4562F;">9px</div>
+  <div style="flex:1 1 auto;font-size:11px;color:#6B6058;line-height:1.45;">A label belongs to the thing under it, so it sits closer than the section gap</div>
+</div>
+        
+<div style="display:flex;align-items:flex-start;gap:12px;padding:8px 16px;">
+  <div style="width:118px;flex:0 0 118px;font-size:11px;font-weight:700;">Card padding</div>
+  <div style="width:112px;flex:0 0 112px;font-size:11px;font-family:ui-monospace,monospace;color:#B4562F;">14 / 16px</div>
+  <div style="flex:1 1 auto;font-size:11px;color:#6B6058;line-height:1.45;">Rows use 14, prose blocks use 16</div>
+</div>
+        
+<div style="display:flex;align-items:flex-start;gap:12px;padding:8px 16px;">
+  <div style="width:118px;flex:0 0 118px;font-size:11px;font-weight:700;">Icons</div>
+  <div style="width:112px;flex:0 0 112px;font-size:11px;font-family:ui-monospace,monospace;color:#B4562F;">16 / 18 / 22px</div>
+  <div style="flex:1 1 auto;font-size:11px;color:#6B6058;line-height:1.45;">Inline with text / in a row / in a tab bar. Stroke 1.7, never filled</div>
+</div>
+        <div style="padding:11px 16px;border-top:1px solid #E9E1D7;display:flex;align-items:flex-start;gap:10px;">
+          <span style="color:#9A7223;display:flex;padding-top:1px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.4"/><path d="M9.8 9.5a2.3 2.3 0 0 1 4.4.8c0 1.5-2.2 1.8-2.2 3.3"/><path d="M12 17.1h.01"/></svg></span>
+          <span style="font-size:11px;color:#6B6058;line-height:1.55;"><span style="font-weight:700;">An honest gap.</span> Spacing was never systematised across the 62 artboards the way colour and type were. The scale above is derived from what the screens actually use, and it needs enforcing in code &mdash; because the design did not enforce it, and iteration 13 measured what that costs: 32 font sizes before anyone counted.</span>
+        </div></div>
+    </div>
+
+    <div style="width:380px;flex:0 0 380px;">
+      <div style="background:#FFFFFF;border:1px solid #E9E1D7;border-radius:14px;">
+        <div style="padding:15px 16px 8px;"><div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#9A8F85;">Component anatomy</div></div>
+        <div style="padding:0 16px 14px;font-size:11px;color:#6B6058;line-height:1.6;">
+          <span style="font-weight:700;color:#241E1A;">Card</span> &mdash; surface, 1px line, radius 14. Sections inside are divided by lineSoft, never by a gap. A card with an accent border is the one thing on the screen that matters.<br><br>
+          <span style="font-weight:700;color:#241E1A;">Row</span> &mdash; avatar or icon, then title over meta, then a chevron if it leads somewhere. No chevron means it does not. That rule is never broken.<br><br>
+          <span style="font-weight:700;color:#241E1A;">Pill</span> &mdash; 24px, radius 999, 700 weight, 11px. Tinted background carries meaning; a 1px line means neutral. Dashed means not on our roll.<br><br>
+          <span style="font-weight:700;color:#241E1A;">Button</span> &mdash; accent fill for the one action, surface with a line for the alternative, accent outline for a third. Two side by side maximum.<br><br>
+          <span style="font-weight:700;color:#241E1A;">Avatar</span> &mdash; initials, accentTint on accent. A DASHED avatar is a person with no standing here, and that distinction is load-bearing in five screens.<br><br>
+          <span style="font-weight:700;color:#241E1A;">Tab bar</span> &mdash; four tabs, 22px icons, 10px labels, top line, 20px bottom safe area. Never five.
+        </div></div>
+      <div style="height:20px;"></div>
+      <div style="background:#FFFFFF;border:1px solid #E9E1D7;border-radius:14px;border-color:#B4562F55;"><div style="padding:16px;display:flex;align-items:flex-start;gap:11px;">
+        <span style="color:#B4562F;display:flex;padding-top:1px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10.6" width="14" height="9.4" rx="2.2"/><path d="M8.4 10.6V8.2a3.6 3.6 0 0 1 7.2 0v2.4"/></svg></span>
+        <div style="flex:1 1 auto;font-size:11px;color:#6B6058;line-height:1.6;">No shadows anywhere in 62 artboards. Depth is carried by a 1px line and a cream-to-white step, which survives a cheap screen in daylight better than a shadow does &mdash; and looks the same on both platforms without tuning.</div>
+      </div></div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

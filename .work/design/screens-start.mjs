@@ -51,11 +51,11 @@ start['Start.dc.html'] = doc(`
   <div style="display:flex;align-items:flex-end;gap:24px;">
     <div style="flex:1 1 auto;">
       <div style="font-family:${SERIF};font-size:34px;font-weight:500;letter-spacing:-0.015em;line-height:1.1;">Jemaat</div>
-      <div style="font-size:14px;color:${C.ink2};margin-top:12px;line-height:1.6;max-width:820px;">A church membership and care group app for Indonesian congregations. One app serving many churches, each found by its own code. Mobile for everyone, a web side for the work that genuinely needs a big screen, and WhatsApp for anything a person has to act on.<br><br><span style="font-weight:700;color:${C.ink};">Everything else in this canvas is evidence for what is claimed on this page.</span></div>
+      <div style="font-size:14px;color:${C.ink2};margin-top:12px;line-height:1.6;max-width:820px;">A church membership and care group product for Indonesian congregations. One installation serving many churches, each found by its own code. <span style="font-weight:700;color:${C.ink};">It goes live on the web only</span> &mdash; a desktop for the office, the same routes at phone width for a group leader, and WhatsApp for anything a person has to act on. The native app is deferred, not designed away: S12 and S13 show what that costs and what it does not touch.<br><br><span style="font-weight:700;color:${C.ink};">Everything else in this canvas is evidence for what is claimed on this page.</span></div>
     </div>
     <div style="text-align:right;">
-      <div style="font-family:${SERIF};font-size:34px;font-weight:600;">70</div>
-      <div style="font-size:11px;color:${C.ink3};line-height:1.6;margin-top:4px;">artboards &middot; 41 iterations<br>Design only. No code yet.</div>
+      <div style="font-family:${SERIF};font-size:34px;font-weight:600;">87</div>
+      <div style="font-size:11px;color:${C.ink3};line-height:1.6;margin-top:4px;">artboards &middot; 43 iterations<br>Design only. No code yet.</div>
     </div>
   </div>
 
@@ -79,15 +79,16 @@ start['Start.dc.html'] = doc(`
         <div style="padding:15px 18px 6px;">${label('What is in this canvas')}</div>
         ${pageRow('Onboarding', '6', 'Finding a church before any account exists')}
         ${pageRow('Public', '11', 'What a stranger sees, applying, signing in, and both front-door failures')}
-        ${pageRow('Signed in', '22', 'Members, households, care groups, RSVP, attendance, serving')}
-        ${pageRow('Church office', '13', 'The queue, the register, the week, import, export, transfers, roles, merge')}
+        ${pageRow('Signed in', '25', 'Members, households, care groups, RSVP, attendance, serving')}
+        ${pageRow('Church office', '17', 'The queue, the register, the week, import, export, transfers, roles, merge')}
         ${pageRow('Home, stressed', '7', 'One screen in Indonesian, offline, at readable type, quiet, at 2,000, and as R0 ships')}
-        ${pageRow('Ships first', '10', 'The release map, two open decisions, and seven specification sheets')}
+        ${pageRow('Ships first', '11', 'The release map, two open decisions, and eight specification sheets')}
+        ${pageRow('Web first, no app', '9', 'The go-live surface: the browser chrome, the one door, and R0 re-derived for it')}
         <div style="padding:12px 18px 14px;border-top:1px solid ${C.lineSoft};font-size:11px;color:${C.ink2};line-height:1.55;">
           <span style="font-weight:700;color:${C.ink};">Two code series, and they are not the same thing.</span>
-          <span style="font-family:ui-monospace,monospace;">O P M W</span> are screens, numbered per page.
-          <span style="font-family:ui-monospace,monospace;">S1&ndash;S10</span> are the specification sheets on the last page.
-          <span style="font-family:ui-monospace,monospace;">R0 R1 R2</span> are the three releases and never a sheet.
+          <span style="font-family:ui-monospace,monospace;">O P M W B</span> are screens, numbered per page &mdash; <span style="font-family:ui-monospace,monospace;">B</span> is the same product inside a browser.
+          <span style="font-family:ui-monospace,monospace;">S1&ndash;S13</span> are the specification sheets.
+          <span style="font-family:ui-monospace,monospace;">R0 R1 R2</span> are the three releases and never a sheet; <span style="font-family:ui-monospace,monospace;">R0&thinsp;W</span> is R0 on the one surface that ships.
         </div>`)}
     </div>
 
@@ -102,7 +103,7 @@ start['Start.dc.html'] = doc(`
         ${position('No count, no percentage, no score &mdash; in the UI or the schema', 'A column that exists is eventually shown. M23 refuses one, and S5 has no attendance_rate to be tempted by')}
         ${position('Nothing pastoral is automated down any pipe', 'A leader chasing you is care. A robot chasing you is not, and the difference is the whole product')}
         ${position('Home shows only what is due', 'Most weeks most members are due nothing, and Home should then be nearly empty. Empty is a correct state')}
-        ${position('The app is optional for ordinary members', 'WhatsApp reply buttons carry RSVP, serving and hosting. The office needs the web, the leader needs the app, the congregation needs nothing')}
+        ${position('The app is optional &mdash; and at go-live there is none', 'WhatsApp reply buttons carry RSVP, serving and hosting, so the congregation needs nothing installed. S12 followed that to its end: drop the app and only the group leader is affected')}
         ${position('Serving is not a status, and leading is not a rank', 'Grace leads a care group while still a Guest. The screen shows her standing so nobody tries to correct it')}
         ${position('The register is the church&rsquo;s, and it can always leave', 'Export is on every Tuesday, not on the way out. MIT, self-hostable, and the JSON holds nothing back')}
         ${position('No public directory of churches using Jemaat', 'The obvious growth feature. It would publish a national index of congregations with their addresses and meeting times')}

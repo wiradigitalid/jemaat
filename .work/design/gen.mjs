@@ -35,8 +35,9 @@ import { start } from './screens-start.mjs';
 import { fid } from './screens-fidelity.mjs';
 import { rel } from './screens-release.mjs';
 import { rec } from './screens-record.mjs';
+import { webonly } from './screens-webonly.mjs';
 
-const files = { ...onb, ...pub, ...mem, ...web, ...iter, ...imp, ...lead, ...warta, ...quiet, ...talk, ...life, ...xfer, ...notice, ...scale, ...week, ...ret, ...hand, ...data, ...rights, ...broken, ...r0, ...decide, ...decide2, ...empty, ...model, ...sys, ...msg, ...noapp, ...nooffice, ...merge, ...roles, ...threat, ...start, ...fid, ...rel, ...rec };
+const files = { ...onb, ...pub, ...mem, ...web, ...iter, ...imp, ...lead, ...warta, ...quiet, ...talk, ...life, ...xfer, ...notice, ...scale, ...week, ...ret, ...hand, ...data, ...rights, ...broken, ...r0, ...decide, ...decide2, ...empty, ...model, ...sys, ...msg, ...noapp, ...nooffice, ...merge, ...roles, ...threat, ...start, ...fid, ...rel, ...rec, ...webonly };
 
 const P = 390, PH = 844, W = 1440, WH = 900;
 const gapX = 80, gapY = 130;
@@ -157,7 +158,33 @@ const artboards = [
   { file: 'Threat.dc.html', title: 'S10 What this holds, and how it gets out', x: 0, y: 11010, w: 1440, h: 1020, page: 'page-6' },
   { file: 'Archive.dc.html', title: 'S11 The archive and the statement', x: 0, y: 12160, w: 1440, h: 1220, page: 'page-6' },
   { file: 'Start.dc.html', title: 'Jemaat, in one page', x: 0, y: 0, w: 1440, h: 1420, page: 'page-7' },
+
+  /* page-8 The go-live decision: one surface instead of three. */
+  { file: 'WebSignIn.dc.html', title: 'B1 Sign in, in a browser', x: 0, y: 0, w: 390, h: 844, page: 'page-8' },
+  { file: 'WebLeader.dc.html', title: 'B2 A leader on Wednesday', x: 470, y: 0, w: 390, h: 844, page: 'page-8' },
+  { file: 'WebAttendance.dc.html', title: 'B3 Attendance with no signal', x: 940, y: 0, w: 390, h: 844, page: 'page-8' },
+  { file: 'WebWartaLink.dc.html', title: 'B4 The week, from a link', x: 1410, y: 0, w: 390, h: 844, page: 'page-8' },
+  { file: 'WebInApp.dc.html', title: 'B5 The message browser dead end', x: 0, y: 974, w: 390, h: 844, page: 'page-8' },
+  { file: 'WebInstalled.dc.html', title: 'B6 Saved to the home screen', x: 470, y: 974, w: 390, h: 844, page: 'page-8' },
+  { file: 'WebOfficeSignIn.dc.html', title: 'W18 Sign in, office desktop', x: 940, y: 974, w: 1440, h: 900, page: 'page-8' },
+  { file: 'WebFirst.dc.html', title: 'S12 Web first, no app', x: 0, y: 2004, w: 1440, h: 1120, page: 'page-8' },
+  { file: 'WebRelease.dc.html', title: 'S13 R0 on the web', x: 0, y: 3254, w: 1440, h: 1240, page: 'page-8' },
 ];
+
+const webNote = {
+  id: 'n-webonly', x: 1520, y: 2004, w: 540, page: 'page-8',
+  text: 'ITERATION 43 - THE APP WAS THE THIRD SURFACE, NOT THE FIRST\nThe owner has decided to go live on the web and leave the app for later. Checking what that breaks turned up less than expected, and the reason is that the work was already done two years of iterations ago in canvas time.\n\nS7 routed everything a person must ACT on to WhatsApp. S8 read the consequence: the office needs the web, the leader needs the app, the congregation needs nothing. So dropping the app touches exactly ONE PERSON - the group leader. Everyone else is already served.\n\nS9 is paid back rather than lost. Its two phone compressions of W8 and W1 were counted as two extra screens in R0; on one responsive surface they are the same route at a narrower width.\n\nFOUR THINGS THE APP CARRIED WITHOUT ANYONE WRITING THEM DOWN. The session - answered by a link in WhatsApp, and B1 still keeps M11 promise of asking again after 12 days before it shows anyone else number. The install - add to home screen, plus B5 for the dead end every leader meets on day one, because a message browser has nowhere to add anything. Push - gone, and it costs almost nothing, which is S7 paying out a second time.\n\nAND ONE THAT IS REAL WORK. M17 was a designed state: the duty card on the phone, a tapped RSVP queued rather than lost. A browser gets none of that free, and attendance is marked inside a concrete hall with no signal. It. 17 established the leader is the load-bearing volunteer - when he stops ticking, RSVP, M23 and every count go with him. So the offline queue is not a polish item, it is the condition on the whole decision.\n\nA SIXTH LEAK FOR S10, AND IT IS MINE. An app has no forwardable front door; a link does. So a tokened link opens one page for a short time and never the directory, and a sign-in link dies on first use. B4 says it on the screen, which is the only place a disclosure works - the rule S10 already learned twice.',
+};
+
+const webShipNote = {
+  id: 'n-webship', x: 1520, y: 3254, w: 540, page: 'page-8',
+  text: 'RE-DERIVED, NOT REMEMBERED\nIt. 41 caught this canvas twice: a finding lands where it was found and nowhere else, and any plan drawn from a remembered conclusion is drawn from a stale map. S1 is now exactly that - it stages seventeen screens across two surfaces that no longer both exist. So S13 re-derives the column rather than annotating it, and S1 carries a line pointing here.\n\nTHE ARITHMETIC, STATED SO IT CAN BE CHECKED. Seventeen becomes fifteen. Two leave: O1, because there is no install to run first and the church is in the URL, and S9 two phone compressions, which stop being separate screens. Two arrive: B1, the one door, and W18, the office desktop version of it. Capabilities stay at seven - the app shell and push plumbing are swapped for an offline queue, not added to.\n\nW18 CLOSES A HOLE THAT HAS BEEN OPEN SINCE IT. 16. The office cannot sign in to the web at all, named twenty-six iterations ago, carried on S1 ever since because it was cheap and nothing depended on it. Web first makes it the front door for everybody, so it stops being cheap.\n\nONE SMALLER FINDING, AND IT DECIDED A LAYOUT. The four-tab strip cannot come to the web: a bottom bar sits on top of the browser own toolbar and loses about 118px of an 844px screen. Navigation moves to the top - and it STAYS at the top in B6, where a bottom strip would fit again, so that saving the page to a home screen does not hand the leader a second app to learn.\n\nWHAT THIS IS NOT. R0 W is not a smaller R0. It is the same product on one surface: every phone artboard in this canvas is still valid, because 390 is a phone browser as readily as an app frame. The app becomes a distribution decision later instead of a build now.',
+};
+
+const topNavNote = {
+  id: 'n-webnav', x: 1880, y: 0, w: 460, page: 'page-8',
+  text: 'WHAT THESE SIX ARE, AND WHAT THEY ARE NOT\nThey are not new screens. B2, B3 and B6 are M1, M14 and M1-again drawn inside the chrome a browser actually imposes - an address bar the page does not control, and a toolbar eating the bottom.\n\nDrawing that chrome is the point. Every one of these frames is 844px tall like the app artboards, and 118 of them are gone before any content is placed. That is what forced the navigation to the top, and it is why B6 - the same screen with the chrome removed - is worth its own artboard rather than a sentence.\n\nB1 and W18 are the same auth twice, at two widths. B5 is the only genuinely new thing here, and it exists for the same reason P10 and P11 do: this canvas does not ship a happy path without the dead end beside it.\n\nB4 is the member surface, and the only page an ordinary member ever opens. Everything else they do is a reply button in a message, which S8 settled and this decision did not change.',
+};
 
 const walkNote = {
   id: 'n-walk', x: 1520, y: 0, w: 520, page: 'page-6',
@@ -291,6 +318,9 @@ const recNote = {
 const canvas = {
   artboards,
   annotations: [
+    webNote,
+    webShipNote,
+    topNavNote,
     recNote,
     walkNote,
     lagNote,
@@ -430,6 +460,7 @@ const canvas = {
     { id: 'page-4', name: 'Church office (web)' },
     { id: 'page-5', name: 'Home under stress' },
     { id: 'page-6', name: 'What ships first' },
+    { id: 'page-8', name: 'Web first, no app' },
   ],
   launch: { view: 'canvas', page: 'page-7' },
 };

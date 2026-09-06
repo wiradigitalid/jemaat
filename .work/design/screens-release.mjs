@@ -64,7 +64,7 @@ rel['Release.dc.html'] = doc(`
       <div style="font-size:12px;color:${C.ink3};line-height:1.6;">One church &middot; one service &middot; one language<br>Membership, households, care groups</div>
       <div style="margin-top:12px;padding:10px 12px;border:1px solid #B4562F55;border-radius:10px;background:${C.accentTint};text-align:left;">
         <div style="font-size:11.5px;font-weight:700;">R0 here is superseded by S13</div>
-        <div style="font-size:11px;color:${C.ink2};margin-top:5px;line-height:1.5;">This column stages R0 across an app and a web side. Go-live is the web only, so it was re-derived rather than patched: 15 routes, the same 7 capabilities. R1 and R2 still hold.</div>
+        <div style="font-size:11px;color:${C.ink2};margin-top:5px;line-height:1.5;">This column stages R0 across an app and a web side. The first build is the church office alone, so R0 was re-derived rather than patched: 16 routes, 6 capabilities. Everything a member, guest or leader touches moves behind it.</div>
       </div>
     </div>
   </div>

@@ -180,7 +180,7 @@ export const navMember = (active) =>
  */
 export const tierPill = (t) => {
   if (t === 'registered') return pill('Registered Member', C.sageTint, C.sage);
-  if (t === 'community') return pill('Community Member', C.accentTint, C.accent);
+  if (t === 'community') return pill('Member', C.accentTint, C.accent);
   if (t === 'external') return pill('Not on our roll', 'transparent', C.ink3, `border:1px dashed ${C.ink3};`);
   return pill('Guest', C.bg, C.ink3, `border:1px solid ${C.line};`);
 };

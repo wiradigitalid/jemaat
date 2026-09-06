@@ -757,8 +757,8 @@
       "page": "page-8"
     },
     {
-      "file": "AdminHousehold.dc.html",
-      "title": "W26 A household",
+      "file": "AdminRolePicker.dc.html",
+      "title": "W28 Choosing a serving role",
       "x": 0,
       "y": 1954,
       "w": 1440,
@@ -766,10 +766,28 @@
       "page": "page-8"
     },
     {
-      "file": "AdminGroups.dc.html",
-      "title": "W24 Care groups",
+      "file": "AdminHousehold.dc.html",
+      "title": "W26 A household",
       "x": 1520,
       "y": 1954,
+      "w": 1440,
+      "h": 1040,
+      "page": "page-8"
+    },
+    {
+      "file": "AdminGroups.dc.html",
+      "title": "W24 Care groups",
+      "x": 0,
+      "y": 3074,
+      "w": 1440,
+      "h": 900,
+      "page": "page-8"
+    },
+    {
+      "file": "AdminDepartments.dc.html",
+      "title": "W27 Departments and serving roles",
+      "x": 1520,
+      "y": 3074,
       "w": 1440,
       "h": 900,
       "page": "page-8"
@@ -778,7 +796,7 @@
       "file": "AdminChurch.dc.html",
       "title": "W25 The church record",
       "x": 0,
-      "y": 2934,
+      "y": 4154,
       "w": 1440,
       "h": 900,
       "page": "page-8"
@@ -787,7 +805,7 @@
       "file": "AdminScope.dc.html",
       "title": "S12 The register, alone",
       "x": 0,
-      "y": 3914,
+      "y": 5134,
       "w": 1440,
       "h": 1020,
       "page": "page-8"
@@ -796,16 +814,25 @@
       "file": "AdminModel.dc.html",
       "title": "S14 Household, family, and the address",
       "x": 0,
-      "y": 5054,
+      "y": 6274,
       "w": 1440,
-      "h": 1080,
+      "h": 1300,
+      "page": "page-8"
+    },
+    {
+      "file": "AdminServing.dc.html",
+      "title": "S15 Departments, roles, and interest",
+      "x": 0,
+      "y": 7694,
+      "w": 1440,
+      "h": 900,
       "page": "page-8"
     },
     {
       "file": "AdminRelease.dc.html",
       "title": "S13 What ships: the register",
       "x": 0,
-      "y": 6254,
+      "y": 8714,
       "w": 1440,
       "h": 1150,
       "page": "page-8"
@@ -815,7 +842,7 @@
     {
       "id": "n-admin",
       "x": 1520,
-      "y": 3914,
+      "y": 5134,
       "w": 540,
       "page": "page-8",
       "text": "ITERATION 44 - ONE ROLE, NOT ONE SURFACE\nIteration 43 heard \"go live on the web first\" and drew the whole product on the web: a group leader ticking attendance in a phone browser, a member opening the warta from a link. Wrong axis for the fourth time in this canvas. The first build is not one SURFACE - it is one ROLE. The mobile app is a separate build, so the congregation, the guest and the member have nowhere to go at all.\n\nWHAT THAT REMOVES IS LARGER THAN WHAT IT ADDS. The offline queue - the single most expensive item on the last sheet, and the condition I put on the whole decision - existed for a leader in a concrete hall with no signal. There is no leader. It is gone, and so are push, the app shell, and the forwardable-link leak I had just added to S10 as a sixth item.\n\nTHE STRUCTURAL REASON THE REGISTER CAN SHIP ALONE. Every other flow in this canvas is two-sided: an application needs an applicant, an RSVP needs a member, attendance needs a leader, a statement needs a person to state it, a warta needs a reader, a church code needs an app to scan it into. Pendataan is the ONLY one-sided thing in the product - the office types it and the office reads it - so it works with an audience of one. It is also what the brief named first, and what iteration 26 caught the staging having put last.\n\nNINE OFFICE SCREENS GO DORMANT, and none of them is cut. W1, W3, W4, W7, W8, W9, W14, W15, W16 all stay drawn and argued, waiting for the half of the flow that starts them.\n\nAND THE SIDEBAR IS THE SCOPE MADE VISIBLE. W2 carries Applicants, Serving, Sermons and Church code; W22 and W24 do not. They are absent rather than greyed, because a control that cannot do anything is worse than one that is not there - the same rule W25 applies to the four switches a church expects to find and cannot yet be given."
@@ -823,15 +850,23 @@
     {
       "id": "n-household",
       "x": 1520,
-      "y": 5054,
+      "y": 6274,
       "w": 540,
       "page": "page-8",
-      "text": "ITERATION 45 - ONE WORD DOING TWO JOBS\nThe owner asked it plainly: is a household who lives in one house, or is it a family with a head? Forty-four iterations used one word for both and never noticed, because the sample data was a nuclear family at one address - the case where the two facts happen to coincide.\n\nTHEY ARE DIFFERENT FACTS AND THEY CHANGE AT DIFFERENT TIMES. A household is an address with people in it; it changes when somebody moves. A family is who those people are to each other; it survives a move. A daughter who marries out stops being in the household and does not stop being a daughter.\n\nWHAT SHIPS IS THE HOUSEHOLD, with a relationship written on each occupant - head, wife, son, daughter-in-law, grandchild, boards here. That is the shape of a Kartu Keluarga, which is what a church already prints and what a visitation team already uses. Kinship BETWEEN households is not a table yet, and W26 gets away without one through a Moved out row that says where she went: the link is kept, the graph is not.\n\nTHE ESCAPE HATCH IS THAT TWO HOUSEHOLDS MAY SHARE AN ADDRESS. A married son living in his parents house is two households under one roof, not one household of six - each with its own head, each getting its own family card. That single allowance is what lets the register hold family and household apart without modelling kinship at all.\n\nAnd the head is a role, not a rank: a widow living alone is the head of her own household, and nothing in the product hangs a permission on it.\n\nTHE PERSON GREW FROM SIX FIELDS TO ELEVEN, so the six fields and no more position is retired rather than quietly broken. A longer form is abandoned more often, so the phone keeps a four-field fast path with the rest behind More details - the form a volunteer fills standing in a hall is not the form the office fills on a Tuesday.\n\nThe address stays on the household, which is decision 6 unchanged. The person-level override exists for the student in a dorm and the worker in another city, and it is empty on almost every record."
+      "text": "ITERATION 45 - ONE WORD DOING TWO JOBS\nThe owner asked it plainly: is a household who lives in one house, or is it a family with a head? Forty-four iterations used one word for both and never noticed, because the sample data was a nuclear family at one address - the case where the two facts happen to coincide.\n\nTHEY ARE DIFFERENT FACTS AND THEY CHANGE AT DIFFERENT TIMES. A household is an address with people in it; it changes when somebody moves. A family is who those people are to each other; it survives a move. A daughter who marries out stops being in the household and does not stop being a daughter.\n\nWHAT SHIPS IS THE HOUSEHOLD, with a relationship written on each occupant - head, wife, son, daughter-in-law, grandchild, boards here. That is the shape of a Kartu Keluarga, which is what a church already prints and what a visitation team already uses. Kinship BETWEEN households is not a table yet, and W26 gets away without one through a Moved out row that says where she went: the link is kept, the graph is not.\n\nTHE ESCAPE HATCH IS THAT TWO HOUSEHOLDS MAY SHARE AN ADDRESS. A married son living in his parents house is two households under one roof, not one household of six - each with its own head, each getting its own family card. That single allowance is what lets the register hold family and household apart without modelling kinship at all.\n\nAnd the head is a role, not a rank: a widow living alone is the head of her own household, and nothing in the product hangs a permission on it.\n\nTHE PERSON GREW FROM SIX FIELDS TO ELEVEN, so the six fields and no more position is retired rather than quietly broken. A longer form is abandoned more often, so the phone keeps a four-field fast path with the rest behind More details - the form a volunteer fills standing in a hall is not the form the office fills on a Tuesday.\n\nThe address stays on the household, which is decision 6 unchanged. The person-level override exists for the student in a dorm and the worker in another city, and it is empty on almost every record.\n\nITERATION 46 CLOSED THE HALF THIS LEFT OPEN: not everyone under a roof is kin. A friend, a distant relative, a household helper. The relation field is not a kinship field at all - it is HOW A PERSON IS ATTACHED TO THIS HOUSEHOLD - so one list covers both, and whether they count as family is derived from the value rather than asked as a second question.\n\nThe vocabulary is already in every Indonesian home: a Kartu Keluarga carries famili lain and pembantu, so the office recognises the list instead of learning it. W26 shows the two groups as two blocks - Family, then Also lives here - which is the whole answer visible at a glance.\n\nAnd the helper is the case that proves the model: she is IN THE HOUSEHOLD AND NOT IN THE FAMILY. She belongs on the visitation list, she does not belong on the family card, and her own family is in Sukabumi where this register cannot see them and should not pretend to."
+    },
+    {
+      "id": "n-serving",
+      "x": 1520,
+      "y": 7694,
+      "w": 540,
+      "page": "page-8",
+      "text": "ITERATION 46 - A FLAT LIST WAS HIDING A HIERARCHY\nAreas of involvement was five words - Music, Multimedia, Prayer, Teaching, Visitation - typed straight into a person. The owner asked for the shape underneath, and it is two levels: A DEPARTMENT HOLDS SERVING ROLES, AND A PERSON IS INTERESTED IN A ROLE.\n\nThe flat list was worse than it looked. Nobody is interested in Music; they are interested in singing, or in playing keyboard, or in running the projector - and a coordinator who reads Music beside forty-nine names still has to phone all forty-nine to find out which. Two levels turn a label into a list a person can act on.\n\nTHE PICKER IS WHERE THIS IS EASY TO BUILD WRONGLY, which is why W28 exists as a state rather than a sentence. The department is a HEADING, not an option: it groups the results and it cannot be chosen. Search matches both levels, so typing a department name surfaces its roles, and the heading itself stays inert.\n\nAND ONE DETAIL THAT ONLY SHOWS UP IN A LIST: role names repeat across departments. Coordinator exists in four of them. So a chosen role always carries its department - Music / Coordinator - or the chip is worthless the moment it is read anywhere else.\n\nTHE LINE THIS MUST NOT CROSS. It. 5 named serving as its own axis - teams, slots, dates - and S1 cut all four of those screens to Later. What arrives here is the CATALOGUE and the WISH, and no schedule. The distance between an interest and a roster is one table, and building it early would quietly restore the largest cut on the release map.\n\nDeactivate rather than delete, for the same reason the register never deletes a person: interests already point at the row, and one day a roster will too."
     },
     {
       "id": "n-adminship",
       "x": 1520,
-      "y": 6254,
+      "y": 8714,
       "w": 540,
       "page": "page-8",
       "text": "RE-DERIVED TWICE, AND THE NUMBERS MOVED AGAIN\nThis column was rebuilt for one surface at it. 43 and again for one role at it. 44. It moves a third time here, from sixteen routes to seventeen and from six capabilities to seven, because the household earned its own screen and the map is a capability rather than a field. Every number on the sheet is meant to be checked against the column beside it - it. 22 counted 32 that was 31, and a number nobody checks is a number that gets planned against.\n\nFIVE HOLES CLOSE, all of them old. The office could not sign in, named at it. 16 and carried open for twenty-six iterations. Time zones were named on W12 and applied nowhere. Creating a person was mobile-only, which left W2 Add button pointing at an app screen. Care groups could only arrive through the Excel import. And household was doing two jobs under one word.\n\nWhy all five surface together is worth naming: they are the holes that only bite when THE OFFICE IS THE WHOLE PRODUCT. Nobody noticed while a leader and a member were carrying half the flows.\n\nTHE MAP IS THE ONE GENUINELY NEW CAPABILITY. Tiles, address search, a stored coordinate and a draggable pin. It is last in the build order on purpose: everything in the register works without it, just worse, and a visitation team is the only party that needs it.\n\nWHAT THE APP INHERITS. Every M, O and P artboard stays valid against the same API. The app is the other three roles arriving at a register that already holds real data - the easier order to build in and the harder one to sell, because the congregation sees nothing until the second release.\n\nAnd one thing left deliberately unfixed: older sheets still say Community Member in their prose. The pill changed everywhere at once because it lives in one function; the prose did not, and pretending otherwise on this sheet would be the same stale map in a smaller font."

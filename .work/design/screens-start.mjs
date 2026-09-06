@@ -54,8 +54,8 @@ start['Start.dc.html'] = doc(`
       <div style="font-size:14px;color:${C.ink2};margin-top:12px;line-height:1.6;max-width:820px;">A church membership and care group product for Indonesian congregations. One installation serving many churches, each found by its own code. <span style="font-weight:700;color:${C.ink};">The first build is the church office alone</span> &mdash; the register, on a desktop and at phone width for the volunteer who has no desk. The congregation, the guest and the member arrive with the mobile app, which is a separate build: S12 and S13 show what that leaves in and what goes dormant.<br><br><span style="font-weight:700;color:${C.ink};">Everything else in this canvas is evidence for what is claimed on this page.</span></div>
     </div>
     <div style="text-align:right;">
-      <div style="font-family:${SERIF};font-size:34px;font-weight:600;">90</div>
-      <div style="font-size:11px;color:${C.ink3};line-height:1.6;margin-top:4px;">artboards &middot; 45 iterations<br>Design only. No code yet.</div>
+      <div style="font-family:${SERIF};font-size:34px;font-weight:600;">93</div>
+      <div style="font-size:11px;color:${C.ink3};line-height:1.6;margin-top:4px;">artboards &middot; 46 iterations<br>Design only. No code yet.</div>
     </div>
   </div>
 
@@ -83,7 +83,7 @@ start['Start.dc.html'] = doc(`
         ${pageRow('Church office', '17', 'The queue, the register, the week, import, export, transfers, roles, merge')}
         ${pageRow('Home, stressed', '7', 'One screen in Indonesian, offline, at readable type, quiet, at 2,000, and as R0 ships')}
         ${pageRow('Ships first', '11', 'The release map, two open decisions, and eight specification sheets')}
-        ${pageRow('The admin register', '12', 'The first build: one role, the screens it was missing, the household split, and R0 re-derived')}
+        ${pageRow('The admin register', '15', 'The first build: one role, the household split, the serving catalogue, and R0 re-derived')}
         <div style="padding:12px 18px 14px;border-top:1px solid ${C.lineSoft};font-size:11px;color:${C.ink2};line-height:1.55;">
           <span style="font-weight:700;color:${C.ink};">Two code series, and they are not the same thing.</span>
           <span style="font-family:ui-monospace,monospace;">O P M W</span> are screens, numbered per page &mdash; and a width is never a new series, which is why the phone-sized office screens are still <span style="font-family:ui-monospace,monospace;">W</span>.

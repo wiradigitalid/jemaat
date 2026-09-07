@@ -11,11 +11,12 @@ of where things are, a reader that can see this product's code.
 
 | Intent | Does | Precondition | How often |
 |---|---|---|---|
-| `setup` | Guide the global `mode` setting · scaffold the registries that are still empty · **report** the documents already present, read-only · derive the two structure maps | before G1 | once per project |
+| `setup` | Guide the global `mode` setting · scaffold the registries that are still empty · **report** the documents already present, read-only · derive the two structure maps · align the engines | before G1 | once per project |
+| `engines` | Run `npx wdi-method engines --fix`, then report what it changed: the flag stripped from `to-spec` · `to-tickets` · `implement` so `wdi-build` can invoke them, the retired BMad G5 wrappers locked out of model invocation and denied in `.claude/settings.json`, and `docs/agents/` repaired where it still carried upstream's answer | after every `wdi-method install` or `update` | each version jump, and any time `engines-invocable` is red |
 | `component` | Propose the slicing from the brief plus every PRD · birth what is accepted: registry row plus `SRS`/`SDD` skeletons · propose `mode`, `risk_accepted`, `risk_note`, `owns` | **G2 passed** | each time a component is born |
 | `mode` | Change `mode` — global in `index.yaml`, or one component in `components.yaml`. Guided | — | any time |
 | `risk` | Set or review one component's `risk_accepted`, with disclosure of what it touches | the component exists | any time, usually before G4 |
-| `structure` | Re-derive `.control/structure-codebase.md` and `structure-document.md` from the tree on disk | — | when folders change, and at wave close |
+| `structure` | Re-derive `.control/structure-codebase.md` and `structure-document.md` from the tree on disk | — | when folders change, and at spec close |
 | `readers` | Write `.constitution/project/inventory-readers.py` for **this** repo's stack, then prove it by running the engine | code exists | once, and again when the code's shape moves |
 
 ## Two boundaries
@@ -25,6 +26,23 @@ of where things are, a reader that can see this product's code.
   `corpus-guide.md` owns that rule.
 - Retiring or renaming a Product Component that already carries an SRS **is not its authority**. That
   goes through `wdi-decision`. Birthing is cheap; retiring is not.
+
+## Intent `engines`
+
+One command does the work — `npx wdi-method engines --fix` — and this intent exists because the work is
+not the installer's to do unasked. Two of the three things it touches are files somebody else owns:
+`docs/agents/*.md` is the product's, and the engines' `SKILL.md` files are the author's. `install` and
+`update` do the two mechanical halves (the flag, the BMad lock) on every run; the config repair happens
+only here, knowingly, and the previous text is kept as `.bak`.
+
+Report, always, in this order: which engines are present and which are missing (all six are required —
+`to-spec` · `to-tickets` · `implement` · `tdd` · `code-review` · `domain-modeling`), which had the flag
+stripped, how many BMad wrappers were locked, and whether `docs/agents/issue-tracker.md` was upstream's
+or already the method's. If any engine is missing, say so and stop: `npx skills@latest add
+mattpocock/skills` is the owner's to run, and a user-level plugin does not count — its files cannot be
+unlocked.
+
+Then run `validate.py`. `engines-invocable` green is the proof, not the report.
 
 ## Intent `setup`
 
@@ -67,8 +85,9 @@ to its component, however platform-shaped the table looks.
 ## Intents `mode` and `risk` — disclose, then propose
 
 `mode` controls **document depth** and nothing else. `risk_accepted` controls **review intensity** and
-nothing else. Their definitions live in `delivery-flow-guide.md`. What this skill owns is the
-conversation around changing them.
+nothing else. Their definitions live in `delivery-flow-guide.md`, and what the two chosen together cost is
+laid out cell by cell in `.constitution/method/why/mode-risk-map.md` — show it when the owner asks what a
+combination buys. What this skill owns is the conversation around changing them.
 
 **You do not judge. You disclose, then propose.** Read the `FR` that fall to the component, then name
 what it touches:
@@ -81,15 +100,28 @@ what it touches:
 
 Only after that do you propose `mode` and `risk_accepted`.
 
+**Land whatever UX is waiting, in this same act.** A UX run at G2 leaves `EXPERIENCE.md` and `DESIGN.md`
+in `_bmad-output/ux/` because their paths contain `<pc>` and there was no `<pc>` yet. Birthing the
+components is the moment that ends. Landing goes through `wdi-ux` — it owns those two paths and no other
+skill MAY write them — but it is dispatched from here rather than left for the owner to remember. It is
+the only deferral left in the flow, and this is where it closes.
+
+**Containers MAY be registered here when they are genuinely already known** — an app, an API, a database
+the product plainly has. Then a screen `LC` gets its container the moment it is born and there is no debt
+at all. They MUST NOT be guessed to achieve that: `wdi-blueprint` intent `platform` owns the real answer
+at G3, and a container invented here is data C4 then has to unpick. Where you are unsure, leave them and
+let G3 fill both the containers and the empty `LC` rows in one act.
+
 Raising or lowering `mode` is **free and needs no justification** — it is a preference, and a preference
 does not have to be defended. Setting `mode: catalog` on a sensitive component requires nothing, as long
 as its review stays hard; that combination is the one the split exists to make sayable.
 
 Two things are not free:
 
-- **`risk_accepted: high` on a component that touches any of the five** requires a `DEC-` of
-  `type: risk-acceptance`, and `risk_accepted_by:` pointing at it. V23 checks this. On a component that
-  touches none of them, `high` is free.
+- **`risk_accepted: high` on a component that touches any of the five** requires a named acceptance in
+  `risk_accepted_by` — **a person and a date is enough**, written here in `components.yaml` beside the
+  risk itself rather than as a separate file. A `DEC-` id is still accepted and still has to resolve.
+  `high-risk-named` checks this. On a component that touches none of them, `high` is free.
 - **An outside party who will demand the artifacts as a deliverable** — a regulator, an auditor, a
   client through a contract — puts the touched component at `mode: deep` and `risk_accepted: low`,
   whatever the global setting says. That floor MUST NOT be traded against a preference: the risk there

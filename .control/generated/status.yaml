@@ -1,0 +1,30 @@
+promise_progress: n/a
+rtm_rows:
+  green: 0
+  counted: 0
+  excluded_no_uc: 0
+work_progress: []
+gate_readiness: 96%
+validators_red:
+- cites-resolve
+validators_skipped:
+  container-built: '`containers:` is not registered yet'
+  custom-room-declared: the `.constitution/project/` room is empty, and that is a valid state — a generic
+    rule MUST NOT be moved here just to give the room content
+  id-allocated-once: no requirement row in any registry file yet
+  plan-dates: generated/timeline.yaml does not exist yet — overdue-ness is still computed from the registry,
+    but its presence in generated/report is not checked
+  review-trace: no component with risk_accepted low or medium — nothing to guard
+  uc-scheduled: no spec yet, so no ticket yet — every unscheduled UC is the correct state. Full catalogue
+    coverage is checked at G5
+open_questions:
+  blocking: 0
+  assumptions: 0
+  external: 0
+  answered: 0
+  open_by_whose:
+    owner: 0
+    run: 0
+    frozen: 0
+    unstated: 0
+  assumptions_budget_per_gate: 15

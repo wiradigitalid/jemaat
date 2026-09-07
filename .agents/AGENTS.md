@@ -225,3 +225,8 @@ MUST anything in `.constitution/method/why/`; `status: Reference` forbids it. A 
 
 Rewrite this section for the product. Stack, how to run tests, and known pitfalls belong here.
 `wdi-init` intent `structure` derives `.control/structure-codebase.md`; do not duplicate that map.
+
+## Confidentiality & Raw Data Boundary
+
+- `.temp/` is reserved for local, untracked input data (real church documents, personal data). Files in `.temp/` MUST NOT be committed or published.
+- Agents reading from `.temp/` to draft specifications or seed data MUST anonymize/synthesize before writing to `.what/`, `.how/`, or the codebase.

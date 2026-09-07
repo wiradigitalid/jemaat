@@ -726,6 +726,30 @@ admin['AdminDepartments.dc.html'] = doc(`
   </div>
 </div>`);
 
+/* ==================== W29 - no departments yet ==================== */
+
+admin['AdminDepartmentsEmpty.dc.html'] = doc(`
+<div style="width:1440px;height:900px;background:${C.bg};display:flex;flex-direction:column;">
+  <div style="display:flex;align-items:center;gap:14px;padding:20px 32px;background:${C.surfaceAlt};border-bottom:1px solid ${C.line};">
+    <div style="flex:1 1 auto;min-width:0;">
+      <div style="font-size:16px;font-weight:700;">Departments and serving roles</div>
+      <div style="font-size:12px;color:${C.ink3};margin-top:2px;">None yet</div>
+    </div>
+  </div>
+
+  <div style="flex:1 1 auto;min-height:0;display:flex;align-items:center;justify-content:center;padding:32px;">
+    <div style="width:520px;text-align:center;">
+      <span style="width:56px;height:56px;border-radius:999px;background:${C.accentTint};color:${C.accent};display:inline-flex;align-items:center;justify-content:center;">${svg(I.hand, 26)}</span>
+      <div style="font-family:${SERIF};font-size:28px;font-weight:500;letter-spacing:-0.01em;margin-top:20px;">No departments yet</div>
+      <div style="font-size:13.5px;color:${C.ink2};margin-top:12px;line-height:1.65;">A department is a team in your church. The roles inside it are what people put their names to when they say they are willing to serve.</div>
+      <div style="display:flex;justify-content:center;margin-top:24px;">
+        <span style="display:inline-flex;align-items:center;gap:9px;height:48px;padding:0 22px;border-radius:14px;background:${C.accent};color:#FFFFFF;font-size:14px;font-weight:700;">${svg(I.plus, 18, 2.2)}<span>Add the first department</span></span>
+      </div>
+      <div style="font-size:12.5px;color:${C.ink3};margin-top:18px;line-height:1.6;">Names are yours. Nothing is filled in for you, and nothing is required &mdash; a register works with no departments at all.</div>
+    </div>
+  </div>
+</div>`);
+
 /* ==================== W28 - choosing a serving role ==================== */
 
 const optRow = (role, { on = false, chosen = false } = {}) => `
@@ -1096,7 +1120,7 @@ admin['AdminServing.dc.html'] = doc(`
         </div>
         ${rows([
           rule('1', 'A role belongs to exactly one department', 'Moving it is allowed and recorded. A role that floats between departments makes every count ambiguous.'),
-          rule('2', 'The catalogue is per church', 'A congregation with no multimedia team never sees those roles. Every church starts from a seed list and edits it down.'),
+          rule('2', 'The catalogue is per church, and it starts empty', 'Nothing is seeded. A congregation names its own departments and its own roles, and sees no row it did not write.'),
           rule('3', 'Deactivate, never delete', 'People have already expressed interest, and one day a roster will point at it. A dead role stops being offered and keeps resolving.'),
           rule('4', 'Search matches both levels, only one is choosable', 'Typing a department name surfaces its roles; the heading itself stays a label. Nobody is ever interested in Music, they are interested in Keyboardist.'),
           rule('5', 'A chosen role always carries its department', 'Coordinator exists in four departments. The chip reads Music / Coordinator or it is worthless in a list.'),
@@ -1132,7 +1156,7 @@ admin['AdminServing.dc.html'] = doc(`
 
       ${infoCard('What the office gets out of it', `A list per role, which is the first thing a coordinator asks for: eighteen people said Singer and nobody has called them. W27 shows that list beside the role and lets it be exported, which is as far as this release goes towards a rota.`)}
 
-      ${infoCard('The seed list', `Music, Multimedia, Prayer, Teaching, Visitation, Hospitality &mdash; twenty-four roles between them. A new church deletes what it does not have rather than inventing from an empty screen, the same argument W11 makes about the register itself.`, 'border-color:#9A722344;')}
+      ${infoCard('Nothing is seeded', `The catalogue starts empty. A starter list looks generous and quietly imposes a structure: serving is named locally &mdash; pemusik, penyambut, kolektan, operator &mdash; and a row nobody chose is a row the office has to clean, while an unused role still fills the picker for years.<br><br><span style="font-weight:700;color:${C.ink};">W11 argues the opposite for the register itself</span>, and the difference is who owns the vocabulary: a household is a household anywhere, a serving role is whatever this church calls it.<br><br>The cost is stated rather than hidden. Until the first role exists the interest field has nothing to offer, so it shows that and points at W29 &mdash; which is the departments screen a church actually meets first.`, 'border-color:#9A722344;')}
       <div style="flex:1 1 auto;"></div>
     </div>
   </div>
@@ -1202,8 +1226,8 @@ admin['AdminRelease.dc.html'] = doc(`
         ${shipItem('W26', 'A household', 'Address, pin, occupants with relationships, and who moved out', 'new')}
         ${shipItem('W24', 'Care groups', 'Membership is register data. Placing the 12 who asked is the work', 'new')}
         ${shipItem('W25', 'The church record', 'Never drawn anywhere. Also where the time zone finally lands', 'new')}
-        ${shipItem('W27', 'Departments and roles', 'Master data behind the interest field, and the list a coordinator asks for', 'new')}
-        <div style="padding:10px 16px 4px;font-size:11.5px;color:${C.ink3};line-height:1.5;">W28 is not a route. It is W22 with the role picker open, drawn because the grouped search is the part that is easy to build wrongly.</div>
+        ${shipItem('W27', 'Departments and roles', 'Master data behind the interest field, empty until the church writes it', 'new')}
+        <div style="padding:10px 16px 4px;font-size:11.5px;color:${C.ink3};line-height:1.5;">W28 and W29 are not routes. W28 is W22 with the role picker open, because grouped search is the part that is easy to build wrongly; W29 is W27 before a church has written anything, which is the state it ships in.</div>
         <div style="padding:12px 16px 16px;border-top:1px solid ${C.line};font-size:12px;color:${C.ink2};line-height:1.55;">
           <span style="font-weight:700;color:${C.ink};">Not needed, and worth naming so nobody builds them by habit:</span> an offline queue, push notifications, an app shell, RSVP, attendance, meetings, weekly content, applications, and the statement store&rsquo;s second writer.
         </div>`, 'overflow:hidden;')}
@@ -1219,7 +1243,7 @@ admin['AdminRelease.dc.html'] = doc(`
         ${order('2', 'Admin auth, two administrators', 'The vendor template has a lead time. Start it in week one')}
         ${order('3', 'Households, then people', 'The household holds the address, so it is the first table with a shape')}
         ${order('4', 'The map, last of the register', 'Search and a draggable pin. Everything works without it, worse')}
-        ${order('5', 'Care groups and the interest queues', 'Cheap, and the only thing here that generates its own next task')}
+        ${order('5', 'Care groups, then the serving catalogue', 'Both cheap. The catalogue ships empty, so W29 is what the office meets and the interest field waits on it')}
         ${order('6', 'Import, then merge', 'Two weeks together. Never ship the first without the second')}
         ${order('7', 'Export', 'Before the second church signs, not the first')}
         <div style="height:8px;"></div>`)}

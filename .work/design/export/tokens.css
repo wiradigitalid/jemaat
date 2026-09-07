@@ -1,0 +1,257 @@
+/* ============================================================================
+   JEMAAT DESIGN TOKENS
+   Generated from .work/design/lib.mjs, the source of truth for the design
+   canvas. Do not hand-edit: change lib.mjs and re-run export/_gen-tokens.mjs.
+
+   Three rules cannot be expressed as tokens, and stock shadcn/ui breaks all
+   three by default:
+     1. NO SHADOWS. Depth is a 1px border plus a cream-to-white surface step.
+     2. NO RED. Errors and warnings use --warning (amber). Destructive
+        actions use --destructive, the accent darkened, never a new hue.
+     3. Light only, deliberately. See the dark-mode note at the foot.
+   ============================================================================ */
+
+/* --- Tailwind v4 / current shadcn: hex values used directly --------------- */
+:root {
+  --background:                   #FAF7F2;   /* page ground */
+  --foreground:                   #241E1A;   /* body text */
+  --card:                         #FFFFFF;   /* raised surface */
+  --card-foreground:              #241E1A;   
+  --popover:                      #FFFFFF;   /* dropdowns, command palette */
+  --popover-foreground:           #241E1A;   
+  --primary:                      #B4562F;   /* the only saturated action colour */
+  --primary-foreground:           #FFFFFF;   
+  --secondary:                    #F6EAE3;   /* tinted chips, quiet actions */
+  --secondary-foreground:         #8E4224;   
+  --muted:                        #F1EAE1;   /* inert fills, table stripes */
+  --muted-foreground:             #9A8F85;   /* meta text, placeholders */
+  --accent:                       #F6EAE3;   /* hover and highlight rows */
+  --accent-foreground:            #B4562F;   
+  --destructive:                  #8E4224;   /* NOT red - see design-system.md */
+  --destructive-foreground:       #FFFFFF;   
+  --border:                       #E9E1D7;   /* the only depth cue in the product */
+  --input:                        #E9E1D7;   
+  --ring:                         #B4562F;   /* focus ring */
+  --success:                      #4C6B52;   /* added token, not stock shadcn */
+  --success-foreground:           #FFFFFF;   
+  --success-muted:                #EAF0EA;   
+  --warning:                      #9A7223;   /* added token - errors use this, never red */
+  --warning-foreground:           #FFFFFF;   
+  --warning-muted:                #F7EEDD;   
+  --surface-alt:                  #FFFDFB;   /* added token - page headers, toolbars */
+  --ink-2:                        #6B6058;   /* added token - secondary prose */
+  --disabled:                     #EFE8DF;   /* added token */
+  --disabled-foreground:          #B5AAA0;   /* added token */
+  --sidebar:                      #FFFDFB;   
+  --sidebar-foreground:           #241E1A;   
+  --sidebar-primary:              #B4562F;   
+  --sidebar-primary-foreground:   #FFFFFF;   
+  --sidebar-accent:               #F6EAE3;   
+  --sidebar-accent-foreground:    #B4562F;   
+  --sidebar-border:               #E9E1D7;   
+  --sidebar-ring:                 #B4562F;   
+
+  /* Radii. lib.mjs R = { mark: 6, input: 12, card: 14, pill: 999 }.
+     --radius drives shadcn rounded-lg/md/sm, so it carries the control
+     radius and Card keeps its own. */
+  --radius:                       0.75rem;   /* 12px inputs, buttons, chips */
+  --radius-card:                  0.875rem;  /* 14px Card only */
+  --radius-mark:                  0.375rem;  /* 6px  checkboxes, tiny marks */
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-success-muted: var(--success-muted);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-warning-muted: var(--warning-muted);
+  --color-surface-alt: var(--surface-alt);
+  --color-ink-2: var(--ink-2);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --font-sans: "Plus Jakarta Sans", "Segoe UI", system-ui, sans-serif;
+  --font-serif: "Newsreader", Georgia, "Times New Roman", serif;
+
+  /* Type scale from lib.mjs T. Every size on 94 artboards is one of these. */
+  --text-micro: 0.5625rem;  /*  9 */
+  --text-tiny:  0.625rem;   /* 10 */
+  --text-xs:    0.6875rem;  /* 11 */
+  --text-sm:    0.75rem;    /* 12 */
+  --text-base:  0.8125rem;  /* 13  the real body size */
+  --text-md:    0.875rem;   /* 14 */
+  --text-lg:    0.9375rem;  /* 15 */
+  --text-xl:    1.0625rem;  /* 17  phone body minimum */
+  --text-d1:    1.25rem;    /* 20  display */
+  --text-d2:    1.5rem;     /* 24  display */
+  --text-d3:    1.6875rem;  /* 27  display */
+  --text-d4:    2.125rem;   /* 34  display, sheet titles only */
+
+  /* Control heights. Anything else snaps DOWN to the nearest of these. */
+  --size-control-xs:  2.125rem; /* 34 */
+  --size-control-sm:  2.5rem;   /* 40 */
+  --size-control-md:  2.75rem;  /* 44  desktop input and button default */
+  --size-control-lg:  3rem;     /* 48  primary action, phone default */
+  --size-control-xl:  3.25rem;  /* 52  phone input */
+  --size-control-2xl: 3.5rem;   /* 56 */
+
+  /* Spacing, derived from what the artboards use rather than decided up
+     front - S6 flags this as the one axis never systematised. Enforce it in
+     code or it drifts back to 39 values, which happened to the type scale
+     twice. */
+  --spacing-1: 0.25rem;  /*  4 */
+  --spacing-2: 0.5rem;   /*  8 */
+  --spacing-3: 0.75rem;  /* 12 */
+  --spacing-4: 1rem;     /* 16 */
+  --spacing-5: 1.25rem;  /* 20 */
+  --spacing-6: 1.5rem;   /* 24 */
+  --spacing-8: 2rem;     /* 32 */
+  --spacing-10: 2.5rem;  /* 40 */
+}
+
+/* --- Tailwind v3 / older shadcn: the same values as HSL triplets ----------
+   Uncomment this and delete the hex :root above if your stack expects
+   "H S% L%" without a colour function.
+
+:root {
+  --background:                   37.5 44.4% 96.5%;
+  --foreground:                   24 16.1% 12.2%;
+  --card:                         0 0% 100%;
+  --card-foreground:              24 16.1% 12.2%;
+  --popover:                      0 0% 100%;
+  --popover-foreground:           24 16.1% 12.2%;
+  --primary:                      17.6 58.6% 44.5%;
+  --primary-foreground:           0 0% 100%;
+  --secondary:                    22.1 51.4% 92.7%;
+  --secondary-foreground:         17 59.6% 34.9%;
+  --muted:                        33.7 36.4% 91.4%;
+  --muted-foreground:             28.6 9.4% 56.3%;
+  --accent:                       22.1 51.4% 92.7%;
+  --accent-foreground:            17.6 58.6% 44.5%;
+  --destructive:                  17 59.6% 34.9%;
+  --destructive-foreground:       0 0% 100%;
+  --border:                       33.3 29% 87.8%;
+  --input:                        33.3 29% 87.8%;
+  --ring:                         17.6 58.6% 44.5%;
+  --success:                      131.6 16.9% 35.9%;
+  --success-foreground:           0 0% 100%;
+  --success-muted:                120 16.7% 92.9%;
+  --warning:                      39.8 63% 37.1%;
+  --warning-foreground:           0 0% 100%;
+  --warning-muted:                39.2 61.9% 91.8%;
+  --surface-alt:                  30 100% 99.2%;
+  --ink-2:                        25.3 9.7% 38.2%;
+  --disabled:                     33.7 33.3% 90.6%;
+  --disabled-foreground:          28.6 12.4% 66.9%;
+  --sidebar:                      30 100% 99.2%;
+  --sidebar-foreground:           24 16.1% 12.2%;
+  --sidebar-primary:              17.6 58.6% 44.5%;
+  --sidebar-primary-foreground:   0 0% 100%;
+  --sidebar-accent:               22.1 51.4% 92.7%;
+  --sidebar-accent-foreground:    17.6 58.6% 44.5%;
+  --sidebar-border:               33.3 29% 87.8%;
+  --sidebar-ring:                 17.6 58.6% 44.5%;
+  --radius: 0.75rem;
+}
+--------------------------------------------------------------------------- */
+
+/* --- Base layer: the parts stock shadcn gets wrong ----------------------- */
+@layer base {
+  * { border-color: var(--border); }
+
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    -webkit-font-smoothing: antialiased;
+    text-wrap: pretty;
+  }
+
+  /* Rule 1, enforced. Prefer deleting the utility, but keep the guard: one
+     stray shadow-sm and the product looks like every other admin panel. */
+  .shadow-sm, .shadow, .shadow-md, .shadow-lg, .shadow-xl { box-shadow: none !important; }
+
+  h1, h2, h3, .font-display {
+    font-family: var(--font-serif);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+
+  /* Uppercase micro-labels carry letter-spacing everywhere on the canvas. */
+  .label-eyebrow {
+    font-size: var(--text-tiny);
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--muted-foreground);
+  }
+
+  /* Digits that line up in columns: counts, ages, dates in tables. */
+  .tabular { font-variant-numeric: tabular-nums; }
+}
+
+/* --- DARK MODE IS NOT DESIGNED ------------------------------------------
+   S6 committed to one palette: no shadows, a 1px line plus a cream-to-white
+   step, chosen to survive a cheap Android screen in daylight. None of the 94
+   artboards has a dark counterpart.
+
+   Below is a mechanical inversion so a stock shadcn dark toggle does not
+   render unreadable text. It has had NO design pass: accent contrast on a
+   dark ground is unverified and the tints are guesses. Either drop the
+   toggle for the first release, or budget a pass before shipping it.
+   ----------------------------------------------------------------------- */
+.dark {
+  --background: #1A1613;
+  --foreground: #F2EBE3;
+  --card: #221D19;
+  --card-foreground: #F2EBE3;
+  --popover: #221D19;
+  --popover-foreground: #F2EBE3;
+  --primary: #D9784F;
+  --primary-foreground: #1A1613;
+  --secondary: #33291F;
+  --secondary-foreground: #E8C6B4;
+  --muted: #2A2420;
+  --muted-foreground: #A79A8E;
+  --accent: #33291F;
+  --accent-foreground: #D9784F;
+  --destructive: #C25A33;
+  --destructive-foreground: #1A1613;
+  --border: #362E27;
+  --input: #362E27;
+  --ring: #D9784F;
+  --success: #7FA487;
+  --success-muted: #232E25;
+  --warning: #C79A44;
+  --warning-muted: #322818;
+  --surface-alt: #1F1A16;
+  --ink-2: #C3B7AB;
+}

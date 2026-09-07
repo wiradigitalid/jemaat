@@ -1,0 +1,130 @@
+[
+  {
+    "code": "W19",
+    "title": "Sign in, on a phone",
+    "file": "AdminSignIn",
+    "w": 390,
+    "h": 844,
+    "kind": "phone"
+  },
+  {
+    "code": "W20",
+    "title": "The link inside messages",
+    "file": "AdminLinkStuck",
+    "w": 390,
+    "h": 844,
+    "kind": "phone"
+  },
+  {
+    "code": "W21",
+    "title": "The register on a phone",
+    "file": "AdminHomePhone",
+    "w": 390,
+    "h": 844,
+    "kind": "phone"
+  },
+  {
+    "code": "W23",
+    "title": "Add a person, on a phone",
+    "file": "AdminPersonPhone",
+    "w": 390,
+    "h": 844,
+    "kind": "phone"
+  },
+  {
+    "code": "W18",
+    "title": "Sign in, office desktop",
+    "file": "AdminDeskSignIn",
+    "w": 1440,
+    "h": 900,
+    "kind": "desktop"
+  },
+  {
+    "code": "W22",
+    "title": "Add a person, desktop",
+    "file": "AdminPersonNew",
+    "w": 1440,
+    "h": 900,
+    "kind": "desktop"
+  },
+  {
+    "code": "W28",
+    "title": "Choosing a serving role",
+    "file": "AdminRolePicker",
+    "w": 1440,
+    "h": 900,
+    "kind": "desktop"
+  },
+  {
+    "code": "W26",
+    "title": "A household",
+    "file": "AdminHousehold",
+    "w": 1440,
+    "h": 1040,
+    "kind": "desktop"
+  },
+  {
+    "code": "W24",
+    "title": "Care groups",
+    "file": "AdminGroups",
+    "w": 1440,
+    "h": 900,
+    "kind": "desktop"
+  },
+  {
+    "code": "W27",
+    "title": "Departments and serving roles",
+    "file": "AdminDepartments",
+    "w": 1440,
+    "h": 900,
+    "kind": "desktop"
+  },
+  {
+    "code": "W29",
+    "title": "No departments yet",
+    "file": "AdminDepartmentsEmpty",
+    "w": 1440,
+    "h": 900,
+    "kind": "desktop"
+  },
+  {
+    "code": "W25",
+    "title": "The church record",
+    "file": "AdminChurch",
+    "w": 1440,
+    "h": 900,
+    "kind": "desktop"
+  },
+  {
+    "code": "S12",
+    "title": "The register, alone",
+    "file": "AdminScope",
+    "w": 1440,
+    "h": 1020,
+    "kind": "sheet"
+  },
+  {
+    "code": "S14",
+    "title": "Household, family, and the address",
+    "file": "AdminModel",
+    "w": 1440,
+    "h": 1300,
+    "kind": "sheet"
+  },
+  {
+    "code": "S15",
+    "title": "Departments, roles, and interest",
+    "file": "AdminServing",
+    "w": 1440,
+    "h": 900,
+    "kind": "sheet"
+  },
+  {
+    "code": "S13",
+    "title": "What ships: the register",
+    "file": "AdminRelease",
+    "w": 1440,
+    "h": 1150,
+    "kind": "sheet"
+  }
+]

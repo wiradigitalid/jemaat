@@ -1,6 +1,7 @@
 # Screens — the admin register
 
-Twelve product screens and four specification sheets, exported from canvas page 8.
+Nineteen product screens and four specification sheets — twelve product screens from canvas page 8
+plus the seven older office screens the release also needs.
 PNGs in `screens/`, self-contained HTML in `html/` (open in any browser — the HTML is the exact
 source the PNGs were rendered from, so measure against it rather than against a screenshot).
 
@@ -21,6 +22,35 @@ office screens are still `W`, because the split is by how big the job is, not by
 | **W27** | `AdminDepartments` | list route | Departments and serving roles. Department list, roles with interest counts, one deactivated role shown, and the people interested in the selected department. |
 | **W29** | `AdminDepartmentsEmpty` | same route, empty state | No departments yet. **This is the state the product ships in** — nothing is seeded. One sentence, one action. |
 | **W25** | `AdminChurch` | settings route | The church record: name, address, time zone, worship day, map, administrators (minimum two), and what the register currently holds. |
+
+## Already drawn, and in the release (canvas page 4)
+
+These seven predate the admin-register pass. They are in the R0-A ship list unchanged, and they are
+office screens with real product copy — but read the drift note below before building two of them.
+
+| Code | File | What it is |
+|---|---|---|
+| **W11** | `WebEmpty` | The first screen a church ever sees: an empty People table that teaches one concept, then gives an order to work in. Onboarding, not a placeholder. |
+| **W2** | `WebPeople` | The People table. Search, filter, and the missing-phone-number complaint that becomes a queue on W21. |
+| **W6** | `WebPerson` | One person, and lifecycle. Transferred and deceased are register facts: nothing is ever deleted, forward-looking surfaces drop the person, backward-looking ones keep them. |
+| **W5** | `WebImport` | Import from Excel. Nothing is rejected — all rows land and the bad ones arrive flagged. Two weeks of work on its own. |
+| **W12** | `WebMerge` | Two records, one person. Never lose a value to an empty one; histories add; reversible for thirty days. |
+| **W10** | `WebData` | Your data, and leaving. Export is on every Tuesday, not on the way out. Addresses are left out of the default export. |
+| **W13** | `WebRoles` | Who can do what — in this release, who the administrators are. Refuses a church with only one. |
+
+### Drift note, and it matters
+
+**W6 and W2 predate the eleven-field person and the household split.** W6 shows the old six-field
+record with no second phone, no serving interests, no care-group wish; W2's columns were chosen
+before those fields existed. Build W22/W26 first (they are current), then re-derive W6 and W2 from
+them rather than copying the artboard.
+
+**W17** (`WebHouseAdmin`, *A household, and who signs in*) is on canvas page 4 but **not** in the
+ship list: W26 supersedes it, and its "who signs in" column describes accounts that do not exist in
+this release. It is not exported.
+
+These seven also predate the copy rule, so one or two carry a line of reasoning in the UI that the
+newer screens would not. Strip it when you build.
 
 ## Phone — 390 × 844
 

@@ -3,7 +3,8 @@
 Everything needed to build the first release (the church office alone) on **shadcn/ui + Tailwind**
 without the result drifting from the design canvas.
 
-Exported 2026-09-07 from canvas page 8 — 94 artboards, 47 iterations.
+Exported 2026-09-07 from a 94-artboard canvas: page 8 (the admin-register pass) plus the seven
+older office screens the release ships unchanged.
 Live canvas: <https://claude.ai/code/artifact/689187a4-319b-4df5-a81c-3588c58859e1>
 
 ## Contents
@@ -13,8 +14,8 @@ Live canvas: <https://claude.ai/code/artifact/689187a4-319b-4df5-a81c-3588c58859
 | `design-system.md` | Colour, type, spacing, radii, icons, copy rules — and **the three rules stock shadcn breaks**. Read first. |
 | `tokens.css` | Drop-in CSS variables for shadcn (Tailwind v4 hex block, v3 HSL block commented below it), plus a base layer. Generated — do not hand-edit. |
 | `components.md` | Every canvas component → its shadcn component, with the class overrides that make stock shadcn match. Includes the two hard interactions (grouped role picker, household matcher) and the map. |
-| `screens.md` | The twelve product screens and four spec sheets: route shape, size, purpose. Plus the build order. |
-| `screens/*.png` | Every screen rendered at its exact artboard size. |
+| `screens.md` | All 19 product screens and 4 spec sheets: route shape, size, purpose, the build order, and the drift note on the two older screens. |
+| `screens/*.png` | All 23 screens rendered at their exact artboard size. |
 | `html/*.html` | The same screens as self-contained HTML. **Measure against these, not the PNGs** — they are the source the PNGs came from. |
 | `_gen-tokens.mjs` | Regenerates `tokens.css` from `../lib.mjs`. |
 

@@ -1,35 +1,66 @@
 [
   {
-    "code": "W19",
-    "title": "Sign in, on a phone",
-    "file": "AdminSignIn",
-    "w": 390,
-    "h": 844,
-    "kind": "phone"
+    "code": "W11",
+    "title": "The first screen ever seen",
+    "file": "WebEmpty",
+    "w": 1440,
+    "h": 900,
+    "kind": "desktop",
+    "canvasPage": "page-4"
   },
   {
-    "code": "W20",
-    "title": "The link inside messages",
-    "file": "AdminLinkStuck",
-    "w": 390,
-    "h": 844,
-    "kind": "phone"
+    "code": "W2",
+    "title": "People table",
+    "file": "WebPeople",
+    "w": 1440,
+    "h": 900,
+    "kind": "desktop",
+    "canvasPage": "page-4"
   },
   {
-    "code": "W21",
-    "title": "The register on a phone",
-    "file": "AdminHomePhone",
-    "w": 390,
-    "h": 844,
-    "kind": "phone"
+    "code": "W6",
+    "title": "One person, and lifecycle",
+    "file": "WebPerson",
+    "w": 1440,
+    "h": 900,
+    "kind": "desktop",
+    "canvasPage": "page-4"
   },
   {
-    "code": "W23",
-    "title": "Add a person, on a phone",
-    "file": "AdminPersonPhone",
-    "w": 390,
-    "h": 844,
-    "kind": "phone"
+    "code": "W5",
+    "title": "Import from Excel",
+    "file": "WebImport",
+    "w": 1440,
+    "h": 900,
+    "kind": "desktop",
+    "canvasPage": "page-4"
+  },
+  {
+    "code": "W12",
+    "title": "Two records, one person",
+    "file": "WebMerge",
+    "w": 1440,
+    "h": 900,
+    "kind": "desktop",
+    "canvasPage": "page-4"
+  },
+  {
+    "code": "W10",
+    "title": "Your data, and leaving",
+    "file": "WebData",
+    "w": 1440,
+    "h": 900,
+    "kind": "desktop",
+    "canvasPage": "page-4"
+  },
+  {
+    "code": "W13",
+    "title": "Who can do what",
+    "file": "WebRoles",
+    "w": 1440,
+    "h": 900,
+    "kind": "desktop",
+    "canvasPage": "page-4"
   },
   {
     "code": "W18",
@@ -37,7 +68,35 @@
     "file": "AdminDeskSignIn",
     "w": 1440,
     "h": 900,
-    "kind": "desktop"
+    "kind": "desktop",
+    "canvasPage": "page-8"
+  },
+  {
+    "code": "W19",
+    "title": "Sign in, on a phone",
+    "file": "AdminSignIn",
+    "w": 390,
+    "h": 844,
+    "kind": "phone",
+    "canvasPage": "page-8"
+  },
+  {
+    "code": "W20",
+    "title": "The link inside messages",
+    "file": "AdminLinkStuck",
+    "w": 390,
+    "h": 844,
+    "kind": "phone",
+    "canvasPage": "page-8"
+  },
+  {
+    "code": "W21",
+    "title": "The register on a phone",
+    "file": "AdminHomePhone",
+    "w": 390,
+    "h": 844,
+    "kind": "phone",
+    "canvasPage": "page-8"
   },
   {
     "code": "W22",
@@ -45,15 +104,17 @@
     "file": "AdminPersonNew",
     "w": 1440,
     "h": 900,
-    "kind": "desktop"
+    "kind": "desktop",
+    "canvasPage": "page-8"
   },
   {
-    "code": "W28",
-    "title": "Choosing a serving role",
-    "file": "AdminRolePicker",
-    "w": 1440,
-    "h": 900,
-    "kind": "desktop"
+    "code": "W23",
+    "title": "Add a person, on a phone",
+    "file": "AdminPersonPhone",
+    "w": 390,
+    "h": 844,
+    "kind": "phone",
+    "canvasPage": "page-8"
   },
   {
     "code": "W26",
@@ -61,7 +122,8 @@
     "file": "AdminHousehold",
     "w": 1440,
     "h": 1040,
-    "kind": "desktop"
+    "kind": "desktop",
+    "canvasPage": "page-8"
   },
   {
     "code": "W24",
@@ -69,7 +131,8 @@
     "file": "AdminGroups",
     "w": 1440,
     "h": 900,
-    "kind": "desktop"
+    "kind": "desktop",
+    "canvasPage": "page-8"
   },
   {
     "code": "W27",
@@ -77,7 +140,8 @@
     "file": "AdminDepartments",
     "w": 1440,
     "h": 900,
-    "kind": "desktop"
+    "kind": "desktop",
+    "canvasPage": "page-8"
   },
   {
     "code": "W29",
@@ -85,7 +149,8 @@
     "file": "AdminDepartmentsEmpty",
     "w": 1440,
     "h": 900,
-    "kind": "desktop"
+    "kind": "desktop",
+    "canvasPage": "page-8"
   },
   {
     "code": "W25",
@@ -93,7 +158,17 @@
     "file": "AdminChurch",
     "w": 1440,
     "h": 900,
-    "kind": "desktop"
+    "kind": "desktop",
+    "canvasPage": "page-8"
+  },
+  {
+    "code": "W28",
+    "title": "Choosing a serving role",
+    "file": "AdminRolePicker",
+    "w": 1440,
+    "h": 900,
+    "kind": "desktop",
+    "canvasPage": "page-8"
   },
   {
     "code": "S12",
@@ -101,7 +176,8 @@
     "file": "AdminScope",
     "w": 1440,
     "h": 1020,
-    "kind": "sheet"
+    "kind": "sheet",
+    "canvasPage": "page-8"
   },
   {
     "code": "S14",
@@ -109,7 +185,8 @@
     "file": "AdminModel",
     "w": 1440,
     "h": 1300,
-    "kind": "sheet"
+    "kind": "sheet",
+    "canvasPage": "page-8"
   },
   {
     "code": "S15",
@@ -117,7 +194,8 @@
     "file": "AdminServing",
     "w": 1440,
     "h": 900,
-    "kind": "sheet"
+    "kind": "sheet",
+    "canvasPage": "page-8"
   },
   {
     "code": "S13",
@@ -125,6 +203,7 @@
     "file": "AdminRelease",
     "w": 1440,
     "h": 1150,
-    "kind": "sheet"
+    "kind": "sheet",
+    "canvasPage": "page-8"
   }
 ]

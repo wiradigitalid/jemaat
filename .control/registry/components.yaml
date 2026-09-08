@@ -12,10 +12,183 @@
 #
 # A component is born through wdi-init intent `component` at the tail of G2. This file is born empty.
 
-product_components: []
+product_components:
+  - id: membership
+    name: "Membership & Households"
+    purpose: "Core personal records, family structures, households, and member lifecycle tracking"
+    risk_accepted: medium
+    risk_note: "Handles personal data (names, phone numbers, addresses, family linkages)"
+    containers:
+      - api
+      - web
+      - mobile
+    owns:
+      - person
+      - household
+      - family_relationship
+      - membership_record
+
+  - id: serving
+    name: "Volunteer Scheduling & Rosters"
+    purpose: "Ministry departments, service roles, roster planning, and volunteer confirmations"
+    risk_accepted: low
+    containers:
+      - api
+      - web
+      - mobile
+    owns:
+      - ministry_team
+      - serving_role
+      - service_schedule
+      - roster_assignment
+      - volunteer_availability
+
+  - id: caregroups
+    name: "Care Groups & Attendance"
+    purpose: "Small group management, meeting schedules, attendance logging, and pastoral monitoring"
+    risk_accepted: low
+    containers:
+      - api
+      - web
+      - mobile
+    owns:
+      - care_group
+      - group_membership
+      - meeting_session
+      - attendance_record
+
+  - id: portal
+    name: "Congregational Portal & Workflows"
+    purpose: "Mobile bulletin, weekly schedules, guest onboarding, and automated reminders"
+    risk_accepted: low
+    containers:
+      - api
+      - web
+      - mobile
+    owns:
+      - church_profile
+      - announcement
+      - sermon_bulletin
+      - guest_intake_entry
+      - notification_event
 
 platform_owns: []
 
-containers: []
+containers:
+  - id: api
+    name: "Go Backend REST API"
+    type: service
+    built: true
+    path: apps/api
+    technology: "Go 1.22, Gin/Chi, PostgreSQL, SQLC/pgx"
 
-logical_components: []
+  - id: web
+    name: "React Web Admin"
+    type: web
+    built: true
+    path: apps/web
+    technology: "React 18, Vite, TypeScript, Tailwind CSS, shadcn/ui"
+
+  - id: mobile
+    name: "Flutter Mobile Client"
+    type: mobile
+    built: true
+    path: apps/mobile
+    technology: "Flutter 3.x, Dart, SQLite (sqflite/drift)"
+
+  - id: db
+    name: "PostgreSQL Database"
+    type: database
+    built: false
+    technology: "PostgreSQL 16"
+
+logical_components:
+  - id: screen-mobile-home
+    name: "Mobile Home Feed"
+    component: portal
+    lc_type: ui-screen
+    container: mobile
+
+  - id: screen-mobile-service
+    name: "Mobile Service Bulletin"
+    component: portal
+    lc_type: ui-screen
+    container: mobile
+
+  - id: screen-mobile-sermons
+    name: "Mobile Sermon Archive"
+    component: portal
+    lc_type: ui-screen
+    container: mobile
+
+  - id: screen-mobile-serving
+    name: "Mobile Serving Roster"
+    component: serving
+    lc_type: ui-screen
+    container: mobile
+
+  - id: screen-mobile-caregroups
+    name: "Mobile Care Group Hub"
+    component: caregroups
+    lc_type: ui-screen
+    container: mobile
+
+  - id: screen-mobile-attendance
+    name: "Mobile Attendance Check-In"
+    component: caregroups
+    lc_type: ui-screen
+    container: mobile
+
+  - id: screen-mobile-directory
+    name: "Mobile Member Directory"
+    component: portal
+    lc_type: ui-screen
+    container: mobile
+
+  - id: screen-mobile-profile
+    name: "Mobile Personal Profile"
+    component: membership
+    lc_type: ui-screen
+    container: mobile
+
+  - id: screen-mobile-auth
+    name: "Mobile Church Code & Onboarding"
+    component: portal
+    lc_type: ui-screen
+    container: mobile
+
+  - id: screen-web-people
+    name: "Web Admin People Registry"
+    component: membership
+    lc_type: ui-screen
+    container: web
+
+  - id: screen-web-households
+    name: "Web Admin Household Manager"
+    component: membership
+    lc_type: ui-screen
+    container: web
+
+  - id: screen-web-roster
+    name: "Web Admin Roster Matrix"
+    component: serving
+    lc_type: ui-screen
+    container: web
+
+  - id: screen-web-caregroups
+    name: "Web Admin Care Group Manager"
+    component: caregroups
+    lc_type: ui-screen
+    container: web
+
+  - id: screen-web-data
+    name: "Web Admin CSV Import & Deduplication"
+    component: membership
+    lc_type: ui-screen
+    container: web
+
+  - id: screen-web-settings
+    name: "Web Admin Church Settings & QR"
+    component: portal
+    lc_type: ui-screen
+    container: web

@@ -1,0 +1,194 @@
+# requirements-church-operations.yaml — SSOT for CAP, FR, NFR, UJ for church-operations
+#
+# ONE FILE, ONE WRITER, ONE GATE. Owned by wdi-product at G2.
+
+capabilities:
+  - id: CAP-1
+    goal: BG-1
+    title: "Household and Member Identity Management"
+    priority: P0
+    target_release: v0.1.0
+    depends_on: []
+
+  - id: CAP-2
+    goal: BG-2
+    title: "Ministry Roster and Volunteer Scheduling"
+    priority: P0
+    target_release: v0.1.0
+    depends_on:
+      - CAP-1
+
+  - id: CAP-3
+    goal: BG-3
+    title: "Care Group Operations and Attendance"
+    priority: P0
+    target_release: v0.1.0
+    depends_on:
+      - CAP-1
+
+  - id: CAP-4
+    goal: BG-4
+    title: "Congregational Portal and Service Directory"
+    priority: P0
+    target_release: v0.1.0
+    depends_on:
+      - CAP-1
+
+  - id: CAP-5
+    goal: BG-5
+    title: "Workflow Automation, Reminders, and Guest Intake"
+    priority: P0
+    target_release: v0.1.0
+    depends_on:
+      - CAP-2
+      - CAP-3
+      - CAP-4
+
+functional:
+  - id: FR-1
+    capability: CAP-1
+    title: "Member Personal Record Management"
+    statement: "Administrators can create, view, update, and search individual congregant profiles with personal details, contact information, baptismal/membership status, and custom tags."
+    proof: "Administrator creates and updates a member record via web portal, verifies all fields persist, and searches profile by name or phone."
+
+  - id: FR-2
+    capability: CAP-1
+    title: "Household and Family Relationship Linking"
+    statement: "Administrators can group individuals into households, define primary contacts/heads of household, and establish family relationships (spouse, child, parent, dependent)."
+    proof: "Creating a household links multiple individual records; editing household address reflects across all associated members."
+
+  - id: FR-3
+    capability: CAP-1
+    title: "Bulk Member Import and Duplicate Detection"
+    statement: "Administrators can import existing congregational data from CSV spreadsheets, preview column mapping, detect duplicate profiles, and merge duplicate records."
+    proof: "Importing a 100-row CSV correctly populates members and flags duplicate phone/email records for administrative merge resolution."
+
+  - id: FR-4
+    capability: CAP-1
+    title: "Membership Lifecycle and Status Tracking"
+    statement: "The system tracks membership lifecycle transitions (active, newcomer, regular attendee, inactive, archived, or transferred) with audit history."
+    proof: "Updating a member status from newcomer to active logs the transition with timestamp and administrator identity in the audit trail."
+
+  - id: FR-5
+    capability: CAP-2
+    title: "Ministry Departments and Service Roles Setup"
+    statement: "Coordinators can define church ministry departments (e.g., Worship, Ushering, Tech, Kids) and configure specific serving roles with volunteer capacity requirements."
+    proof: "Coordinator creates ministry teams and roles; roles become available for assignment across future service dates."
+
+  - id: FR-6
+    capability: CAP-2
+    title: "Service Scheduling and Roster Matrix"
+    statement: "Coordinators can plan upcoming service schedules, assign qualified volunteers to specific roles, and view ministry coverage on a calendar roster matrix."
+    proof: "Assigning volunteers to Sunday service slots displays complete coverage and identifies unfilled roles on the matrix."
+
+  - id: FR-7
+    capability: CAP-2
+    title: "Mobile Volunteer Serving RSVP and Confirmation"
+    statement: "Scheduled volunteers receive automated notifications of assigned serving duties with duty details and can accept, decline, or request swap with one tap."
+    proof: "Volunteer confirms an assignment on mobile; status updates from 'pending' to 'confirmed' on the coordinator's roster dashboard."
+
+  - id: FR-8
+    capability: CAP-2
+    title: "Volunteer Blockout Dates and Conflict Prevention"
+    statement: "Volunteers can submit unavailable dates in advance, and the system prevents scheduling double-bookings across overlapping services."
+    proof: "Attempting to assign a volunteer on a blocked-out date or to two concurrent roles triggers an administrative warning."
+
+  - id: FR-9
+    capability: CAP-3
+    title: "Care Group Directory and Membership Management"
+    statement: "Administrators and group leaders can organize small care groups by zone/demographic, assign leaders, and manage member enrollment."
+    proof: "A care group profile lists designated leaders and enrolled members, visible to authorized leaders and administrators."
+
+  - id: FR-10
+    capability: CAP-3
+    title: "Mobile Care Group Attendance and Meeting Logging"
+    statement: "Care group leaders can record meeting details, check off attendees and guests on mobile, and submit attendance reports with offline storage support."
+    proof: "Leader marks attendance while offline; records sync automatically to the central database when network connectivity returns."
+
+  - id: FR-11
+    capability: CAP-3
+    title: "Care Group Pastoral Attention and Inactivity Alerts"
+    statement: "The system identifies care group members who have been absent for 3 or more consecutive meetings and surfaces pastoral attention prompts to leaders."
+    proof: "Dashboard flags members with 3 consecutive unexcused absences in the pastoral care review queue."
+
+  - id: FR-12
+    capability: CAP-4
+    title: "Congregational Mobile Dashboard and Weekly Schedule"
+    statement: "Church members and visitors can view the church's weekly service schedule, upcoming events, verified announcements, and sermon information on mobile."
+    proof: "Publishing a weekly announcement or service update displays immediately on the mobile member home screen."
+
+  - id: FR-13
+    capability: CAP-4
+    title: "Church Joining via QR Code and Fast Code Verification"
+    statement: "Newcomers and members can connect to their local church by scanning a church QR code or entering a short 6-digit church code with phone OTP verification."
+    proof: "Entering a valid church code successfully binds the mobile app instance to the church congregation profile."
+
+  - id: FR-14
+    capability: CAP-4
+    title: "Personal Serving Schedule and Church Directory"
+    statement: "Congregants can view their upcoming serving assignments across all ministries and search an opt-in congregation directory with privacy controls."
+    proof: "Member views their confirmed serving dates in a consolidated personal schedule tab on mobile."
+
+  - id: FR-15
+    capability: CAP-5
+    title: "Automated Push and Messaging Reminders"
+    statement: "The system triggers automated time-based notifications (24-48 hours before service or care group) for volunteer duties, meetings, and attendance confirmations."
+    proof: "Scheduled cron/event worker dispatches reminders to volunteers who have not yet responded to their roster assignment."
+
+  - id: FR-16
+    capability: CAP-5
+    title: "First-Time Guest Intake and Follow-Up Queue"
+    statement: "First-time guests can submit their basic contact details via self-service mobile intake, creating a follow-up ticket in the pastoral care queue."
+    proof: "Submitting guest info generates a welcome notification to the guest and queues a task for the guest welcoming team."
+
+  - id: FR-17
+    capability: CAP-5
+    title: "Offline-Capable Mobile Workflow Synchronization"
+    statement: "Mobile client caches user schedules, roster duties, and care group rosters locally, enabling attendance recording and schedule viewing during network interruptions."
+    proof: "App functions in airplane mode for roster viewing and attendance marking, queuing mutations for background sync."
+
+nonfunctional:
+  - id: NFR-1
+    goal: BG-1
+    title: "Role-Based Data Privacy and PII Protection"
+    statement: "Personal congregant data (phone numbers, addresses, giving records) must be protected with strict role-based access control, masking sensitive contact fields from unauthorized members."
+    enforced_by: "API authorization middleware, row-level data filtering, and automated security test suite."
+
+  - id: NFR-2
+    goal: BG-4
+    title: "Mobile Dashboard Performance and Responsiveness"
+    statement: "The mobile home dashboard and volunteer roster must achieve P95 render latency under 500ms under standard mobile 4G network conditions."
+    enforced_by: "Automated API benchmark suite and Flutter client frame-rate profiling."
+
+  - id: NFR-3
+    goal: BG-5
+    title: "Zero Copyleft Dependency Isolation"
+    statement: "All backend, frontend, and mobile code and third-party libraries must adhere to permissive open-source licenses (MIT, Apache 2.0, BSD), with zero GPL/AGPL dependencies."
+    enforced_by: "License compliance scanning step integrated into CI pipeline."
+
+  - id: NFR-4
+    goal: BG-3
+    title: "Offline-First Mobile Reliability"
+    statement: "The mobile app must maintain functional read access to schedules and allow attendance record creation when disconnected, syncing idempotently on reconnect."
+    enforced_by: "Network disconnection simulation integration tests."
+
+journeys:
+  - id: UJ-1
+    title: "Church Administrator registers a family and assigns household connections"
+    persona: "Church Administrator"
+    statement: "Admin logs in to web portal, enters parent details, creates household unit, attaches two children records, and saves the family profile with primary contact designation."
+
+  - id: UJ-2
+    title: "Ministry volunteer receives schedule assignment and confirms with one tap"
+    persona: "Volunteer"
+    statement: "Volunteer receives mobile notification for Sunday audio team duty, opens duty summary card, and taps 'Confirm Attendance', updating coordinator's roster in real time."
+
+  - id: UJ-3
+    title: "Care group leader marks weekly attendance and syncs offline"
+    persona: "Care Group Leader"
+    statement: "Leader opens care group meeting on mobile in an area with poor signal, checks off present members and one guest, and saves; app syncs the report as soon as signal restores."
+
+  - id: UJ-4
+    title: "First-time visitor scans church QR code, registers, and accesses service details"
+    persona: "First-Time Visitor"
+    statement: "Guest scans lobby QR code, enters name and mobile number, enters 6-digit church verification code, and immediately views today's sermon outline and welcome info."

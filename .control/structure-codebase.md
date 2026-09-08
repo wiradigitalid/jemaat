@@ -44,16 +44,19 @@ jemaat/
 
 ## Containers
 
-**There are none.** `containers:` in `.control/registry/components.yaml` is empty, and container
-headings here must be exactly the `built: true` containers registered there.
+Three deployable containers are registered at G3 (`built: true`):
 
-That matches the tree: **no application code exists in this repo.** No `apps/`, no Go, no React
-outside `.work/`. The register is designed and not yet built — `.what/` and `.how/` are empty, and
-the first container is born at G3.
+### api
 
-The one exception is deliberately not a container. `.work/spike-w25/` is a Vite + React app that
-runs, but `AGENTS.md` states `.work/` MUST NOT be imported by the application and MUST be excluded
-when searching for code. It proves the design tokens against shadcn/ui and ships nothing.
+Backend REST API service in Go (`apps/api/`). Implements core domain logic, database migrations, and REST endpoints for all four Product Components. Connects to PostgreSQL (`db`, `built: false`).
+
+### web
+
+Web administration portal in React + Vite + TypeScript (`apps/web/`). Provides church office administration for membership records, roster planning matrix, care group oversight, and church settings.
+
+### mobile
+
+Mobile client application in Flutter (`apps/mobile/`). Provides congregational portal, 1-tap volunteer confirmations, offline-capable care group attendance check-in, and newcomer onboarding via QR code scanning.
 
 ## Libraries
 

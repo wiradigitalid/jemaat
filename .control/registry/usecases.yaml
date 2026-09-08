@@ -2,5 +2,160 @@
 #
 # `critical: true` when the UC touches MONEY, PERSONAL DATA, or an IRREVERSIBLE ACTION.
 # This label decides something ONLY at `mode: deep`.
+# Critical count must not exceed 1/3 of a component's use cases.
 
-usecases: []
+usecases:
+  - id: UC-1
+    title: "I want to record a new church member with their personal and contact details."
+    actor: "Church Administrator"
+    component: "membership"
+    satisfies:
+      - FR-1
+    critical: true
+
+  - id: UC-2
+    title: "I want to link family members together into a shared household."
+    actor: "Church Administrator"
+    component: "membership"
+    satisfies:
+      - FR-2
+    critical: false
+
+  - id: UC-3
+    title: "I want to import our church's member spreadsheet and review potential duplicates."
+    actor: "Church Administrator"
+    component: "membership"
+    satisfies:
+      - FR-3
+    critical: false
+
+  - id: UC-4
+    title: "I want to update a congregant's membership standing when they transfer or relocate."
+    actor: "Church Administrator"
+    component: "membership"
+    satisfies:
+      - FR-4
+    critical: false
+
+  - id: UC-5
+    title: "I want to review and update my own personal and household profile."
+    actor: "Church Member"
+    component: "membership"
+    satisfies:
+      - FR-1
+      - FR-2
+    critical: false
+
+  - id: UC-6
+    title: "I want to configure our ministry teams and define their serving roles."
+    actor: "Ministry Coordinator"
+    component: "serving"
+    satisfies:
+      - FR-5
+    critical: false
+
+  - id: UC-7
+    title: "I want to build the monthly service roster and assign qualified volunteers."
+    actor: "Ministry Coordinator"
+    component: "serving"
+    satisfies:
+      - FR-6
+    critical: false
+
+  - id: UC-8
+    title: "I want to confirm, decline, or swap my scheduled serving assignment with one tap."
+    actor: "Volunteer"
+    component: "serving"
+    satisfies:
+      - FR-7
+    critical: false
+
+  - id: UC-9
+    title: "I want to block out the dates when I will be traveling or unavailable to serve."
+    actor: "Volunteer"
+    component: "serving"
+    satisfies:
+      - FR-8
+    critical: false
+
+  - id: UC-10
+    title: "I want to find an available substitute when a scheduled volunteer declines."
+    actor: "Ministry Coordinator"
+    component: "serving"
+    satisfies:
+      - FR-6
+      - FR-7
+    critical: false
+
+  - id: UC-11
+    title: "I want to set up our care group schedule and manage enrolled members."
+    actor: "Care Group Leader"
+    component: "caregroups"
+    satisfies:
+      - FR-9
+    critical: false
+
+  - id: UC-12
+    title: "I want to record who attended tonight's care group meeting even without internet access."
+    actor: "Care Group Leader"
+    component: "caregroups"
+    satisfies:
+      - FR-10
+      - FR-17
+    critical: false
+
+  - id: UC-13
+    title: "I want to see when care group members miss several meetings in a row so our team can reach out."
+    actor: "Pastor / Pastoral Team"
+    component: "caregroups"
+    satisfies:
+      - FR-11
+    critical: false
+
+  - id: UC-14
+    title: "I want to RSVP for our upcoming care group gathering and see the meeting location."
+    actor: "Care Group Member"
+    component: "caregroups"
+    satisfies:
+      - FR-9
+    critical: false
+
+  - id: UC-15
+    title: "I want to check this Sunday's service schedule, sermon notes, and church announcements."
+    actor: "Church Member"
+    component: "portal"
+    satisfies:
+      - FR-12
+    critical: false
+
+  - id: UC-16
+    title: "I want to join my church's mobile portal by scanning a QR code or entering a 6-digit code."
+    actor: "First-Time Visitor"
+    component: "portal"
+    satisfies:
+      - FR-13
+    critical: false
+
+  - id: UC-17
+    title: "I want to find another church member's contact information in the church directory."
+    actor: "Church Member"
+    component: "portal"
+    satisfies:
+      - FR-14
+    critical: true
+
+  - id: UC-18
+    title: "I want to receive automated reminders before my scheduled serving duties and meetings."
+    actor: "Church Member"
+    component: "portal"
+    satisfies:
+      - FR-15
+    critical: false
+
+  - id: UC-19
+    title: "I want to follow up with first-time visitors who submitted their contact details."
+    actor: "Communications Coordinator"
+    component: "portal"
+    satisfies:
+      - FR-16
+    critical: false

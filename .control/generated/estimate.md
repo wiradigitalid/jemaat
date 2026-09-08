@@ -11,3 +11,20 @@
 
 | Task | FR | Component | mode | Exposure | Load | Priority | Depends on | Release |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Member Personal Record Management | `FR-1` | `—` | `catalog` | not set yet | — | P0 | — | v0.1.0 |
+| Mobile Care Group Attendance and Meeting Logging | `FR-10` | `—` | `catalog` | not set yet | — | P0 | `CAP-1` | v0.1.0 |
+| Care Group Pastoral Attention and Inactivity Alerts | `FR-11` | `—` | `catalog` | not set yet | — | P0 | `CAP-1` | v0.1.0 |
+| Congregational Mobile Dashboard and Weekly Schedule | `FR-12` | `—` | `catalog` | not set yet | — | P0 | `CAP-1` | v0.1.0 |
+| Church Joining via QR Code and Fast Code Verification | `FR-13` | `—` | `catalog` | not set yet | — | P0 | `CAP-1` | v0.1.0 |
+| Personal Serving Schedule and Church Directory | `FR-14` | `—` | `catalog` | not set yet | — | P0 | `CAP-1` | v0.1.0 |
+| Automated Push and Messaging Reminders | `FR-15` | `—` | `catalog` | not set yet | — | P0 | `CAP-2`, `CAP-3`, `CAP-4` | v0.1.0 |
+| First-Time Guest Intake and Follow-Up Queue | `FR-16` | `—` | `catalog` | not set yet | — | P0 | `CAP-2`, `CAP-3`, `CAP-4` | v0.1.0 |
+| Offline-Capable Mobile Workflow Synchronization | `FR-17` | `—` | `catalog` | not set yet | — | P0 | `CAP-2`, `CAP-3`, `CAP-4` | v0.1.0 |
+| Household and Family Relationship Linking | `FR-2` | `—` | `catalog` | not set yet | — | P0 | — | v0.1.0 |
+| Bulk Member Import and Duplicate Detection | `FR-3` | `—` | `catalog` | not set yet | — | P0 | — | v0.1.0 |
+| Membership Lifecycle and Status Tracking | `FR-4` | `—` | `catalog` | not set yet | — | P0 | — | v0.1.0 |
+| Ministry Departments and Service Roles Setup | `FR-5` | `—` | `catalog` | not set yet | — | P0 | `CAP-1` | v0.1.0 |
+| Service Scheduling and Roster Matrix | `FR-6` | `—` | `catalog` | not set yet | — | P0 | `CAP-1` | v0.1.0 |
+| Mobile Volunteer Serving RSVP and Confirmation | `FR-7` | `—` | `catalog` | not set yet | — | P0 | `CAP-1` | v0.1.0 |
+| Volunteer Blockout Dates and Conflict Prevention | `FR-8` | `—` | `catalog` | not set yet | — | P0 | `CAP-1` | v0.1.0 |
+| Care Group Directory and Membership Management | `FR-9` | `—` | `catalog` | not set yet | — | P0 | `CAP-1` | v0.1.0 |

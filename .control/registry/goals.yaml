@@ -18,8 +18,28 @@
 # repo no matter which file holds it — that is what lets a ticket say `satisfies: [FR-12]` without
 # also naming the PRD. `id-allocated-once` fails when two files declare the same id.
 
-goals: []
-# - id: BG-1
-#   title: "one line, the outcome the product exists for"
-#   measure: "how you would know it held"
-#   why: "only when the reason is not already carried by the brief's The Problem"
+goals:
+  - id: BG-1
+    title: "Unified Membership and Household Registry"
+    statement: "Provide church administrators with a single, reliable source of truth for congregants, family structures, and household relationships."
+    measure: "100% of church membership and household linkages consolidated in a structured database, replacing fragmented spreadsheets."
+
+  - id: BG-2
+    title: "Ministry Roster and Volunteer Scheduling"
+    statement: "Enable church coordinators to plan ministry schedules, assign volunteer roles, and track serving commitments transparently."
+    measure: "Service rosters scheduled and published with automated role notifications, achieving at least 80% confirmed volunteer responses prior to service."
+
+  - id: BG-3
+    title: "Small Group Coordination and Mobile Workflows"
+    statement: "Empower care group leaders and members with mobile tools for meeting schedules, RSVP confirmation, and attendance recording."
+    measure: "Care groups record weekly attendance and meeting RSVPs via mobile within 24 hours of each gathering."
+
+  - id: BG-4
+    title: "Self-Service Member and Visitor Portal"
+    statement: "Provide congregants and guests with direct mobile access to verified church announcements, service schedules, personal serving rosters, and guest onboarding."
+    measure: "Active members access their service assignments and church updates directly from mobile without requiring manual administrative broadcast."
+
+  - id: BG-5
+    title: "Digital Automation for Daily Church Workflows"
+    statement: "Transition traditionally manual and paper-bound church workflows into automated digital reminders, event check-ins, and guest follow-up queues."
+    measure: "Elimination of paper attendance sheets and manual phone reminders for standard weekly church events."

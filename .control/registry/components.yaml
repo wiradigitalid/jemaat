@@ -18,6 +18,7 @@ product_components:
     purpose: "Core personal records, family structures, households, and member lifecycle tracking"
     risk_accepted: medium
     risk_note: "Handles personal data (names, phone numbers, addresses, family linkages)"
+    g4_passed: true
     containers:
       - api
       - web
@@ -32,6 +33,7 @@ product_components:
     name: "Volunteer Scheduling & Rosters"
     purpose: "Ministry departments, service roles, roster planning, and volunteer confirmations"
     risk_accepted: low
+    g4_passed: true
     containers:
       - api
       - web
@@ -47,6 +49,7 @@ product_components:
     name: "Care Groups & Attendance"
     purpose: "Small group management, meeting schedules, attendance logging, and pastoral monitoring"
     risk_accepted: low
+    g4_passed: true
     containers:
       - api
       - web
@@ -61,6 +64,7 @@ product_components:
     name: "Congregational Portal & Workflows"
     purpose: "Mobile bulletin, weekly schedules, guest onboarding, and automated reminders"
     risk_accepted: low
+    g4_passed: true
     containers:
       - api
       - web

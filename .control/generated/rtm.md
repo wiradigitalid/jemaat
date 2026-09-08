@@ -9,285 +9,363 @@ rtm:
   FR: FR-1
   DEC: []
   UC: UC-1
-  ticket: ''
-  spec: ''
-  release: ''
-  test: []
-  status: ''
-  green: false
+  ticket: SPEC-1-01
+  spec: SPEC-1
+  release: v0.1.0
+  test:
+  - TestHealthCheck
+  - TestAdminLayoutShellRender
+  status: ready-for-agent
   exempt: false
-  broken_at: ticket
+  green: false
+  broken_at: status
+- BG: BG-1
+  CAP: CAP-1
+  FR: FR-1
+  DEC: []
+  UC: UC-1
+  ticket: SPEC-1-02
+  spec: SPEC-1
+  release: v0.1.0
+  test:
+  - TestPeopleAPI_CRUD
+  - TestWebPeople_TableRender
+  - TestAdminPersonNew_FormSubmit
+  status: ready-for-agent
+  exempt: false
+  green: false
+  broken_at: status
 - BG: BG-1
   CAP: CAP-1
   FR: FR-1
   DEC: []
   UC: UC-5
-  ticket: ''
-  spec: ''
-  release: ''
-  test: []
-  status: ''
-  green: false
+  ticket: SPEC-1-02
+  spec: SPEC-1
+  release: v0.1.0
+  test:
+  - TestPeopleAPI_CRUD
+  - TestWebPeople_TableRender
+  - TestAdminPersonNew_FormSubmit
+  status: ready-for-agent
   exempt: false
-  broken_at: ticket
+  green: false
+  broken_at: status
 - BG: BG-3
   CAP: CAP-3
   FR: FR-10
   DEC: []
   UC: UC-12
-  ticket: ''
-  spec: ''
-  release: ''
-  test: []
-  status: ''
-  green: false
+  ticket: SPEC-3-02
+  spec: SPEC-3
+  release: v0.1.0
+  test:
+  - TestMeetingReports_SummaryView
+  - TestPastoralAlerts_ThreeConsecutiveAbsences
+  - TestAttendanceSync_IdempotentUpsert
+  status: ready-for-agent
   exempt: false
-  broken_at: ticket
+  green: false
+  broken_at: status
 - BG: BG-3
   CAP: CAP-3
   FR: FR-11
   DEC: []
   UC: UC-13
-  ticket: ''
-  spec: ''
-  release: ''
-  test: []
-  status: ''
-  green: false
+  ticket: SPEC-3-02
+  spec: SPEC-3
+  release: v0.1.0
+  test:
+  - TestMeetingReports_SummaryView
+  - TestPastoralAlerts_ThreeConsecutiveAbsences
+  - TestAttendanceSync_IdempotentUpsert
+  status: ready-for-agent
   exempt: false
-  broken_at: ticket
+  green: false
+  broken_at: status
 - BG: BG-4
   CAP: CAP-4
   FR: FR-12
   DEC: []
   UC: UC-15
-  ticket: ''
-  spec: ''
-  release: ''
-  test: []
-  status: ''
-  green: false
+  ticket: SPEC-4-01
+  spec: SPEC-4
+  release: v0.1.0
+  test:
+  - TestChurchProfileAPI_GetAndUpdate
+  - TestQRCodeGenerator_CanonicalDeepLink
+  - TestWebChurchCode_PrintPosterRender
+  status: ready-for-agent
   exempt: false
-  broken_at: ticket
+  green: false
+  broken_at: status
 - BG: BG-4
   CAP: CAP-4
   FR: FR-13
   DEC: []
   UC: UC-16
-  ticket: ''
-  spec: ''
-  release: ''
-  test: []
-  status: ''
-  green: false
+  ticket: SPEC-4-01
+  spec: SPEC-4
+  release: v0.1.0
+  test:
+  - TestChurchProfileAPI_GetAndUpdate
+  - TestQRCodeGenerator_CanonicalDeepLink
+  - TestWebChurchCode_PrintPosterRender
+  status: ready-for-agent
   exempt: false
-  broken_at: ticket
+  green: false
+  broken_at: status
 - BG: BG-4
   CAP: CAP-4
   FR: FR-14
   DEC: []
   UC: UC-17
-  ticket: ''
-  spec: ''
-  release: ''
-  test: []
-  status: ''
-  green: false
+  ticket: SPEC-4-02
+  spec: SPEC-4
+  release: v0.1.0
+  test:
+  - TestApplicantsQueue_TriageAndContact
+  - TestApplicantAdmit_PromoteToMember
+  - TestWebApplicants_SplitPaneRender
+  status: ready-for-agent
   exempt: false
-  broken_at: ticket
+  green: false
+  broken_at: status
 - BG: BG-5
   CAP: CAP-5
   FR: FR-15
   DEC: []
   UC: UC-18
-  ticket: ''
-  spec: ''
-  release: ''
-  test: []
-  status: ''
-  green: false
+  ticket: SPEC-4-02
+  spec: SPEC-4
+  release: v0.1.0
+  test:
+  - TestApplicantsQueue_TriageAndContact
+  - TestApplicantAdmit_PromoteToMember
+  - TestWebApplicants_SplitPaneRender
+  status: ready-for-agent
   exempt: false
-  broken_at: ticket
+  green: false
+  broken_at: status
 - BG: BG-5
   CAP: CAP-5
   FR: FR-16
   DEC: []
   UC: UC-19
-  ticket: ''
-  spec: ''
-  release: ''
-  test: []
-  status: ''
-  green: false
+  ticket: SPEC-4-02
+  spec: SPEC-4
+  release: v0.1.0
+  test:
+  - TestApplicantsQueue_TriageAndContact
+  - TestApplicantAdmit_PromoteToMember
+  - TestWebApplicants_SplitPaneRender
+  status: ready-for-agent
   exempt: false
-  broken_at: ticket
+  green: false
+  broken_at: status
 - BG: BG-5
   CAP: CAP-5
   FR: FR-17
   DEC: []
   UC: UC-12
-  ticket: ''
-  spec: ''
-  release: ''
-  test: []
-  status: ''
-  green: false
+  ticket: SPEC-3-02
+  spec: SPEC-3
+  release: v0.1.0
+  test:
+  - TestMeetingReports_SummaryView
+  - TestPastoralAlerts_ThreeConsecutiveAbsences
+  - TestAttendanceSync_IdempotentUpsert
+  status: ready-for-agent
   exempt: false
-  broken_at: ticket
+  green: false
+  broken_at: status
 - BG: BG-1
   CAP: CAP-1
   FR: FR-2
   DEC: []
   UC: UC-2
-  ticket: ''
-  spec: ''
-  release: ''
-  test: []
-  status: ''
-  green: false
+  ticket: SPEC-1-03
+  spec: SPEC-1
+  release: v0.1.0
+  test:
+  - TestHouseholdsAPI_LinkFamily
+  - TestWebHouseAdmin_CardRender
+  - TestHeadOfHousehold_EnforceSingleHead
+  status: ready-for-agent
   exempt: false
-  broken_at: ticket
+  green: false
+  broken_at: status
 - BG: BG-1
   CAP: CAP-1
   FR: FR-2
   DEC: []
   UC: UC-5
-  ticket: ''
-  spec: ''
-  release: ''
-  test: []
-  status: ''
-  green: false
+  ticket: SPEC-1-02
+  spec: SPEC-1
+  release: v0.1.0
+  test:
+  - TestPeopleAPI_CRUD
+  - TestWebPeople_TableRender
+  - TestAdminPersonNew_FormSubmit
+  status: ready-for-agent
   exempt: false
-  broken_at: ticket
+  green: false
+  broken_at: status
 - BG: BG-1
   CAP: CAP-1
   FR: FR-3
   DEC: []
   UC: UC-3
-  ticket: ''
-  spec: ''
-  release: ''
-  test: []
-  status: ''
-  green: false
+  ticket: SPEC-1-04
+  spec: SPEC-1
+  release: v0.1.0
+  test:
+  - TestCSVImport_PreviewAndValidation
+  - TestDuplicateDetection_PhoneEmail
+  - TestWebMerge_ExecuteMerge
+  status: ready-for-agent
   exempt: false
-  broken_at: ticket
+  green: false
+  broken_at: status
 - BG: BG-1
   CAP: CAP-1
   FR: FR-4
   DEC: []
   UC: UC-4
-  ticket: ''
-  spec: ''
-  release: ''
-  test: []
-  status: ''
-  green: false
+  ticket: SPEC-1-05
+  spec: SPEC-1
+  release: v0.1.0
+  test:
+  - TestMembershipStatus_Transitions
+  - TestWebTransfer_GenerateAttestation
+  - TestAuditHistory_ChronologicalLog
+  status: ready-for-agent
   exempt: false
-  broken_at: ticket
+  green: false
+  broken_at: status
 - BG: BG-2
   CAP: CAP-2
   FR: FR-5
   DEC: []
   UC: UC-6
-  ticket: ''
-  spec: ''
-  release: ''
-  test: []
-  status: ''
-  green: false
+  ticket: SPEC-2-01
+  spec: SPEC-2
+  release: v0.1.0
+  test:
+  - TestMinistryTeamsAPI_CRUD
+  - TestWebRoles_DepartmentCardRender
+  status: ready-for-agent
   exempt: false
-  broken_at: ticket
+  green: false
+  broken_at: status
 - BG: BG-2
   CAP: CAP-2
   FR: FR-6
   DEC: []
   UC: UC-10
-  ticket: ''
-  spec: ''
-  release: ''
-  test: []
-  status: ''
-  green: false
+  ticket: SPEC-2-02
+  spec: SPEC-2
+  release: v0.1.0
+  test:
+  - TestRosterMatrix_SlotAssignment
+  - TestWebRoster_GridStatusRendering
+  - TestSubstituteAssignment_OnDecline
+  status: ready-for-agent
   exempt: false
-  broken_at: ticket
+  green: false
+  broken_at: status
 - BG: BG-2
   CAP: CAP-2
   FR: FR-6
   DEC: []
   UC: UC-7
-  ticket: ''
-  spec: ''
-  release: ''
-  test: []
-  status: ''
-  green: false
+  ticket: SPEC-2-02
+  spec: SPEC-2
+  release: v0.1.0
+  test:
+  - TestRosterMatrix_SlotAssignment
+  - TestWebRoster_GridStatusRendering
+  - TestSubstituteAssignment_OnDecline
+  status: ready-for-agent
   exempt: false
-  broken_at: ticket
+  green: false
+  broken_at: status
 - BG: BG-2
   CAP: CAP-2
   FR: FR-7
   DEC: []
   UC: UC-10
-  ticket: ''
-  spec: ''
-  release: ''
-  test: []
-  status: ''
-  green: false
+  ticket: SPEC-2-02
+  spec: SPEC-2
+  release: v0.1.0
+  test:
+  - TestRosterMatrix_SlotAssignment
+  - TestWebRoster_GridStatusRendering
+  - TestSubstituteAssignment_OnDecline
+  status: ready-for-agent
   exempt: false
-  broken_at: ticket
+  green: false
+  broken_at: status
 - BG: BG-2
   CAP: CAP-2
   FR: FR-7
   DEC: []
   UC: UC-8
-  ticket: ''
-  spec: ''
-  release: ''
-  test: []
-  status: ''
-  green: false
+  ticket: SPEC-2-02
+  spec: SPEC-2
+  release: v0.1.0
+  test:
+  - TestRosterMatrix_SlotAssignment
+  - TestWebRoster_GridStatusRendering
+  - TestSubstituteAssignment_OnDecline
+  status: ready-for-agent
   exempt: false
-  broken_at: ticket
+  green: false
+  broken_at: status
 - BG: BG-2
   CAP: CAP-2
   FR: FR-8
   DEC: []
   UC: UC-9
-  ticket: ''
-  spec: ''
-  release: ''
-  test: []
-  status: ''
-  green: false
+  ticket: SPEC-2-03
+  spec: SPEC-2
+  release: v0.1.0
+  test:
+  - TestBlockoutDates_ConflictWarning
+  - TestOverlappingService_DoubleBookingGuard
+  - TestCoordinatorOverride_ReasonCodeEnforced
+  status: ready-for-agent
   exempt: false
-  broken_at: ticket
+  green: false
+  broken_at: status
 - BG: BG-3
   CAP: CAP-3
   FR: FR-9
   DEC: []
   UC: UC-11
-  ticket: ''
-  spec: ''
-  release: ''
-  test: []
-  status: ''
-  green: false
+  ticket: SPEC-3-01
+  spec: SPEC-3
+  release: v0.1.0
+  test:
+  - TestCareGroupsAPI_DirectoryAndEnrollment
+  - TestAdminGroups_CardListRender
+  status: ready-for-agent
   exempt: false
-  broken_at: ticket
+  green: false
+  broken_at: status
 - BG: BG-3
   CAP: CAP-3
   FR: FR-9
   DEC: []
   UC: UC-14
-  ticket: ''
-  spec: ''
-  release: ''
-  test: []
-  status: ''
-  green: false
+  ticket: SPEC-3-01
+  spec: SPEC-3
+  release: v0.1.0
+  test:
+  - TestCareGroupsAPI_DirectoryAndEnrollment
+  - TestAdminGroups_CardListRender
+  status: ready-for-agent
   exempt: false
-  broken_at: ticket
+  green: false
+  broken_at: status
 ```

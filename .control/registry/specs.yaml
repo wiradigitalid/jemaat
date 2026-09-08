@@ -1,5 +1,252 @@
-# waves.yaml — rencana kerja.
+# specs.yaml — SSOT for execution specifications & ticket index
 #
-# `release` MUST disebut tiap wave. STATUS STORY MUST NOT DISALIN KE SINI.
+# Governed by WDI Method G5 / wdi-build.
+# Ticket status lives in the ticket files under {spec_folder}/issues/<NN>-*.md, NEVER here.
 
-specs: []
+specs:
+  - id: SPEC-1
+    release: v0.1.0
+    prd: church-operations
+    fr:
+      - FR-1
+      - FR-2
+      - FR-3
+      - FR-4
+    size: M
+    depends_on: []
+    spec_folder: .scratch/spec-1-web-admin-membership
+    spec_reviewed:
+      date: '2026-09-08'
+      sha: '20eb47a'
+      lenses:
+        - edge-case-hunter
+    tickets:
+      - id: SPEC-1-01
+        component: membership
+        satisfies:
+          - UC-1
+          - FR-1
+        blocked_by: []
+        touches:
+          - screen-web-people
+        tests:
+          - TestHealthCheck
+          - TestAdminLayoutShellRender
+
+      - id: SPEC-1-02
+        component: membership
+        satisfies:
+          - UC-1
+          - UC-5
+          - FR-1
+        blocked_by:
+          - SPEC-1-01
+        touches:
+          - screen-web-people
+        tests:
+          - TestPeopleAPI_CRUD
+          - TestWebPeople_TableRender
+          - TestAdminPersonNew_FormSubmit
+
+      - id: SPEC-1-03
+        component: membership
+        satisfies:
+          - UC-2
+          - FR-2
+        blocked_by:
+          - SPEC-1-02
+        touches:
+          - screen-web-households
+        tests:
+          - TestHouseholdsAPI_LinkFamily
+          - TestWebHouseAdmin_CardRender
+          - TestHeadOfHousehold_EnforceSingleHead
+
+      - id: SPEC-1-04
+        component: membership
+        satisfies:
+          - UC-3
+          - FR-3
+        blocked_by:
+          - SPEC-1-02
+        touches:
+          - screen-web-data
+        tests:
+          - TestCSVImport_PreviewAndValidation
+          - TestDuplicateDetection_PhoneEmail
+          - TestWebMerge_ExecuteMerge
+
+      - id: SPEC-1-05
+        component: membership
+        satisfies:
+          - UC-4
+          - FR-4
+        blocked_by:
+          - SPEC-1-02
+        touches:
+          - screen-web-people
+        tests:
+          - TestMembershipStatus_Transitions
+          - TestWebTransfer_GenerateAttestation
+          - TestAuditHistory_ChronologicalLog
+
+  - id: SPEC-2
+    release: v0.1.0
+    prd: church-operations
+    fr:
+      - FR-5
+      - FR-6
+      - FR-7
+      - FR-8
+    size: M
+    depends_on:
+      - SPEC-1
+    spec_folder: .scratch/spec-2-web-admin-serving
+    spec_reviewed:
+      date: '2026-09-08'
+      sha: '20eb47a'
+      lenses:
+        - edge-case-hunter
+    tickets:
+      - id: SPEC-2-01
+        component: serving
+        satisfies:
+          - UC-6
+          - FR-5
+        blocked_by: []
+        touches:
+          - screen-web-roster
+        tests:
+          - TestMinistryTeamsAPI_CRUD
+          - TestWebRoles_DepartmentCardRender
+
+      - id: SPEC-2-02
+        component: serving
+        satisfies:
+          - UC-7
+          - UC-8
+          - UC-10
+          - FR-6
+          - FR-7
+        blocked_by:
+          - SPEC-2-01
+        touches:
+          - screen-web-roster
+        tests:
+          - TestRosterMatrix_SlotAssignment
+          - TestWebRoster_GridStatusRendering
+          - TestSubstituteAssignment_OnDecline
+
+      - id: SPEC-2-03
+        component: serving
+        satisfies:
+          - UC-9
+          - FR-8
+        blocked_by:
+          - SPEC-2-02
+        touches:
+          - screen-web-roster
+        tests:
+          - TestBlockoutDates_ConflictWarning
+          - TestOverlappingService_DoubleBookingGuard
+          - TestCoordinatorOverride_ReasonCodeEnforced
+
+  - id: SPEC-3
+    release: v0.1.0
+    prd: church-operations
+    fr:
+      - FR-9
+      - FR-10
+      - FR-11
+      - FR-17
+    size: M
+    depends_on:
+      - SPEC-1
+    spec_folder: .scratch/spec-3-web-admin-caregroups
+    spec_reviewed:
+      date: '2026-09-08'
+      sha: '20eb47a'
+      lenses:
+        - edge-case-hunter
+    tickets:
+      - id: SPEC-3-01
+        component: caregroups
+        satisfies:
+          - UC-11
+          - UC-14
+          - FR-9
+        blocked_by: []
+        touches:
+          - screen-web-caregroups
+        tests:
+          - TestCareGroupsAPI_DirectoryAndEnrollment
+          - TestAdminGroups_CardListRender
+
+      - id: SPEC-3-02
+        component: caregroups
+        satisfies:
+          - UC-12
+          - UC-13
+          - FR-10
+          - FR-11
+          - FR-17
+        blocked_by:
+          - SPEC-3-01
+        touches:
+          - screen-web-caregroups
+        tests:
+          - TestMeetingReports_SummaryView
+          - TestPastoralAlerts_ThreeConsecutiveAbsences
+          - TestAttendanceSync_IdempotentUpsert
+
+  - id: SPEC-4
+    release: v0.1.0
+    prd: church-operations
+    fr:
+      - FR-12
+      - FR-13
+      - FR-14
+      - FR-15
+      - FR-16
+    size: M
+    depends_on:
+      - SPEC-1
+    spec_folder: .scratch/spec-4-web-admin-portal-workflows
+    spec_reviewed:
+      date: '2026-09-08'
+      sha: '20eb47a'
+      lenses:
+        - edge-case-hunter
+    tickets:
+      - id: SPEC-4-01
+        component: portal
+        satisfies:
+          - UC-15
+          - UC-16
+          - FR-12
+          - FR-13
+        blocked_by: []
+        touches:
+          - screen-web-settings
+        tests:
+          - TestChurchProfileAPI_GetAndUpdate
+          - TestQRCodeGenerator_CanonicalDeepLink
+          - TestWebChurchCode_PrintPosterRender
+
+      - id: SPEC-4-02
+        component: portal
+        satisfies:
+          - UC-17
+          - UC-18
+          - UC-19
+          - FR-14
+          - FR-15
+          - FR-16
+        blocked_by:
+          - SPEC-4-01
+        touches:
+          - screen-web-settings
+        tests:
+          - TestApplicantsQueue_TriageAndContact
+          - TestApplicantAdmit_PromoteToMember
+          - TestWebApplicants_SplitPaneRender

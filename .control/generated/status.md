@@ -6,9 +6,29 @@
 promise_progress: 0%
 rtm_rows:
   green: 0
-  counted: 22
+  counted: 23
   excluded_no_uc: 0
-work_progress: []
+work_progress:
+- spec: SPEC-1
+  status: null
+  tickets_done: 0
+  tickets_total: 5
+  work_progress: 0%
+- spec: SPEC-2
+  status: null
+  tickets_done: 0
+  tickets_total: 3
+  work_progress: 0%
+- spec: SPEC-3
+  status: null
+  tickets_done: 0
+  tickets_total: 2
+  work_progress: 0%
+- spec: SPEC-4
+  status: null
+  tickets_done: 0
+  tickets_total: 2
+  work_progress: 0%
 gate_readiness: 100%
 validators_red: []
 validators_skipped:
@@ -16,8 +36,14 @@ validators_skipped:
     rule MUST NOT be moved here just to give the room content
   plan-dates: generated/timeline.yaml does not exist yet — overdue-ness is still computed from the registry,
     but its presence in generated/report is not checked
-  uc-scheduled: no spec yet, so no ticket yet — every unscheduled UC is the correct state. Full catalogue
-    coverage is checked at G5
+  review-trace: 'advisory — trace stale, re-run before the next gate or spec close: .how/_platform/ARCHITECTURE-SPINE.md
+    (changed at 20eb47a, reviewed at fa39a61), .how/caregroups/SDD-caregroups.md (changed at 20eb47a,
+    reviewed at fa39a61), .how/membership/SDD-membership.md (changed at 20eb47a, reviewed at fa39a61),
+    .how/portal/SDD-portal.md (changed at 20eb47a, reviewed at fa39a61), .how/serving/SDD-serving.md (changed
+    at 20eb47a, reviewed at fa39a61), .what/caregroups/SRS-caregroups.md (changed at 20eb47a, reviewed
+    at fa39a61), .what/membership/SRS-membership.md (changed at 20eb47a, reviewed at fa39a61), .what/portal/SRS-portal.md
+    (changed at 20eb47a, reviewed at fa39a61), .what/serving/SRS-serving.md (changed at 20eb47a, reviewed
+    at fa39a61)'
 open_questions:
   blocking: 0
   assumptions: 0

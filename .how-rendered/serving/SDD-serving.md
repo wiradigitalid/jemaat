@@ -8,7 +8,7 @@ This is what the owner reads at **G4 Component** for this component.
 
 ## What is staked
 
-`mode: guarded` · `risk_accepted: low` · `g4_passed: —`
+`mode: guarded` · `risk_accepted: low` · `g4_passed: True`
 
 **risk_note:** —
 

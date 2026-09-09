@@ -1,6 +1,6 @@
 # SPEC-4-01: Church Settings, Tenant Profile & QR Code Print Generator
 
-**Status:** ready-for-agent
+**Status:** done
 **Component:** portal
 **Satisfies:** [UC-15, UC-16, FR-12, FR-13]
 **Blocked by:** [SPEC-1-01]

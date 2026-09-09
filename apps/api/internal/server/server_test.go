@@ -1508,3 +1508,122 @@ func TestPastoralAlerts_ThreeConsecutiveAbsences(t *testing.T) {
 		t.Errorf("expected status 'dismissed', got %s", updatedAlert.Status)
 	}
 }
+
+func TestChurchProfileAPI_GetAndUpdate(t *testing.T) {
+	authSvc := auth.NewService(auth.DefaultJWTSecret)
+	srv := server.NewServer(authSvc)
+
+	token, code, _ := authSvc.RequestLink("+6281234567890")
+	verifyResp, _ := authSvc.Verify("+6281234567890", token, code, false)
+	bearer := "Bearer " + verifyResp.Token
+
+	// 1. Get church profile (UC-15, FR-12)
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/church/profile", nil)
+	req.Header.Set("Authorization", bearer)
+	rec := httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 on get church profile, got %d", rec.Code)
+	}
+	var profileResp struct {
+		Name     string `json:"name"`
+		Code     string `json:"code"`
+		DeepLink string `json:"deep_link"`
+		City     string `json:"city"`
+	}
+	_ = json.Unmarshal(rec.Body.Bytes(), &profileResp)
+	if profileResp.Name != "Immanuel Church, Sunter" {
+		t.Errorf("expected Immanuel Church, Sunter, got %s", profileResp.Name)
+	}
+
+	// 2. Update church profile
+	newName := "Immanuel Community Church"
+	updatePayload := map[string]string{
+		"name": newName,
+		"city": "Jakarta",
+	}
+	body, _ := json.Marshal(updatePayload)
+	req = httptest.NewRequest(http.MethodPut, "/api/v1/church/profile", bytes.NewReader(body))
+	req.Header.Set("Authorization", bearer)
+	req.Header.Set("Content-Type", "application/json")
+	rec = httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 on update church profile, got %d", rec.Code)
+	}
+	_ = json.Unmarshal(rec.Body.Bytes(), &profileResp)
+	if profileResp.Name != newName {
+		t.Errorf("expected name %s, got %s", newName, profileResp.Name)
+	}
+
+	// 3. Regenerate 6-digit church code (BR-POR-2, AD-6)
+	req = httptest.NewRequest(http.MethodPost, "/api/v1/church/code/regenerate", nil)
+	req.Header.Set("Authorization", bearer)
+	rec = httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 on regenerate code, got %d", rec.Code)
+	}
+	_ = json.Unmarshal(rec.Body.Bytes(), &profileResp)
+	if len(profileResp.Code) != 7 || !strings.Contains(profileResp.Code, "-") {
+		t.Errorf("expected formatted 6-char code with hyphen (XXX-XXX), got %s", profileResp.Code)
+	}
+	expectedLink := "jemaat://church?code=" + profileResp.Code
+	if profileResp.DeepLink != expectedLink {
+		t.Errorf("expected deep link %s, got %s", expectedLink, profileResp.DeepLink)
+	}
+
+	// 4. Test public church lookup by 6-digit code (UC-16, AD-6, BR-POR-2)
+	// Test case-insensitive and un-hyphenated input normalization
+	rawCode := strings.ReplaceAll(profileResp.Code, "-", "")
+	req = httptest.NewRequest(http.MethodGet, "/api/v1/church/lookup?code="+strings.ToLower(rawCode), nil)
+	rec = httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 on public church lookup, got %d: %s", rec.Code, rec.Body.String())
+	}
+	var lookupResp struct {
+		Name string `json:"name"`
+		Code string `json:"code"`
+	}
+	_ = json.Unmarshal(rec.Body.Bytes(), &lookupResp)
+	if lookupResp.Name != newName || lookupResp.Code != profileResp.Code {
+		t.Errorf("expected lookup match for %s, got %+v", profileResp.Code, lookupResp)
+	}
+}
+
+func TestQRCodeGenerator_CanonicalDeepLink(t *testing.T) {
+	authSvc := auth.NewService(auth.DefaultJWTSecret)
+	srv := server.NewServer(authSvc)
+
+	token, code, _ := authSvc.RequestLink("+6281234567890")
+	verifyResp, _ := authSvc.Verify("+6281234567890", token, code, false)
+	bearer := "Bearer " + verifyResp.Token
+
+	// Get QR Code payload (AD-6, FR-13)
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/church/qr", nil)
+	req.Header.Set("Authorization", bearer)
+	rec := httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 on get QR code, got %d", rec.Code)
+	}
+	var qrResp struct {
+		Code     string `json:"code"`
+		DeepLink string `json:"deep_link"`
+		SVG      string `json:"svg"`
+	}
+	_ = json.Unmarshal(rec.Body.Bytes(), &qrResp)
+
+	if !strings.HasPrefix(qrResp.DeepLink, "jemaat://church?code=") {
+		t.Errorf("expected canonical deep link, got %s", qrResp.DeepLink)
+	}
+	if !strings.Contains(qrResp.SVG, "<svg") || !strings.Contains(qrResp.SVG, "</svg>") {
+		t.Errorf("expected valid SVG payload, got %s", qrResp.SVG)
+	}
+}

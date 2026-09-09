@@ -13,6 +13,7 @@ import { WebData } from './components/WebData.tsx';
 import { AdminDepartments } from './components/AdminDepartments.tsx';
 import { WebRoster } from './components/WebRoster.tsx';
 import { AdminGroups } from './components/AdminGroups.tsx';
+import { WebChurchCode } from './components/WebChurchCode.tsx';
 import {
   AdminUser,
   AuthResponse,
@@ -740,6 +741,8 @@ export const App: React.FC<{
           )
         ) : activeNav === 'Care Groups' ? (
           <AdminGroups />
+        ) : activeNav === 'Church code' ? (
+          <WebChurchCode />
         ) : activeNav === 'Settings' ? (
           <WebData
             totalMembers={people.length || 254}

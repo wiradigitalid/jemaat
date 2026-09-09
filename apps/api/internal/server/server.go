@@ -10,6 +10,7 @@ import (
 	"jemaat/apps/api/internal/caregroups"
 	"jemaat/apps/api/internal/households"
 	"jemaat/apps/api/internal/people"
+	"jemaat/apps/api/internal/portal"
 	"jemaat/apps/api/internal/serving"
 
 	"github.com/go-chi/chi/v5"
@@ -26,6 +27,7 @@ type Server struct {
 	rosterStore    *serving.RosterStore
 	caregroupStore *caregroups.Store
 	meetingStore   *caregroups.MeetingStore
+	portalStore    *portal.Store
 }
 
 func NewServer(authService *auth.Service) *Server {
@@ -69,6 +71,7 @@ func NewServerWithAllStores(authService *auth.Service, peopleStore *people.Store
 		rosterStore:    rosterStore,
 		caregroupStore: cgStore,
 		meetingStore:   caregroups.NewMeetingStore(),
+		portalStore:    portal.NewStore(),
 	}
 
 	s.setupMiddleware()
@@ -99,8 +102,9 @@ func (s *Server) setupMiddleware() {
 
 func (s *Server) setupRoutes() {
 	s.router.Route("/api/v1", func(r chi.Router) {
-		// Public health check
+		// Public health check and church lookup
 		r.Get("/health", s.handleHealth)
+		r.Get("/church/lookup", s.handleLookupChurch)
 
 		// Public authentication routes
 		r.Route("/auth", func(authRouter chi.Router) {
@@ -180,6 +184,12 @@ func (s *Server) setupRoutes() {
 			protected.Get("/care-groups/absence-alerts", s.handleListAbsenceAlerts)
 			protected.Post("/pastoral/alerts/{id}/contact", s.handleContactPastoralAlert)
 			protected.Post("/pastoral/alerts/{id}/dismiss", s.handleDismissPastoralAlert)
+
+			// Church Tenant Profile & QR Code Print Generator (SPEC-4-01, UC-15, UC-16, FR-12, FR-13, AD-6, BR-POR-2)
+			protected.Get("/church/profile", s.handleGetChurchProfile)
+			protected.Put("/church/profile", s.handleUpdateChurchProfile)
+			protected.Post("/church/code/regenerate", s.handleRegenerateChurchCode)
+			protected.Get("/church/qr", s.handleGetChurchQR)
 		})
 	})
 }
@@ -1156,4 +1166,79 @@ func (s *Server) handleDismissPastoralAlert(w http.ResponseWriter, r *http.Reque
 
 	w.WriteHeader(http.StatusOK)
 	_ = json.NewEncoder(w).Encode(alert)
+}
+
+func (s *Server) handleGetChurchProfile(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	p := s.portalStore.GetProfile()
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(p)
+}
+
+func (s *Server) handleUpdateChurchProfile(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	var req portal.UpdateProfileRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": "invalid request body"})
+		return
+	}
+
+	p, err := s.portalStore.UpdateProfile(req)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(p)
+}
+
+func (s *Server) handleRegenerateChurchCode(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	p, err := s.portalStore.RegenerateCode()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(p)
+}
+
+func (s *Server) handleGetChurchQR(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	p := s.portalStore.GetProfile()
+	svg := s.portalStore.GenerateQRSVG()
+
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(map[string]interface{}{
+		"code":      p.Code,
+		"deep_link": p.DeepLink,
+		"svg":       svg,
+	})
+}
+
+func (s *Server) handleLookupChurch(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	code := r.URL.Query().Get("code")
+	if code == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": "code query parameter is required"})
+		return
+	}
+
+	p, err := s.portalStore.LookupCode(code)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(p)
 }

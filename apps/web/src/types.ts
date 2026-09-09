@@ -220,3 +220,19 @@ export interface AbsenceAlert {
   contact_notes?: string;
   dismiss_reason?: string;
 }
+
+export interface ChurchProfile {
+  id: string;
+  name: string;
+  address: string;
+  city: string;
+  time_zone: string;
+  worship_day: string;
+  code: string;
+  deep_link: string;
+  phone: string;
+  email: string;
+  devices_following: number;
+  members_signed_in: number;
+  applicants_waiting: number;
+}

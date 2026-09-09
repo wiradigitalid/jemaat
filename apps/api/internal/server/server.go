@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"jemaat/apps/api/internal/auth"
+	"jemaat/apps/api/internal/caregroups"
 	"jemaat/apps/api/internal/households"
 	"jemaat/apps/api/internal/people"
 	"jemaat/apps/api/internal/serving"
@@ -23,6 +24,7 @@ type Server struct {
 	householdStore *households.Store
 	servingStore   *serving.Store
 	rosterStore    *serving.RosterStore
+	caregroupStore *caregroups.Store
 }
 
 func NewServer(authService *auth.Service) *Server {
@@ -30,23 +32,33 @@ func NewServer(authService *auth.Service) *Server {
 	hStore := households.NewStore(pStore)
 	sStore := serving.NewStore()
 	rStore := serving.NewRosterStore()
-	return NewServerWithAllStores(authService, pStore, hStore, sStore, rStore)
+	cgStore := caregroups.NewStore()
+	return NewServerWithAllStores(authService, pStore, hStore, sStore, rStore, cgStore)
 }
 
 func NewServerWithStore(authService *auth.Service, peopleStore *people.Store) *Server {
 	hStore := households.NewStore(peopleStore)
 	sStore := serving.NewStore()
 	rStore := serving.NewRosterStore()
-	return NewServerWithAllStores(authService, peopleStore, hStore, sStore, rStore)
+	cgStore := caregroups.NewStore()
+	return NewServerWithAllStores(authService, peopleStore, hStore, sStore, rStore, cgStore)
 }
 
 func NewServerWithStores(authService *auth.Service, peopleStore *people.Store, householdStore *households.Store) *Server {
 	sStore := serving.NewStore()
 	rStore := serving.NewRosterStore()
-	return NewServerWithAllStores(authService, peopleStore, householdStore, sStore, rStore)
+	cgStore := caregroups.NewStore()
+	return NewServerWithAllStores(authService, peopleStore, householdStore, sStore, rStore, cgStore)
 }
 
-func NewServerWithAllStores(authService *auth.Service, peopleStore *people.Store, householdStore *households.Store, servingStore *serving.Store, rosterStore *serving.RosterStore) *Server {
+func NewServerWithAllStores(authService *auth.Service, peopleStore *people.Store, householdStore *households.Store, servingStore *serving.Store, rosterStore *serving.RosterStore, optionalCgStore ...*caregroups.Store) *Server {
+	var cgStore *caregroups.Store
+	if len(optionalCgStore) > 0 && optionalCgStore[0] != nil {
+		cgStore = optionalCgStore[0]
+	} else {
+		cgStore = caregroups.NewStore()
+	}
+
 	s := &Server{
 		router:         chi.NewRouter(),
 		authService:    authService,
@@ -54,6 +66,7 @@ func NewServerWithAllStores(authService *auth.Service, peopleStore *people.Store
 		householdStore: householdStore,
 		servingStore:   servingStore,
 		rosterStore:    rosterStore,
+		caregroupStore: cgStore,
 	}
 
 	s.setupMiddleware()
@@ -149,6 +162,14 @@ func (s *Server) setupRoutes() {
 			// Volunteer Availability & Blockout Dates endpoints (SPEC-2-03, BR-2, AD-4)
 			protected.Get("/volunteers/availability", s.handleListAvailability)
 			protected.Post("/volunteers/availability", s.handleAddAvailability)
+
+			// Care Groups & Member Enrollment endpoints (SPEC-3-01, UC-11, UC-14, FR-9)
+			protected.Get("/care-groups", s.handleListCareGroups)
+			protected.Post("/care-groups", s.handleCreateCareGroup)
+			protected.Get("/care-groups/unplaced", s.handleListUnplacedCareGroup)
+			protected.Get("/care-groups/{id}", s.handleGetCareGroup)
+			protected.Post("/care-groups/{id}/members", s.handleEnrollCareGroupMember)
+			protected.Delete("/care-groups/{id}/members/{personId}", s.handleRemoveCareGroupMember)
 		})
 	})
 }
@@ -884,4 +905,121 @@ func (s *Server) handleAddAvailability(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusCreated)
 	_ = json.NewEncoder(w).Encode(avail)
+}
+
+func (s *Server) handleListCareGroups(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	groups := s.caregroupStore.List()
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(map[string]interface{}{
+		"data":  groups,
+		"total": len(groups),
+	})
+}
+
+func (s *Server) handleCreateCareGroup(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	var req caregroups.CreateCareGroupRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": "invalid request body"})
+		return
+	}
+
+	group, err := s.caregroupStore.Create(req)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	_ = json.NewEncoder(w).Encode(group)
+}
+
+func (s *Server) handleListUnplacedCareGroup(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	unplaced := s.caregroupStore.ListUnplaced()
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(map[string]interface{}{
+		"data":  unplaced,
+		"total": len(unplaced),
+	})
+}
+
+func (s *Server) handleGetCareGroup(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	id := chi.URLParam(r, "id")
+
+	group, err := s.caregroupStore.Get(id)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(group)
+}
+
+func (s *Server) handleEnrollCareGroupMember(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	id := chi.URLParam(r, "id")
+
+	var req caregroups.EnrollMemberRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": "invalid request body"})
+		return
+	}
+
+	// Fetch person name and standing if not provided
+	if p, err := s.peopleStore.Get(req.PersonID, false); err == nil {
+		if req.FullName == "" {
+			req.FullName = p.FullName
+		}
+		if req.Standing == "" {
+			req.Standing = string(p.Standing)
+		}
+	}
+
+	group, err := s.caregroupStore.EnrollMember(id, req)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	// Synchronize member record
+	_, _ = s.peopleStore.Update(req.PersonID, people.UpdatePersonRequest{
+		CareGroupID:   &id,
+		CareGroupName: &group.Name,
+	})
+
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(group)
+}
+
+func (s *Server) handleRemoveCareGroupMember(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	groupID := chi.URLParam(r, "id")
+	personID := chi.URLParam(r, "personId")
+
+	group, err := s.caregroupStore.RemoveMember(groupID, personID)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	// Clear person's care group linkage
+	emptyStr := ""
+	_, _ = s.peopleStore.Update(personID, people.UpdatePersonRequest{
+		CareGroupID:   &emptyStr,
+		CareGroupName: &emptyStr,
+	})
+
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(group)
 }

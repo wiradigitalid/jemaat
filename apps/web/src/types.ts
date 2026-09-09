@@ -164,3 +164,32 @@ export interface RosterMatrix {
     declined: number;
   };
 }
+
+export interface CareGroupMember {
+  person_id: string;
+  full_name: string;
+  standing: string;
+  is_leader: boolean;
+  enrolled_at?: string;
+}
+
+export interface CareGroup {
+  id: string;
+  name: string;
+  zone: string;
+  leader_person_id?: string;
+  leader_name: string;
+  meeting_day: string;
+  meeting_time?: string;
+  meeting_address?: string;
+  members_count: number;
+  members?: CareGroupMember[];
+}
+
+export interface UnplacedPerson {
+  person_id: string;
+  full_name: string;
+  initials: string;
+  zone: string;
+  requested_at?: string;
+}

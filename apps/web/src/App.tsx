@@ -12,6 +12,7 @@ import { WebTransferDialog } from './components/WebTransferDialog.tsx';
 import { WebData } from './components/WebData.tsx';
 import { AdminDepartments } from './components/AdminDepartments.tsx';
 import { WebRoster } from './components/WebRoster.tsx';
+import { AdminGroups } from './components/AdminGroups.tsx';
 import {
   AdminUser,
   AuthResponse,
@@ -737,6 +738,8 @@ export const App: React.FC<{
               />
             </div>
           )
+        ) : activeNav === 'Care Groups' ? (
+          <AdminGroups />
         ) : activeNav === 'Settings' ? (
           <WebData
             totalMembers={people.length || 254}

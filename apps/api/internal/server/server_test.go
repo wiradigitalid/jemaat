@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"jemaat/apps/api/internal/auth"
+	"jemaat/apps/api/internal/caregroups"
 	"jemaat/apps/api/internal/households"
 	"jemaat/apps/api/internal/people"
 	"jemaat/apps/api/internal/server"
@@ -1216,5 +1217,114 @@ func TestConflictDetection_DoubleBookingPrevention(t *testing.T) {
 	_ = json.Unmarshal(rec.Body.Bytes(), &conflictResp)
 	if conflictResp.Conflict.Type != serving.ConflictTypeDoubleBooking {
 		t.Errorf("expected conflict type 'double_booking', got %s", conflictResp.Conflict.Type)
+	}
+}
+
+func TestCareGroupsAPI_DirectoryAndEnrollment(t *testing.T) {
+	authSvc := auth.NewService(auth.DefaultJWTSecret)
+	pStore := people.NewStore()
+	hStore := households.NewStore(pStore)
+	sStore := serving.NewStore()
+	rStore := serving.NewRosterStore()
+	cgStore := caregroups.NewStore()
+	srv := server.NewServerWithAllStores(authSvc, pStore, hStore, sStore, rStore, cgStore)
+
+	token, code, _ := authSvc.RequestLink("+6281234567890")
+	verifyResp, _ := authSvc.Verify("+6281234567890", token, code, false)
+	bearer := "Bearer " + verifyResp.Token
+
+	// 1. List Care Groups (UC-11)
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/care-groups", nil)
+	req.Header.Set("Authorization", bearer)
+	rec := httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 on list care groups, got %d", rec.Code)
+	}
+	var listResp struct {
+		Data  []caregroups.CareGroup `json:"data"`
+		Total int                    `json:"total"`
+	}
+	_ = json.Unmarshal(rec.Body.Bytes(), &listResp)
+	if listResp.Total < 5 {
+		t.Errorf("expected at least 5 seeded care groups, got %d", listResp.Total)
+	}
+
+	// 2. Create a new care group
+	newGroupPayload := caregroups.CreateCareGroupRequest{
+		Name:           "Solafide",
+		Zone:           "Kelapa Gading",
+		LeaderName:     "Hendrik Tan",
+		MeetingDay:     "Tuesdays",
+		MeetingTime:    "19:00",
+		MeetingAddress: "Jl. Boulevard Raya Blok PA 1",
+	}
+	body, _ := json.Marshal(newGroupPayload)
+	req = httptest.NewRequest(http.MethodPost, "/api/v1/care-groups", bytes.NewReader(body))
+	req.Header.Set("Authorization", bearer)
+	req.Header.Set("Content-Type", "application/json")
+	rec = httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusCreated {
+		t.Fatalf("expected 201 on create care group, got %d", rec.Code)
+	}
+	var createdGroup caregroups.CareGroup
+	_ = json.Unmarshal(rec.Body.Bytes(), &createdGroup)
+
+	// 3. List unplaced care group applicants
+	req = httptest.NewRequest(http.MethodGet, "/api/v1/care-groups/unplaced", nil)
+	req.Header.Set("Authorization", bearer)
+	rec = httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 on list unplaced, got %d", rec.Code)
+	}
+	var unplacedResp struct {
+		Data  []caregroups.UnplacedPerson `json:"data"`
+		Total int                         `json:"total"`
+	}
+	_ = json.Unmarshal(rec.Body.Bytes(), &unplacedResp)
+	if unplacedResp.Total < 1 {
+		t.Errorf("expected unplaced applicants, got %d", unplacedResp.Total)
+	}
+
+	// 4. Enroll member into care group (UC-14, FR-9)
+	enrollPayload := caregroups.EnrollMemberRequest{
+		PersonID: "per-rw",
+		FullName: "Rian Wijaya",
+		Standing: "Member",
+		IsLeader: false,
+	}
+	body, _ = json.Marshal(enrollPayload)
+	req = httptest.NewRequest(http.MethodPost, "/api/v1/care-groups/"+createdGroup.ID+"/members", bytes.NewReader(body))
+	req.Header.Set("Authorization", bearer)
+	req.Header.Set("Content-Type", "application/json")
+	rec = httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 on enroll member, got %d: %s", rec.Code, rec.Body.String())
+	}
+	var updatedGroup caregroups.CareGroup
+	_ = json.Unmarshal(rec.Body.Bytes(), &updatedGroup)
+	if updatedGroup.MembersCount != 1 {
+		t.Errorf("expected 1 member in group, got %d", updatedGroup.MembersCount)
+	}
+
+	// 5. Remove member from care group
+	req = httptest.NewRequest(http.MethodDelete, "/api/v1/care-groups/"+createdGroup.ID+"/members/per-rw", nil)
+	req.Header.Set("Authorization", bearer)
+	rec = httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 on remove member, got %d", rec.Code)
+	}
+	_ = json.Unmarshal(rec.Body.Bytes(), &updatedGroup)
+	if updatedGroup.MembersCount != 0 {
+		t.Errorf("expected 0 members after remove, got %d", updatedGroup.MembersCount)
 	}
 }

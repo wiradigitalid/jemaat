@@ -1,7 +1,7 @@
-# SPEC-4 — Web Admin: Church Settings, QR Code & Guest Triage
+# SPEC-4 — Web Admin: Church Settings, QR Code, Guest Triage & Access Roles
 
 ## Overview
-Implements church identity configuration, 6-digit church code generation, high-resolution QR code banner export for lobby check-in, and the first-time visitor / member applicant triage queue for church office staff.
+Implements church identity configuration, 6-digit church code generation, high-resolution QR code banner export for lobby check-in, the first-time visitor triage queue, and church office staff access role management ("Who can do what").
 
 ## References
 - PRD: `.what/_prd/church-operations/prd.md` (`CAP-4`, `CAP-5`)
@@ -11,8 +11,8 @@ Implements church identity configuration, 6-digit church code generation, high-r
 - HTML Prototypes:
   - Church Code & QR Print: `.work/design/WebChurchCode.dc.html`, `.work/design/AdminChurch.dc.html`
   - Applicants Triage Queue: `.work/design/WebApplicants.dc.html`
-  - Church Office Settings: `.work/design/AdminScope.dc.html`
+  - Church Office Access Roles: `.work/design/WebRoles.dc.html` ("Who can do what")
 
 ## Seams & Testing Strategy
-- API Seam: REST endpoints `/api/v1/church/profile`, `/api/v1/church/qr`, `/api/v1/guests/applicants` tested with Go HTTP tests.
-- UI Seam: SVG QR rendering and print stylesheet verification, applicants split-pane triage layout matching `WebApplicants.dc.html`.
+- API Seam: REST endpoints `/api/v1/church/profile`, `/api/v1/church/qr`, `/api/v1/guests/queue`, `/api/v1/church/access-roles` tested with Go HTTP tests.
+- UI Seam: SVG QR rendering and print stylesheet verification, applicants split-pane triage layout matching `WebApplicants.dc.html`, and access roles list matching `WebRoles.dc.html`.

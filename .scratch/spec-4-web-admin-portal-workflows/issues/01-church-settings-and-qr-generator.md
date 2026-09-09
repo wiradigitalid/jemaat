@@ -3,7 +3,7 @@
 **Status:** ready-for-agent
 **Component:** portal
 **Satisfies:** [UC-15, UC-16, FR-12, FR-13]
-**Blocked by:** []
+**Blocked by:** [SPEC-1-01]
 **Touches:** [screen-web-settings]
 
 ## Description

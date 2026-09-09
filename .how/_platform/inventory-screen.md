@@ -25,9 +25,11 @@ User interface screens planned for Jemaat, mapping the 95 prototypes in `.work/d
 | 7 | Mobile Member Directory (`screen-mobile-directory`) | `/directory` | `portal` | Church Member | `UC-17` |
 | 8 | Mobile Personal Profile (`screen-mobile-profile`) | `/profile` | `membership` | Church Member | `UC-5` |
 | 9 | Mobile Church Code & Onboarding (`screen-mobile-auth`) | `/onboarding` | `portal` | First-Time Visitor | `UC-16` |
-| 10 | Web Admin People Registry (`screen-web-people`) | `/admin/people` | `membership` | Church Administrator | `UC-1`, `UC-4` |
-| 11 | Web Admin Household Manager (`screen-web-households`) | `/admin/households` | `membership` | Church Administrator | `UC-2` |
-| 12 | Web Admin Roster Matrix (`screen-web-roster`) | `/admin/roster` | `serving` | Ministry Coordinator | `UC-6`, `UC-7`, `UC-10` |
-| 13 | Web Admin Care Group Manager (`screen-web-caregroups`) | `/admin/care-groups` | `caregroups` | Pastor / Pastoral Team | `UC-11`, `UC-13` |
-| 14 | Web Admin CSV Import & Deduplication (`screen-web-data`) | `/admin/data/import` | `membership` | Church Administrator | `UC-3` |
-| 15 | Web Admin Church Settings & QR (`screen-web-settings`) | `/admin/settings` | `portal` | Communications Coordinator | `UC-16`, `UC-19` |
+| 10 | Web Admin Desk Sign In (`screen-web-auth`) | `/admin/login` | `membership` | Church Administrator | `UC-1` |
+| 11 | Web Admin People Registry (`screen-web-people`) | `/admin/people` | `membership` | Church Administrator | `UC-1`, `UC-4` |
+| 12 | Web Admin Household Manager (`screen-web-households`) | `/admin/households` | `membership` | Church Administrator | `UC-2` |
+| 13 | Web Admin Roster Matrix (`screen-web-roster`) | `/admin/roster` | `serving` | Ministry Coordinator | `UC-6`, `UC-7`, `UC-10` |
+| 14 | Web Admin Care Group Manager (`screen-web-caregroups`) | `/admin/care-groups` | `caregroups` | Pastor / Pastoral Team | `UC-11`, `UC-13` |
+| 15 | Web Admin Data Import & Export (`screen-web-data`) | `/admin/data` | `membership` | Church Administrator | `UC-3` |
+| 16 | Web Admin Church Settings & QR (`screen-web-settings`) | `/admin/settings` | `portal` | Communications Coordinator | `UC-16`, `UC-19` |
+| 17 | Web Admin Office Access Roles (`screen-web-roles`) | `/admin/settings/roles` | `portal` | Church Administrator | `UC-1` |

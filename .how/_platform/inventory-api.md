@@ -44,3 +44,11 @@ REST API endpoints planned for the Go backend API container, grouped by componen
 | 26 | `POST` | `/api/v1/guests/intake` | `portal` | Submit newcomer contact card from mobile QR onboarding | draft |
 | 27 | `GET` | `/api/v1/guests/queue` | `portal` | Administrative welcome queue for first-time visitor follow-up | draft |
 | 28 | `POST` | `/api/v1/notifications/dispatch` | `portal` | Trigger automated notification queue processing and reminder dispatch | draft |
+| 29 | `POST` | `/api/v1/auth/request-link` | `membership` | Request WhatsApp magic link or 6-digit OTP for admin desktop sign-in | draft |
+| 30 | `POST` | `/api/v1/auth/verify` | `membership` | Verify authentication link or OTP and issue JWT session token | draft |
+| 31 | `GET` | `/api/v1/data/export` | `membership` | Export church data (people, attendance, care groups, sermons) as XLSX/JSON | draft |
+| 32 | `GET` | `/api/v1/church/profile` | `portal` | Retrieve church tenant profile, service times, and contact information | draft |
+| 33 | `PUT` | `/api/v1/church/profile` | `portal` | Update church tenant profile, service times, and contact information | draft |
+| 34 | `GET` | `/api/v1/church/qr` | `portal` | Generate vector SVG / PNG QR code for printable church welcome poster | draft |
+| 35 | `GET` | `/api/v1/church/access-roles` | `portal` | List church office access roles and assigned staff members | draft |
+| 36 | `POST` | `/api/v1/church/access-roles` | `portal` | Grant or revoke church office administrative privileges | draft |

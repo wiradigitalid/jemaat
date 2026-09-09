@@ -394,6 +394,14 @@ REST API endpoints planned for the Go backend API container, grouped by componen
 | 26 | `POST` | `/api/v1/guests/intake` | `portal` | Submit newcomer contact card from mobile QR onboarding | draft |
 | 27 | `GET` | `/api/v1/guests/queue` | `portal` | Administrative welcome queue for first-time visitor follow-up | draft |
 | 28 | `POST` | `/api/v1/notifications/dispatch` | `portal` | Trigger automated notification queue processing and reminder dispatch | draft |
+| 29 | `POST` | `/api/v1/auth/request-link` | `membership` | Request WhatsApp magic link or 6-digit OTP for admin desktop sign-in | draft |
+| 30 | `POST` | `/api/v1/auth/verify` | `membership` | Verify authentication link or OTP and issue JWT session token | draft |
+| 31 | `GET` | `/api/v1/data/export` | `membership` | Export church data (people, attendance, care groups, sermons) as XLSX/JSON | draft |
+| 32 | `GET` | `/api/v1/church/profile` | `portal` | Retrieve church tenant profile, service times, and contact information | draft |
+| 33 | `PUT` | `/api/v1/church/profile` | `portal` | Update church tenant profile, service times, and contact information | draft |
+| 34 | `GET` | `/api/v1/church/qr` | `portal` | Generate vector SVG / PNG QR code for printable church welcome poster | draft |
+| 35 | `GET` | `/api/v1/church/access-roles` | `portal` | List church office access roles and assigned staff members | draft |
+| 36 | `POST` | `/api/v1/church/access-roles` | `portal` | Grant or revoke church office administrative privileges | draft |
 
 ### List of screens — `inventory-screen.md`
 
@@ -414,12 +422,14 @@ User interface screens planned for Jemaat, mapping the 95 prototypes in `.work/d
 | 7 | Mobile Member Directory (`screen-mobile-directory`) | `/directory` | `portal` | Church Member | `UC-17` |
 | 8 | Mobile Personal Profile (`screen-mobile-profile`) | `/profile` | `membership` | Church Member | `UC-5` |
 | 9 | Mobile Church Code & Onboarding (`screen-mobile-auth`) | `/onboarding` | `portal` | First-Time Visitor | `UC-16` |
-| 10 | Web Admin People Registry (`screen-web-people`) | `/admin/people` | `membership` | Church Administrator | `UC-1`, `UC-4` |
-| 11 | Web Admin Household Manager (`screen-web-households`) | `/admin/households` | `membership` | Church Administrator | `UC-2` |
-| 12 | Web Admin Roster Matrix (`screen-web-roster`) | `/admin/roster` | `serving` | Ministry Coordinator | `UC-6`, `UC-7`, `UC-10` |
-| 13 | Web Admin Care Group Manager (`screen-web-caregroups`) | `/admin/care-groups` | `caregroups` | Pastor / Pastoral Team | `UC-11`, `UC-13` |
-| 14 | Web Admin CSV Import & Deduplication (`screen-web-data`) | `/admin/data/import` | `membership` | Church Administrator | `UC-3` |
-| 15 | Web Admin Church Settings & QR (`screen-web-settings`) | `/admin/settings` | `portal` | Communications Coordinator | `UC-16`, `UC-19` |
+| 10 | Web Admin Desk Sign In (`screen-web-auth`) | `/admin/login` | `membership` | Church Administrator | `UC-1` |
+| 11 | Web Admin People Registry (`screen-web-people`) | `/admin/people` | `membership` | Church Administrator | `UC-1`, `UC-4` |
+| 12 | Web Admin Household Manager (`screen-web-households`) | `/admin/households` | `membership` | Church Administrator | `UC-2` |
+| 13 | Web Admin Roster Matrix (`screen-web-roster`) | `/admin/roster` | `serving` | Ministry Coordinator | `UC-6`, `UC-7`, `UC-10` |
+| 14 | Web Admin Care Group Manager (`screen-web-caregroups`) | `/admin/care-groups` | `caregroups` | Pastor / Pastoral Team | `UC-11`, `UC-13` |
+| 15 | Web Admin Data Import & Export (`screen-web-data`) | `/admin/data` | `membership` | Church Administrator | `UC-3` |
+| 16 | Web Admin Church Settings & QR (`screen-web-settings`) | `/admin/settings` | `portal` | Communications Coordinator | `UC-16`, `UC-19` |
+| 17 | Web Admin Office Access Roles (`screen-web-roles`) | `/admin/settings/roles` | `portal` | Church Administrator | `UC-1` |
 
 ## Error envelope
 

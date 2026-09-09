@@ -14,6 +14,7 @@ rtm:
   release: v0.1.0
   test:
   - TestHealthCheck
+  - TestAdminAuth_MagicLinkAndOTP
   - TestAdminLayoutShellRender
   status: ready-for-agent
   exempt: false
@@ -29,8 +30,25 @@ rtm:
   release: v0.1.0
   test:
   - TestPeopleAPI_CRUD
-  - TestWebPeople_TableRender
+  - TestWebEmpty_RenderWhenZeroMembers
+  - TestWebPeople_TableRenderWithPrivacyMasking
   - TestAdminPersonNew_FormSubmit
+  status: ready-for-agent
+  exempt: false
+  green: false
+  broken_at: status
+- BG: BG-1
+  CAP: CAP-1
+  FR: FR-1
+  DEC: []
+  UC: UC-1
+  ticket: SPEC-4-03
+  spec: SPEC-4
+  release: v0.1.0
+  test:
+  - TestChurchAccessRoles_ListAndGrant
+  - TestEnforceMinTwoAdministrators
+  - TestWebRoles_WhoCanDoWhatRender
   status: ready-for-agent
   exempt: false
   green: false
@@ -45,7 +63,8 @@ rtm:
   release: v0.1.0
   test:
   - TestPeopleAPI_CRUD
-  - TestWebPeople_TableRender
+  - TestWebEmpty_RenderWhenZeroMembers
+  - TestWebPeople_TableRenderWithPrivacyMasking
   - TestAdminPersonNew_FormSubmit
   status: ready-for-agent
   exempt: false
@@ -62,7 +81,6 @@ rtm:
   test:
   - TestMeetingReports_SummaryView
   - TestPastoralAlerts_ThreeConsecutiveAbsences
-  - TestAttendanceSync_IdempotentUpsert
   status: ready-for-agent
   exempt: false
   green: false
@@ -78,7 +96,6 @@ rtm:
   test:
   - TestMeetingReports_SummaryView
   - TestPastoralAlerts_ThreeConsecutiveAbsences
-  - TestAttendanceSync_IdempotentUpsert
   status: ready-for-agent
   exempt: false
   green: false
@@ -174,7 +191,6 @@ rtm:
   test:
   - TestMeetingReports_SummaryView
   - TestPastoralAlerts_ThreeConsecutiveAbsences
-  - TestAttendanceSync_IdempotentUpsert
   status: ready-for-agent
   exempt: false
   green: false
@@ -189,7 +205,7 @@ rtm:
   release: v0.1.0
   test:
   - TestHouseholdsAPI_LinkFamily
-  - TestWebHouseAdmin_CardRender
+  - TestAdminHousehold_FullPageRender
   - TestHeadOfHousehold_EnforceSingleHead
   status: ready-for-agent
   exempt: false
@@ -205,7 +221,8 @@ rtm:
   release: v0.1.0
   test:
   - TestPeopleAPI_CRUD
-  - TestWebPeople_TableRender
+  - TestWebEmpty_RenderWhenZeroMembers
+  - TestWebPeople_TableRenderWithPrivacyMasking
   - TestAdminPersonNew_FormSubmit
   status: ready-for-agent
   exempt: false
@@ -229,6 +246,21 @@ rtm:
   broken_at: status
 - BG: BG-1
   CAP: CAP-1
+  FR: FR-3
+  DEC: []
+  UC: UC-3
+  ticket: SPEC-1-06
+  spec: SPEC-1
+  release: v0.1.0
+  test:
+  - TestDataExportAPI_XLSX
+  - TestWebData_DownloadCardsRender
+  status: ready-for-agent
+  exempt: false
+  green: false
+  broken_at: status
+- BG: BG-1
+  CAP: CAP-1
   FR: FR-4
   DEC: []
   UC: UC-4
@@ -237,6 +269,7 @@ rtm:
   release: v0.1.0
   test:
   - TestMembershipStatus_Transitions
+  - TestAutoCloseRoles_OnMemberTransfer
   - TestWebTransfer_GenerateAttestation
   - TestAuditHistory_ChronologicalLog
   status: ready-for-agent
@@ -253,7 +286,8 @@ rtm:
   release: v0.1.0
   test:
   - TestMinistryTeamsAPI_CRUD
-  - TestWebRoles_DepartmentCardRender
+  - TestAdminDepartments_CardRender
+  - TestAdminDepartmentsEmpty_Render
   status: ready-for-agent
   exempt: false
   green: false

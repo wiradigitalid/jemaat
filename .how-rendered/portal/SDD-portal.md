@@ -31,6 +31,7 @@ Rendered from `components.yaml`.
 | `screen-mobile-home` | Mobile Home Feed | `ui-screen` | `mobile` |
 | `screen-mobile-sermons` | Mobile Sermon Archive | `ui-screen` | `mobile` |
 | `screen-mobile-service` | Mobile Service Bulletin | `ui-screen` | `mobile` |
+| `screen-web-roles` | Web Admin Church Office Access Roles | `ui-screen` | `web` |
 | `screen-web-settings` | Web Admin Church Settings & QR | `ui-screen` | `web` |
 
 

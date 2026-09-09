@@ -14,24 +14,23 @@ dag:
     - SPEC-1-03
     - SPEC-1-04
     - SPEC-1-05
+  - parallel:
+    - SPEC-1-06
 - spec: SPEC-2
   order:
-  - parallel:
+  - blocked:
     - SPEC-2-01
-  - parallel:
     - SPEC-2-02
-  - parallel:
     - SPEC-2-03
 - spec: SPEC-3
   order:
-  - parallel:
+  - blocked:
     - SPEC-3-01
-  - parallel:
     - SPEC-3-02
 - spec: SPEC-4
   order:
-  - parallel:
+  - blocked:
     - SPEC-4-01
-  - parallel:
     - SPEC-4-02
+    - SPEC-4-03
 ```

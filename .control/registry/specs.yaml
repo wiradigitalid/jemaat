@@ -16,8 +16,8 @@ specs:
     depends_on: []
     spec_folder: .scratch/spec-1-web-admin-membership
     spec_reviewed:
-      date: '2026-09-08'
-      sha: '20eb47a'
+      date: '2026-09-09'
+      sha: 'e12919b'
       lenses:
         - edge-case-hunter
     tickets:
@@ -28,9 +28,11 @@ specs:
           - FR-1
         blocked_by: []
         touches:
+          - screen-web-auth
           - screen-web-people
         tests:
           - TestHealthCheck
+          - TestAdminAuth_MagicLinkAndOTP
           - TestAdminLayoutShellRender
 
       - id: SPEC-1-02
@@ -45,7 +47,8 @@ specs:
           - screen-web-people
         tests:
           - TestPeopleAPI_CRUD
-          - TestWebPeople_TableRender
+          - TestWebEmpty_RenderWhenZeroMembers
+          - TestWebPeople_TableRenderWithPrivacyMasking
           - TestAdminPersonNew_FormSubmit
 
       - id: SPEC-1-03
@@ -59,7 +62,7 @@ specs:
           - screen-web-households
         tests:
           - TestHouseholdsAPI_LinkFamily
-          - TestWebHouseAdmin_CardRender
+          - TestAdminHousehold_FullPageRender
           - TestHeadOfHousehold_EnforceSingleHead
 
       - id: SPEC-1-04
@@ -87,8 +90,22 @@ specs:
           - screen-web-people
         tests:
           - TestMembershipStatus_Transitions
+          - TestAutoCloseRoles_OnMemberTransfer
           - TestWebTransfer_GenerateAttestation
           - TestAuditHistory_ChronologicalLog
+
+      - id: SPEC-1-06
+        component: membership
+        satisfies:
+          - UC-3
+          - FR-3
+        blocked_by:
+          - SPEC-1-04
+        touches:
+          - screen-web-data
+        tests:
+          - TestDataExportAPI_XLSX
+          - TestWebData_DownloadCardsRender
 
   - id: SPEC-2
     release: v0.1.0
@@ -103,8 +120,8 @@ specs:
       - SPEC-1
     spec_folder: .scratch/spec-2-web-admin-serving
     spec_reviewed:
-      date: '2026-09-08'
-      sha: '20eb47a'
+      date: '2026-09-09'
+      sha: 'e12919b'
       lenses:
         - edge-case-hunter
     tickets:
@@ -113,12 +130,14 @@ specs:
         satisfies:
           - UC-6
           - FR-5
-        blocked_by: []
+        blocked_by:
+          - SPEC-1-01
         touches:
           - screen-web-roster
         tests:
           - TestMinistryTeamsAPI_CRUD
-          - TestWebRoles_DepartmentCardRender
+          - TestAdminDepartments_CardRender
+          - TestAdminDepartmentsEmpty_Render
 
       - id: SPEC-2-02
         component: serving
@@ -130,6 +149,7 @@ specs:
           - FR-7
         blocked_by:
           - SPEC-2-01
+          - SPEC-1-02
         touches:
           - screen-web-roster
         tests:
@@ -164,8 +184,8 @@ specs:
       - SPEC-1
     spec_folder: .scratch/spec-3-web-admin-caregroups
     spec_reviewed:
-      date: '2026-09-08'
-      sha: '20eb47a'
+      date: '2026-09-09'
+      sha: 'e12919b'
       lenses:
         - edge-case-hunter
     tickets:
@@ -175,7 +195,9 @@ specs:
           - UC-11
           - UC-14
           - FR-9
-        blocked_by: []
+        blocked_by:
+          - SPEC-1-01
+          - SPEC-1-02
         touches:
           - screen-web-caregroups
         tests:
@@ -197,12 +219,12 @@ specs:
         tests:
           - TestMeetingReports_SummaryView
           - TestPastoralAlerts_ThreeConsecutiveAbsences
-          - TestAttendanceSync_IdempotentUpsert
 
   - id: SPEC-4
     release: v0.1.0
     prd: church-operations
     fr:
+      - FR-1
       - FR-12
       - FR-13
       - FR-14
@@ -213,8 +235,8 @@ specs:
       - SPEC-1
     spec_folder: .scratch/spec-4-web-admin-portal-workflows
     spec_reviewed:
-      date: '2026-09-08'
-      sha: '20eb47a'
+      date: '2026-09-09'
+      sha: 'e12919b'
       lenses:
         - edge-case-hunter
     tickets:
@@ -225,7 +247,8 @@ specs:
           - UC-16
           - FR-12
           - FR-13
-        blocked_by: []
+        blocked_by:
+          - SPEC-1-01
         touches:
           - screen-web-settings
         tests:
@@ -244,9 +267,25 @@ specs:
           - FR-16
         blocked_by:
           - SPEC-4-01
+          - SPEC-1-02
         touches:
           - screen-web-settings
         tests:
           - TestApplicantsQueue_TriageAndContact
           - TestApplicantAdmit_PromoteToMember
           - TestWebApplicants_SplitPaneRender
+
+      - id: SPEC-4-03
+        component: portal
+        satisfies:
+          - UC-1
+          - FR-1
+        blocked_by:
+          - SPEC-4-01
+          - SPEC-1-02
+        touches:
+          - screen-web-roles
+        tests:
+          - TestChurchAccessRoles_ListAndGrant
+          - TestEnforceMinTwoAdministrators
+          - TestWebRoles_WhoCanDoWhatRender

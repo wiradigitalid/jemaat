@@ -112,87 +112,116 @@ logical_components:
     component: portal
     lc_type: ui-screen
     container: mobile
+    area: screen-mobile-home
 
   - id: screen-mobile-service
     name: "Mobile Service Bulletin"
     component: portal
     lc_type: ui-screen
     container: mobile
+    area: screen-mobile-service
 
   - id: screen-mobile-sermons
     name: "Mobile Sermon Archive"
     component: portal
     lc_type: ui-screen
     container: mobile
+    area: screen-mobile-sermons
 
   - id: screen-mobile-serving
     name: "Mobile Serving Roster"
     component: serving
     lc_type: ui-screen
     container: mobile
+    area: screen-mobile-serving
 
   - id: screen-mobile-caregroups
     name: "Mobile Care Group Hub"
     component: caregroups
     lc_type: ui-screen
     container: mobile
+    area: screen-mobile-caregroups
 
   - id: screen-mobile-attendance
     name: "Mobile Attendance Check-In"
     component: caregroups
     lc_type: ui-screen
     container: mobile
+    area: screen-mobile-attendance
 
   - id: screen-mobile-directory
     name: "Mobile Member Directory"
     component: portal
     lc_type: ui-screen
     container: mobile
+    area: screen-mobile-directory
 
   - id: screen-mobile-profile
     name: "Mobile Personal Profile"
     component: membership
     lc_type: ui-screen
     container: mobile
+    area: screen-mobile-profile
 
   - id: screen-mobile-auth
     name: "Mobile Church Code & Onboarding"
     component: portal
     lc_type: ui-screen
     container: mobile
+    area: screen-mobile-auth
+
+  - id: screen-web-auth
+    name: "Web Admin Desk Sign In"
+    component: membership
+    lc_type: ui-screen
+    container: web
+    area: screen-web-auth
 
   - id: screen-web-people
     name: "Web Admin People Registry"
     component: membership
     lc_type: ui-screen
     container: web
+    area: screen-web-people
 
   - id: screen-web-households
     name: "Web Admin Household Manager"
     component: membership
     lc_type: ui-screen
     container: web
+    area: screen-web-households
 
   - id: screen-web-roster
     name: "Web Admin Roster Matrix"
     component: serving
     lc_type: ui-screen
     container: web
+    area: screen-web-roster
 
   - id: screen-web-caregroups
     name: "Web Admin Care Group Manager"
     component: caregroups
     lc_type: ui-screen
     container: web
+    area: screen-web-caregroups
 
   - id: screen-web-data
-    name: "Web Admin CSV Import & Deduplication"
+    name: "Web Admin CSV Import, Data Export & Merge"
     component: membership
     lc_type: ui-screen
     container: web
+    area: screen-web-data
 
   - id: screen-web-settings
     name: "Web Admin Church Settings & QR"
     component: portal
     lc_type: ui-screen
     container: web
+    area: screen-web-settings
+
+  - id: screen-web-roles
+    name: "Web Admin Church Office Access Roles"
+    component: portal
+    lc_type: ui-screen
+    container: web
+    area: screen-web-roles

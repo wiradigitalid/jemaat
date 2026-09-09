@@ -17,6 +17,7 @@ product_components:
   - mobile
   logical_components:
   - screen-mobile-profile
+  - screen-web-auth
   - screen-web-data
   - screen-web-households
   - screen-web-people
@@ -32,6 +33,7 @@ product_components:
   - screen-mobile-home
   - screen-mobile-sermons
   - screen-mobile-service
+  - screen-web-roles
   - screen-web-settings
 - id: serving
   name: Volunteer Scheduling & Rosters
@@ -46,75 +48,85 @@ logical_components:
 - id: screen-mobile-attendance
   type: null
   component: caregroups
-  area: null
+  area: screen-mobile-attendance
   owner: null
 - id: screen-mobile-auth
   type: null
   component: portal
-  area: null
+  area: screen-mobile-auth
   owner: null
 - id: screen-mobile-caregroups
   type: null
   component: caregroups
-  area: null
+  area: screen-mobile-caregroups
   owner: null
 - id: screen-mobile-directory
   type: null
   component: portal
-  area: null
+  area: screen-mobile-directory
   owner: null
 - id: screen-mobile-home
   type: null
   component: portal
-  area: null
+  area: screen-mobile-home
   owner: null
 - id: screen-mobile-profile
   type: null
   component: membership
-  area: null
+  area: screen-mobile-profile
   owner: null
 - id: screen-mobile-sermons
   type: null
   component: portal
-  area: null
+  area: screen-mobile-sermons
   owner: null
 - id: screen-mobile-service
   type: null
   component: portal
-  area: null
+  area: screen-mobile-service
   owner: null
 - id: screen-mobile-serving
   type: null
   component: serving
-  area: null
+  area: screen-mobile-serving
+  owner: null
+- id: screen-web-auth
+  type: null
+  component: membership
+  area: screen-web-auth
   owner: null
 - id: screen-web-caregroups
   type: null
   component: caregroups
-  area: null
+  area: screen-web-caregroups
   owner: null
 - id: screen-web-data
   type: null
   component: membership
-  area: null
+  area: screen-web-data
   owner: null
 - id: screen-web-households
   type: null
   component: membership
-  area: null
+  area: screen-web-households
   owner: null
 - id: screen-web-people
   type: null
   component: membership
-  area: null
+  area: screen-web-people
+  owner: null
+- id: screen-web-roles
+  type: null
+  component: portal
+  area: screen-web-roles
   owner: null
 - id: screen-web-roster
   type: null
   component: serving
-  area: null
+  area: screen-web-roster
   owner: null
 - id: screen-web-settings
   type: null
   component: portal
-  area: null
+  area: screen-web-settings
   owner: null

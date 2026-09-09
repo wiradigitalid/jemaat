@@ -27,7 +27,8 @@ Rendered from `components.yaml`.
 | id | Name | Type | Container |
 | --- | --- | --- | --- |
 | `screen-mobile-profile` | Mobile Personal Profile | `ui-screen` | `mobile` |
-| `screen-web-data` | Web Admin CSV Import & Deduplication | `ui-screen` | `web` |
+| `screen-web-auth` | Web Admin Desk Sign In | `ui-screen` | `web` |
+| `screen-web-data` | Web Admin CSV Import, Data Export & Merge | `ui-screen` | `web` |
 | `screen-web-households` | Web Admin Household Manager | `ui-screen` | `web` |
 | `screen-web-people` | Web Admin People Registry | `ui-screen` | `web` |
 

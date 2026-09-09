@@ -5,6 +5,7 @@
 
 specs:
   - id: SPEC-1
+    status: closed
     release: v0.1.0
     prd: church-operations
     fr:

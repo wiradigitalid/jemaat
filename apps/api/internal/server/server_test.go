@@ -696,3 +696,59 @@ func TestAuditHistory_ChronologicalLog(t *testing.T) {
 		t.Error("expected audit entry for lifecycle_change by Lidya S.")
 	}
 }
+
+func TestDataExportAPI_XLSX(t *testing.T) {
+	authSvc := auth.NewService(auth.DefaultJWTSecret)
+	pStore := people.NewStore()
+	hStore := households.NewStore(pStore)
+	srv := server.NewServerWithStores(authSvc, pStore, hStore)
+
+	token, code, _ := authSvc.RequestLink("+6281234567890")
+	verifyResp, _ := authSvc.Verify("+6281234567890", token, code, false)
+	bearer := "Bearer " + verifyResp.Token
+
+	// Seed members
+	_, _ = pStore.Create(people.CreatePersonRequest{
+		FullName: "Andreas Wibowo",
+		Phone:    "0811-2200-3311",
+		Standing: people.StandingRegistered,
+	})
+
+	// 1. Test comprehensive JSON export
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/data/export", nil)
+	req.Header.Set("Authorization", bearer)
+	rec := httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 on data export, got %d", rec.Code)
+	}
+
+	var exportResp map[string]interface{}
+	if err := json.Unmarshal(rec.Body.Bytes(), &exportResp); err != nil {
+		t.Fatalf("failed to decode export payload: %v", err)
+	}
+
+	if exportResp["church_name"] != "Immanuel Church, Sunter" {
+		t.Errorf("expected church name 'Immanuel Church, Sunter', got %v", exportResp["church_name"])
+	}
+	if exportResp["total_members"].(float64) < 1 {
+		t.Errorf("expected total_members >= 1, got %v", exportResp["total_members"])
+	}
+
+	// 2. Test CSV/XLSX stream export format
+	reqStream := httptest.NewRequest(http.MethodGet, "/api/v1/data/export?format=xlsx&category=people", nil)
+	reqStream.Header.Set("Authorization", bearer)
+	recStream := httptest.NewRecorder()
+	srv.Router().ServeHTTP(recStream, reqStream)
+
+	if recStream.Code != http.StatusOK {
+		t.Fatalf("expected 200 on stream export, got %d", recStream.Code)
+	}
+	if !strings.Contains(recStream.Header().Get("Content-Disposition"), "attachment") {
+		t.Errorf("expected attachment header, got %s", recStream.Header().Get("Content-Disposition"))
+	}
+	if !strings.Contains(recStream.Body.String(), "Andreas Wibowo") {
+		t.Errorf("expected Andreas Wibowo in CSV stream, got %s", recStream.Body.String())
+	}
+}

@@ -9,6 +9,7 @@ import { AdminHousehold } from './components/AdminHousehold.tsx';
 import { WebImport } from './components/WebImport.tsx';
 import { WebMerge } from './components/WebMerge.tsx';
 import { WebTransferDialog } from './components/WebTransferDialog.tsx';
+import { WebData } from './components/WebData.tsx';
 import {
   AdminUser,
   AuthResponse,
@@ -603,6 +604,24 @@ export const App: React.FC<{
             onUpdateAddress={handleUpdateHouseholdAddress}
             onSetHead={handleSetHouseholdHead}
             onAddMember={handleAddHouseholdMember}
+          />
+        ) : activeNav === 'Settings' ? (
+          <WebData
+            totalMembers={people.length || 254}
+            onDownloadCategory={(cat, fmt) => {
+              const savedToken =
+                sessionStorage.getItem(TOKEN_STORAGE_KEY) || localStorage.getItem(TOKEN_STORAGE_KEY);
+              fetch(`${apiBaseUrl}/api/v1/data/export?category=${cat}&format=${fmt.toLowerCase()}`, {
+                headers: savedToken ? { Authorization: `Bearer ${savedToken}` } : {},
+              }).catch(() => {});
+            }}
+            onDownloadAll={() => {
+              const savedToken =
+                sessionStorage.getItem(TOKEN_STORAGE_KEY) || localStorage.getItem(TOKEN_STORAGE_KEY);
+              fetch(`${apiBaseUrl}/api/v1/data/export`, {
+                headers: savedToken ? { Authorization: `Bearer ${savedToken}` } : {},
+              }).catch(() => {});
+            }}
           />
         ) : (
           <div className="w-full flex-1 bg-surface border border-line rounded-card p-6 flex flex-col items-center justify-center text-center">

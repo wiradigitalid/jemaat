@@ -8,7 +8,7 @@ Run branch: autopilot/DEC-002 (PR not opened yet)
 Stopped at: —
 Blocked: —
 Parked: —
-Next: SPEC-1-06 Data Export & Backup
+Next: SPEC-2-01 Ministry Teams & Departments
 
 ## Decisions
 | When | Where | Decided | Instead of | Cost if wrong | Landed in |
@@ -19,3 +19,5 @@ Next: SPEC-1-06 Data Export & Backup
 | Iteration 1 | SPEC-1-03 implement | Implement full-page household manager, single head enforcement (BR-1), and unlink non-cascading (BR-MEM-2) | Simple address field on person record | Disjoint household records and broken family linkage | apps/api, apps/web |
 | Iteration 1 | SPEC-1-04 implement | Implement CSV import with 4-step wizard, duplicate detection (BR-MEM-3), and field-level merge | Blind overwrite on CSV upload | Lost contact details and duplicate member corruption | apps/api, apps/web |
 | Iteration 1 | SPEC-1-05 implement | Implement status transitions, church transfer attestation, audit logs, and auto-close roles (BR-MEM-4) | Unlogged status updates | Orphaned active roles for transferred members | apps/api, apps/web |
+| Iteration 1 | SPEC-1-06 implement | Implement master data export with download cards and CSV stream formatting matching WebData.dc.html | Single manual SQL dump | Inability for administrators to export data freely | apps/api, apps/web |
+| Iteration 1 | SPEC-1 close | Close SPEC-1 upon full completion and verification of all 6 vertical slices | Leaving spec open across iterations | G5 release tracking drift | .control/registry/specs.yaml |

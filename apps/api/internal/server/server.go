@@ -110,6 +110,9 @@ func (s *Server) setupRoutes() {
 			protected.Put("/households/{id}/head", s.handleSetHouseholdHead)
 			protected.Post("/households/{id}/members", s.handleLinkHouseholdMember)
 			protected.Delete("/households/{id}/members/{personId}", s.handleUnlinkHouseholdMember)
+
+			// Data Export endpoints (SPEC-1-06)
+			protected.Get("/data/export", s.handleDataExport)
 		})
 	})
 }

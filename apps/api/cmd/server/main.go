@@ -23,7 +23,7 @@ func main() {
 
 	authService := auth.NewService(jwtSecret)
 	peopleStore := people.NewStore()
-	if os.Getenv("SEED_DEMO") == "true" {
+	if os.Getenv("SEED_DEMO") != "false" {
 		peopleStore.SeedInitialDemoData()
 	}
 

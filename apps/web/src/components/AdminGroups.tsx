@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { CareGroup, UnplacedPerson } from '../types.ts';
 import { PlusIcon, UserPlusIcon } from './Icons.tsx';
+import { WebPastoralAlerts } from './WebPastoralAlerts.tsx';
 
 interface AdminGroupsProps {
   groups?: CareGroup[];
@@ -94,6 +95,7 @@ export const AdminGroups: React.FC<AdminGroupsProps> = ({
   const [groupList, setGroupList] = useState<CareGroup[]>(groups);
   const [unplacedQueue, setUnplacedQueue] = useState<UnplacedPerson[]>(unplaced);
   const [selectedGroupId, setSelectedGroupId] = useState<string>(groups[0]?.id || 'cg-01');
+  const [view, setView] = useState<'groups' | 'pastoral'>('groups');
   const [showNewGroupModal, setShowNewGroupModal] = useState(false);
   const [showAddMemberModal, setShowAddMemberModal] = useState(false);
 
@@ -255,7 +257,7 @@ export const AdminGroups: React.FC<AdminGroupsProps> = ({
   return (
     <div className="flex flex-col flex-1 min-h-0 bg-bg">
       {/* Top Header Bar matching AdminGroups.dc.html */}
-      <div className="flex items-center gap-[14px] p-[20px_32px] bg-surfaceAlt border-b border-line select-none">
+      <div className="flex items-center gap-[14px] p-[20px_32px] bg-surfaceAlt border-b border-line select-none flex-wrap">
         <div className="flex-1 min-w-0">
           <h1 className="text-[16px] font-bold text-ink m-0">Care groups</h1>
           <div className="text-[12px] text-ink3 mt-0.5">
@@ -263,18 +265,51 @@ export const AdminGroups: React.FC<AdminGroupsProps> = ({
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setShowNewGroupModal(true)}
-          className="flex items-center gap-2 h-[40px] px-[18px] rounded-input bg-accent text-white text-[13px] font-semibold hover:bg-accentDark transition-colors cursor-pointer"
-        >
-          <PlusIcon size={17} strokeWidth={2.2} />
-          <span>New group</span>
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setView('groups')}
+            className={`h-[40px] px-4 rounded-input text-[13px] font-semibold transition-colors cursor-pointer ${
+              view === 'groups'
+                ? 'bg-surface border border-line text-ink font-bold shadow-xs'
+                : 'text-ink2 hover:bg-surface'
+            }`}
+          >
+            Care groups
+          </button>
+          <button
+            type="button"
+            onClick={() => setView('pastoral')}
+            className={`flex items-center gap-2 h-[40px] px-4 rounded-input text-[13px] font-semibold transition-colors cursor-pointer ${
+              view === 'pastoral'
+                ? 'bg-surface border border-line text-ink font-bold shadow-xs'
+                : 'text-ink2 hover:bg-surface'
+            }`}
+          >
+            <span>Pastoral alerts</span>
+            <span className="inline-flex items-center justify-center px-1.5 h-[18px] rounded-full bg-amberTint text-amber text-[10.5px] font-bold">
+              2
+            </span>
+          </button>
+
+          {view === 'groups' && (
+            <button
+              type="button"
+              onClick={() => setShowNewGroupModal(true)}
+              className="flex items-center gap-2 h-[40px] px-[18px] rounded-input bg-accent text-white text-[13px] font-semibold hover:bg-accentDark transition-colors cursor-pointer"
+            >
+              <PlusIcon size={17} strokeWidth={2.2} />
+              <span>New group</span>
+            </button>
+          )}
+        </div>
       </div>
 
-      {/* 3-Column Layout matching AdminGroups.dc.html */}
-      <div className="flex-1 min-h-0 flex gap-6 p-[24px_32px] overflow-hidden">
+      {view === 'pastoral' ? (
+        <WebPastoralAlerts />
+      ) : (
+        /* 3-Column Layout matching AdminGroups.dc.html */
+        <div className="flex-1 min-h-0 flex gap-6 p-[24px_32px] overflow-hidden">
         {/* Left Column: Groups List (352px) */}
         <div className="w-[352px] flex-[0_0_352px]">
           <div className="bg-surface border border-line rounded-card overflow-hidden h-full flex flex-col shadow-sm">
@@ -446,6 +481,7 @@ export const AdminGroups: React.FC<AdminGroupsProps> = ({
           </div>
         </div>
       </div>
+      )}
 
       {/* Modal: New Care Group */}
       {showNewGroupModal && (

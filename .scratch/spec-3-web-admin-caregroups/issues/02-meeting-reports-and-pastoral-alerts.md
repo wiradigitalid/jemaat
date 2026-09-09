@@ -1,6 +1,6 @@
 # SPEC-3-02: Care Group Meeting Reports, Attendance Sync & Pastoral Absence Review
 
-**Status:** ready-for-agent
+**Status:** done
 **Component:** caregroups
 **Satisfies:** [UC-12, UC-13, FR-10, FR-11, FR-17]
 **Blocked by:** [SPEC-3-01]

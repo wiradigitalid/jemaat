@@ -8,7 +8,7 @@ Run branch: autopilot/DEC-002 (Draft PR #1 open: https://github.com/wiradigitali
 Stopped at: —
 Blocked: —
 Parked: —
-Next: SPEC-3-01 Care Groups Directory & Member Enrollment
+Next: SPEC-4-01 Church Profile, Code & Printable QR Posters
 
 ## Decisions
 | When | Where | Decided | Instead of | Cost if wrong | Landed in |
@@ -25,3 +25,6 @@ Next: SPEC-3-01 Care Groups Directory & Member Enrollment
 | Iteration 1 | SPEC-2-02 implement | Implement monthly roster matrix grid matching WebRoster.dc.html, slot assignments, and substitutes (UC-7/8/10) | Static calendar without volunteer substitutions | Coordinator unable to fill duty vacancies | apps/api, apps/web |
 | Iteration 1 | SPEC-2-03 implement | Implement conflict engine, blockouts (BR-2), double-booking guards (AD-4), and mandatory override justifications | Silent double-booking or scheduling unavailable volunteers | Volunteer burnout, empty service roles on Sunday | apps/api, apps/web |
 | Iteration 1 | SPEC-2 close | Close SPEC-2 upon full verification of volunteer scheduling, roster matrix, and conflict engine | Keeping spec open | Milestone tracking ambiguity | .control/registry/specs.yaml |
+| Iteration 1 | SPEC-3-01 implement | Implement 3-pane care groups directory, unplaced placement queue, and member enrollment matching AdminGroups.dc.html | Single flat list without unplaced placement | Unassigned seekers left in limbo | apps/api, apps/web |
+| Iteration 1 | SPEC-3-02 implement | Implement meeting records review, idempotent attendance sync (AD-5), and 3-consecutive-absence pastoral alerts (BR-3) | Manual tallying or unlogged absences | Members slipping away unnoticed without pastoral outreach | apps/api, apps/web |
+| Iteration 1 | SPEC-3 close | Close SPEC-3 upon full verification of care groups directory, meeting logs, and pastoral absence triage | Leaving spec open | Release tracking desync | .control/registry/specs.yaml |

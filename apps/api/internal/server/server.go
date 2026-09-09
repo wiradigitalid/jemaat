@@ -25,6 +25,7 @@ type Server struct {
 	servingStore   *serving.Store
 	rosterStore    *serving.RosterStore
 	caregroupStore *caregroups.Store
+	meetingStore   *caregroups.MeetingStore
 }
 
 func NewServer(authService *auth.Service) *Server {
@@ -67,6 +68,7 @@ func NewServerWithAllStores(authService *auth.Service, peopleStore *people.Store
 		servingStore:   servingStore,
 		rosterStore:    rosterStore,
 		caregroupStore: cgStore,
+		meetingStore:   caregroups.NewMeetingStore(),
 	}
 
 	s.setupMiddleware()
@@ -170,6 +172,14 @@ func (s *Server) setupRoutes() {
 			protected.Get("/care-groups/{id}", s.handleGetCareGroup)
 			protected.Post("/care-groups/{id}/members", s.handleEnrollCareGroupMember)
 			protected.Delete("/care-groups/{id}/members/{personId}", s.handleRemoveCareGroupMember)
+
+			// Meeting Reports, Attendance Sync & Pastoral Alerts (SPEC-3-02, UC-12, UC-13, FR-10, FR-11, FR-17, BR-3, AD-5)
+			protected.Get("/care-groups/{id}/meetings", s.handleListCareGroupMeetings)
+			protected.Post("/care-groups/{id}/meetings", s.handleCreateCareGroupMeeting)
+			protected.Post("/care-groups/attendance/sync", s.handleSyncAttendance)
+			protected.Get("/care-groups/absence-alerts", s.handleListAbsenceAlerts)
+			protected.Post("/pastoral/alerts/{id}/contact", s.handleContactPastoralAlert)
+			protected.Post("/pastoral/alerts/{id}/dismiss", s.handleDismissPastoralAlert)
 		})
 	})
 }
@@ -1022,4 +1032,128 @@ func (s *Server) handleRemoveCareGroupMember(w http.ResponseWriter, r *http.Requ
 
 	w.WriteHeader(http.StatusOK)
 	_ = json.NewEncoder(w).Encode(group)
+}
+
+func (s *Server) handleListCareGroupMeetings(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	id := chi.URLParam(r, "id")
+
+	meetings := s.meetingStore.ListMeetings(id)
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(map[string]interface{}{
+		"care_group_id": id,
+		"data":          meetings,
+		"total":         len(meetings),
+	})
+}
+
+func (s *Server) handleCreateCareGroupMeeting(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	id := chi.URLParam(r, "id")
+
+	var req struct {
+		Date           string `json:"date"`
+		DateLabel      string `json:"date_label"`
+		HostName       string `json:"host_name"`
+		Topic          string `json:"topic"`
+		OfferingAmount int64  `json:"offering_amount"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": "invalid request body"})
+		return
+	}
+
+	groupName := "Care Group"
+	if g, err := s.caregroupStore.Get(id); err == nil {
+		groupName = g.Name
+	}
+
+	mtg, err := s.meetingStore.CreateMeeting(id, groupName, req.Date, req.DateLabel, req.HostName, req.Topic, req.OfferingAmount)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	_ = json.NewEncoder(w).Encode(mtg)
+}
+
+func (s *Server) handleSyncAttendance(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	var req caregroups.SyncAttendanceRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": "invalid request body"})
+		return
+	}
+
+	syncedCount := s.meetingStore.SyncAttendance(req)
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(map[string]interface{}{
+		"status":  "synced",
+		"synced":  syncedCount,
+		"message": "attendance records ingested successfully",
+	})
+}
+
+func (s *Server) handleListAbsenceAlerts(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	alerts := s.meetingStore.ListAbsenceAlerts()
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(map[string]interface{}{
+		"data":  alerts,
+		"total": len(alerts),
+	})
+}
+
+func (s *Server) handleContactPastoralAlert(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	id := chi.URLParam(r, "id")
+
+	var req struct {
+		Notes string `json:"notes"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": "invalid request body"})
+		return
+	}
+
+	alert, err := s.meetingStore.ContactAlert(id, req.Notes)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(alert)
+}
+
+func (s *Server) handleDismissPastoralAlert(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	id := chi.URLParam(r, "id")
+
+	var req struct {
+		Reason string `json:"reason"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": "invalid request body"})
+		return
+	}
+
+	alert, err := s.meetingStore.DismissAlert(id, req.Reason)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(alert)
 }

@@ -193,3 +193,30 @@ export interface UnplacedPerson {
   zone: string;
   requested_at?: string;
 }
+
+export interface MeetingSession {
+  id: string;
+  care_group_id: string;
+  care_group_name: string;
+  date: string;
+  date_label: string;
+  host_name: string;
+  topic: string;
+  offering_amount: number;
+  attendees_count: number;
+  guests_count: number;
+}
+
+export interface AbsenceAlert {
+  id: string;
+  person_id: string;
+  person_name: string;
+  person_phone: string;
+  care_group_id: string;
+  care_group_name: string;
+  consecutive_absences: number;
+  last_attended_date: string;
+  status: 'pending' | 'contacted' | 'dismissed';
+  contact_notes?: string;
+  dismiss_reason?: string;
+}

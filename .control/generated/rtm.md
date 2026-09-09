@@ -81,10 +81,10 @@ rtm:
   test:
   - TestMeetingReports_SummaryView
   - TestPastoralAlerts_ThreeConsecutiveAbsences
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-3
   CAP: CAP-3
   FR: FR-11
@@ -96,10 +96,10 @@ rtm:
   test:
   - TestMeetingReports_SummaryView
   - TestPastoralAlerts_ThreeConsecutiveAbsences
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-4
   CAP: CAP-4
   FR: FR-12
@@ -191,10 +191,10 @@ rtm:
   test:
   - TestMeetingReports_SummaryView
   - TestPastoralAlerts_ThreeConsecutiveAbsences
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-1
   CAP: CAP-1
   FR: FR-2
@@ -383,10 +383,10 @@ rtm:
   test:
   - TestCareGroupsAPI_DirectoryAndEnrollment
   - TestAdminGroups_CardListRender
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-3
   CAP: CAP-3
   FR: FR-9
@@ -398,8 +398,8 @@ rtm:
   test:
   - TestCareGroupsAPI_DirectoryAndEnrollment
   - TestAdminGroups_CardListRender
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 ```

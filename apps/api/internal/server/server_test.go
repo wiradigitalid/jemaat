@@ -1328,3 +1328,183 @@ func TestCareGroupsAPI_DirectoryAndEnrollment(t *testing.T) {
 		t.Errorf("expected 0 members after remove, got %d", updatedGroup.MembersCount)
 	}
 }
+
+func TestMeetingReports_SummaryView(t *testing.T) {
+	authSvc := auth.NewService(auth.DefaultJWTSecret)
+	pStore := people.NewStore()
+	hStore := households.NewStore(pStore)
+	sStore := serving.NewStore()
+	rStore := serving.NewRosterStore()
+	cgStore := caregroups.NewStore()
+	srv := server.NewServerWithAllStores(authSvc, pStore, hStore, sStore, rStore, cgStore)
+
+	token, code, _ := authSvc.RequestLink("+6281234567890")
+	verifyResp, _ := authSvc.Verify("+6281234567890", token, code, false)
+	bearer := "Bearer " + verifyResp.Token
+
+	// 1. List meetings for care group cg-01 (UC-12, FR-10)
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/care-groups/cg-01/meetings", nil)
+	req.Header.Set("Authorization", bearer)
+	rec := httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 on list meetings, got %d", rec.Code)
+	}
+	var meetingsResp struct {
+		CareGroupID string                      `json:"care_group_id"`
+		Data        []caregroups.MeetingSession `json:"data"`
+		Total       int                         `json:"total"`
+	}
+	_ = json.Unmarshal(rec.Body.Bytes(), &meetingsResp)
+	if meetingsResp.Total < 3 {
+		t.Errorf("expected at least 3 seeded meetings, got %d", meetingsResp.Total)
+	}
+
+	// 2. Create meeting session
+	newMeetingPayload := map[string]interface{}{
+		"date":            "2026-03-11",
+		"date_label":      "WED 11 MAR",
+		"host_name":       "Dedi Kurnia",
+		"topic":           "Walking in Faith Part 4",
+		"offering_amount": 450000,
+	}
+	body, _ := json.Marshal(newMeetingPayload)
+	req = httptest.NewRequest(http.MethodPost, "/api/v1/care-groups/cg-01/meetings", bytes.NewReader(body))
+	req.Header.Set("Authorization", bearer)
+	req.Header.Set("Content-Type", "application/json")
+	rec = httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusCreated {
+		t.Fatalf("expected 201 on create meeting, got %d: %s", rec.Code, rec.Body.String())
+	}
+	var createdMeeting caregroups.MeetingSession
+	_ = json.Unmarshal(rec.Body.Bytes(), &createdMeeting)
+	if createdMeeting.Topic != "Walking in Faith Part 4" {
+		t.Errorf("expected topic 'Walking in Faith Part 4', got %s", createdMeeting.Topic)
+	}
+}
+
+func TestPastoralAlerts_ThreeConsecutiveAbsences(t *testing.T) {
+	authSvc := auth.NewService(auth.DefaultJWTSecret)
+	pStore := people.NewStore()
+	hStore := households.NewStore(pStore)
+	sStore := serving.NewStore()
+	rStore := serving.NewRosterStore()
+	cgStore := caregroups.NewStore()
+	srv := server.NewServerWithAllStores(authSvc, pStore, hStore, sStore, rStore, cgStore)
+
+	token, code, _ := authSvc.RequestLink("+6281234567890")
+	verifyResp, _ := authSvc.Verify("+6281234567890", token, code, false)
+	bearer := "Bearer " + verifyResp.Token
+
+	// 1. Batch sync offline attendance records (AD-5, BR-CG-2)
+	// Jessica Tan has 3 consecutive unexcused absences (triggers alert - BR-3)
+	// Kevin Halim has 3 absences but meeting 2 is excused (suppresses alert - BR-CG-3)
+	syncPayload := caregroups.SyncAttendanceRequest{
+		Records: []caregroups.AttendanceSyncItem{
+			{MeetingSessionID: "mtg-01", PersonID: "per-jt", PersonName: "Jessica Tan", Attended: false, Excused: false},
+			{MeetingSessionID: "mtg-02", PersonID: "per-jt", PersonName: "Jessica Tan", Attended: false, Excused: false},
+			{MeetingSessionID: "mtg-03", PersonID: "per-jt", PersonName: "Jessica Tan", Attended: false, Excused: false},
+			{MeetingSessionID: "mtg-01", PersonID: "per-kh", PersonName: "Kevin Halim", Attended: false, Excused: false},
+			{MeetingSessionID: "mtg-02", PersonID: "per-kh", PersonName: "Kevin Halim", Attended: false, Excused: true, ExcusedReason: "Hospital recovery"},
+			{MeetingSessionID: "mtg-03", PersonID: "per-kh", PersonName: "Kevin Halim", Attended: false, Excused: false},
+		},
+	}
+	body, _ := json.Marshal(syncPayload)
+	req := httptest.NewRequest(http.MethodPost, "/api/v1/care-groups/attendance/sync", bytes.NewReader(body))
+	req.Header.Set("Authorization", bearer)
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 on attendance sync, got %d", rec.Code)
+	}
+
+	// Re-syncing the same payload must be idempotent (BR-CG-2, AD-5)
+	req = httptest.NewRequest(http.MethodPost, "/api/v1/care-groups/attendance/sync", bytes.NewReader(body))
+	req.Header.Set("Authorization", bearer)
+	req.Header.Set("Content-Type", "application/json")
+	rec = httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 on idempotent attendance re-sync, got %d", rec.Code)
+	}
+
+	// 2. Query absence alerts (BR-3, FR-11, UC-13)
+	req = httptest.NewRequest(http.MethodGet, "/api/v1/care-groups/absence-alerts", nil)
+	req.Header.Set("Authorization", bearer)
+	rec = httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 on list absence alerts, got %d", rec.Code)
+	}
+	var alertsResp struct {
+		Data  []caregroups.AbsenceAlert `json:"data"`
+		Total int                       `json:"total"`
+	}
+	_ = json.Unmarshal(rec.Body.Bytes(), &alertsResp)
+
+	// Verify Jessica Tan was dynamically flagged with consecutive absences = 3
+	var foundJessica, foundKevin bool
+	for _, a := range alertsResp.Data {
+		if a.PersonName == "Jessica Tan" {
+			foundJessica = true
+			if a.ConsecutiveAbsences != 3 {
+				t.Errorf("expected 3 consecutive absences for Jessica, got %d", a.ConsecutiveAbsences)
+			}
+		}
+		if a.PersonName == "Kevin Halim" {
+			foundKevin = true
+		}
+	}
+
+	if !foundJessica {
+		t.Error("expected Jessica Tan to be dynamically flagged in absence alerts (BR-3)")
+	}
+	if foundKevin {
+		t.Error("Kevin Halim had an excused absence and must NOT be flagged (BR-CG-3)")
+	}
+
+	// 3. Log pastoral contact notes
+	contactPayload := map[string]string{
+		"notes": "Called member by phone, confirmed recovering from surgery and needs visitation next week",
+	}
+	body, _ = json.Marshal(contactPayload)
+	req = httptest.NewRequest(http.MethodPost, "/api/v1/pastoral/alerts/alt-001/contact", bytes.NewReader(body))
+	req.Header.Set("Authorization", bearer)
+	req.Header.Set("Content-Type", "application/json")
+	rec = httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 on log contact notes, got %d", rec.Code)
+	}
+	var updatedAlert caregroups.AbsenceAlert
+	_ = json.Unmarshal(rec.Body.Bytes(), &updatedAlert)
+	if updatedAlert.Status != "contacted" {
+		t.Errorf("expected status 'contacted', got %s", updatedAlert.Status)
+	}
+
+	// 4. Dismiss alert with pastoral reason
+	dismissPayload := map[string]string{
+		"reason": "Family relocated temporarily to Surabaya for 2 months",
+	}
+	body, _ = json.Marshal(dismissPayload)
+	req = httptest.NewRequest(http.MethodPost, "/api/v1/pastoral/alerts/alt-002/dismiss", bytes.NewReader(body))
+	req.Header.Set("Authorization", bearer)
+	req.Header.Set("Content-Type", "application/json")
+	rec = httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 on dismiss alert, got %d", rec.Code)
+	}
+	_ = json.Unmarshal(rec.Body.Bytes(), &updatedAlert)
+	if updatedAlert.Status != "dismissed" {
+		t.Errorf("expected status 'dismissed', got %s", updatedAlert.Status)
+	}
+}

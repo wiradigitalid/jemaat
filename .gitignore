@@ -7,3 +7,12 @@
 .env
 .env.*
 !.env.example
+
+# Dependencies & Build artifacts
+node_modules/
+dist/
+build/
+*.exe
+*.test
+bin/
+

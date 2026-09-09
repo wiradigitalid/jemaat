@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #FAF7F2;
+  --surface: #FFFFFF;
+  --surfaceAlt: #FFFDFB;
+  --ink: #241E1A;
+  --ink2: #6B6058;
+  --ink3: #9A8F85;
+  --line: #E9E1D7;
+  --lineSoft: #F1EAE1;
+  --accent: #B4562F;
+  --accentDark: #8E4224;
+  --accentTint: #F6EAE3;
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg);
+  color: var(--ink);
+  font-family: "Plus Jakarta Sans", "Segoe UI", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  box-sizing: border-box;
+}

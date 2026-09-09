@@ -8,9 +8,10 @@ Run branch: autopilot/DEC-002 (PR not opened yet)
 Stopped at: —
 Blocked: —
 Parked: —
-Next: SPEC-1-01 Monorepo Scaffold, Admin Auth & Layout Shell
+Next: SPEC-1-02 People Registry & Details
 
 ## Decisions
 | When | Where | Decided | Instead of | Cost if wrong | Landed in |
 |---|---|---|---|---|---|
 | Iteration 1 | wdi-autopilot preflight | Establish mandate DEC-002 for G5 release execution | Manual per-ticket gating | Autopilot halts if parked invariant hit | .control/decisions/DEC-002-autopilot-mandate.md |
+| Iteration 1 | SPEC-1-01 implement | Scaffold Go API and React Web Admin with OTP auth, shared computer storage, and 246px sidebar | Ad-hoc templates without design tokens | Rework UI tokens across specs | apps/api, apps/web |

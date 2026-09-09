@@ -89,11 +89,15 @@ func (s *Server) setupRoutes() {
 			protected.Use(s.authService.Middleware)
 			protected.Get("/desk/summary", s.handleDeskSummary)
 
-			// People endpoints (SPEC-1-02)
+			// People endpoints (SPEC-1-02, SPEC-1-04)
 			protected.Get("/people", s.handleListPeople)
 			protected.Post("/people", s.handleCreatePerson)
 			protected.Get("/people/{id}", s.handleGetPerson)
 			protected.Put("/people/{id}", s.handleUpdatePerson)
+			protected.Post("/people/import", s.handleImportPreview)
+			protected.Post("/people/import/commit", s.handleImportCommit)
+			protected.Get("/people/duplicates", s.handleGetDuplicates)
+			protected.Post("/people/merge", s.handleMergePeople)
 
 			// Household endpoints (SPEC-1-03)
 			protected.Get("/households", s.handleListHouseholds)
@@ -414,4 +418,72 @@ func (s *Server) handleUnlinkHouseholdMember(w http.ResponseWriter, r *http.Requ
 
 	w.WriteHeader(http.StatusOK)
 	_ = json.NewEncoder(w).Encode(hh)
+}
+
+func (s *Server) handleImportPreview(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	preview, err := s.peopleStore.ParseCSVImport(r.Body)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(preview)
+}
+
+func (s *Server) handleImportCommit(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	var req struct {
+		Rows []people.ImportRow `json:"rows"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": "invalid request body"})
+		return
+	}
+
+	imported, err := s.peopleStore.CommitImport(req.Rows)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(map[string]interface{}{
+		"imported": imported,
+		"status":   "success",
+	})
+}
+
+func (s *Server) handleGetDuplicates(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	dups := s.peopleStore.GetDuplicates()
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(map[string]interface{}{
+		"data":  dups,
+		"total": len(dups),
+	})
+}
+
+func (s *Server) handleMergePeople(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	var req people.MergeRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": "invalid request body"})
+		return
+	}
+
+	merged, err := s.peopleStore.Merge(req)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(merged)
 }

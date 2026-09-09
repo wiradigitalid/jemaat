@@ -4,6 +4,7 @@ import { UsersIcon, PlusIcon } from './Icons.tsx';
 interface WebEmptyProps {
   onAddPerson: () => void;
   onHowHouseholdsWork?: () => void;
+  onImportExcel?: () => void;
 }
 
 export const WebEmpty: React.FC<WebEmptyProps> = ({ onAddPerson, onHowHouseholdsWork }) => {

@@ -392,3 +392,129 @@ func TestHeadOfHousehold_EnforceSingleHead(t *testing.T) {
 		t.Fatalf("expected strictly 1 head of household (BR-1), found %d", headCount)
 	}
 }
+
+func TestCSVImport_PreviewAndValidation(t *testing.T) {
+	authSvc := auth.NewService(auth.DefaultJWTSecret)
+	pStore := people.NewStore()
+	hStore := households.NewStore(pStore)
+	srv := server.NewServerWithStores(authSvc, pStore, hStore)
+
+	token, code, _ := authSvc.RequestLink("+6281234567890")
+	verifyResp, _ := authSvc.Verify("+6281234567890", token, code, false)
+	bearer := "Bearer " + verifyResp.Token
+
+	// CSV with 1 valid row and 1 invalid row (missing name)
+	csvData := `Nama,HP,Email,Alamat
+Yohanes Sitorus,0812-9988-7766,yohanes@church.com,Jakarta
+,0811-0000-1111,noname@church.com,Bandung
+`
+	req := httptest.NewRequest(http.MethodPost, "/api/v1/people/import", bytes.NewBufferString(csvData))
+	req.Header.Set("Authorization", bearer)
+	rec := httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 on import preview, got %d", rec.Code)
+	}
+
+	var preview people.ImportPreviewResponse
+	_ = json.Unmarshal(rec.Body.Bytes(), &preview)
+	if preview.TotalRows != 2 {
+		t.Errorf("expected 2 total rows, got %d", preview.TotalRows)
+	}
+	if preview.ValidRows != 1 {
+		t.Errorf("expected 1 valid row, got %d", preview.ValidRows)
+	}
+	if preview.ErrorRows != 1 {
+		t.Errorf("expected 1 error row, got %d", preview.ErrorRows)
+	}
+	if len(preview.Preview[1].Errors) == 0 {
+		t.Error("expected validation error on second row with missing name")
+	}
+}
+
+func TestDuplicateDetection_PhoneEmail(t *testing.T) {
+	authSvc := auth.NewService(auth.DefaultJWTSecret)
+	pStore := people.NewStore()
+	hStore := households.NewStore(pStore)
+	srv := server.NewServerWithStores(authSvc, pStore, hStore)
+
+	token, code, _ := authSvc.RequestLink("+6281234567890")
+	verifyResp, _ := authSvc.Verify("+6281234567890", token, code, false)
+	bearer := "Bearer " + verifyResp.Token
+
+	// Seed existing member
+	_, _ = pStore.Create(people.CreatePersonRequest{
+		FullName: "Existing Person",
+		Phone:    "0812-1122-3344",
+		Email:    "existing@church.com",
+	})
+
+	// CSV import with identical phone number (triggers BR-MEM-3 duplicate detection)
+	csvData := `Nama,HP,Email
+Budi Duplicate,0812-1122-3344,budi.dup@church.com
+`
+	req := httptest.NewRequest(http.MethodPost, "/api/v1/people/import", bytes.NewBufferString(csvData))
+	req.Header.Set("Authorization", bearer)
+	rec := httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	var preview people.ImportPreviewResponse
+	_ = json.Unmarshal(rec.Body.Bytes(), &preview)
+	if preview.Duplicates != 1 {
+		t.Errorf("expected 1 duplicate flagged, got %d", preview.Duplicates)
+	}
+	if !preview.Preview[0].IsDuplicate {
+		t.Error("expected first row to be flagged as duplicate")
+	}
+}
+
+func TestWebMerge_ExecuteMerge(t *testing.T) {
+	authSvc := auth.NewService(auth.DefaultJWTSecret)
+	pStore := people.NewStore()
+	hStore := households.NewStore(pStore)
+	srv := server.NewServerWithStores(authSvc, pStore, hStore)
+
+	token, code, _ := authSvc.RequestLink("+6281234567890")
+	verifyResp, _ := authSvc.Verify("+6281234567890", token, code, false)
+	bearer := "Bearer " + verifyResp.Token
+
+	// Create two duplicate records
+	p1, _ := pStore.Create(people.CreatePersonRequest{
+		FullName: "Budi Halim",
+		Phone:    "0812-1122-3344",
+		Standing: people.StandingRegistered,
+	})
+	p2, _ := pStore.Create(people.CreatePersonRequest{
+		FullName: "B. Halim",
+		Phone:    "0812-1122-3344",
+		Standing: people.StandingMember,
+	})
+
+	// Execute Merge request
+	mergeReq := people.MergeRequest{
+		PrimaryID:   p1.ID,
+		SecondaryID: p2.ID,
+		FullName:    "Budi Halim",
+		Phone:       "0812-1122-3344",
+	}
+	body, _ := json.Marshal(mergeReq)
+	req := httptest.NewRequest(http.MethodPost, "/api/v1/people/merge", bytes.NewReader(body))
+	req.Header.Set("Authorization", bearer)
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 on merge, got %d", rec.Code)
+	}
+
+	// Verify secondary is now inactive/archived
+	sec, _ := pStore.Get(p2.ID, false)
+	if sec.Lifecycle != people.LifecycleInactive {
+		t.Errorf("expected secondary record lifecycle Inactive, got %s", sec.Lifecycle)
+	}
+	if !strings.Contains(sec.Notes, "Merged into Budi Halim") {
+		t.Errorf("expected audit note on secondary record, got %s", sec.Notes)
+	}
+}

@@ -6,6 +6,8 @@ import { WebPeople } from './components/WebPeople.tsx';
 import { WebPerson } from './components/WebPerson.tsx';
 import { AdminPersonNew } from './components/AdminPersonNew.tsx';
 import { AdminHousehold } from './components/AdminHousehold.tsx';
+import { WebImport } from './components/WebImport.tsx';
+import { WebMerge } from './components/WebMerge.tsx';
 import {
   AdminUser,
   AuthResponse,
@@ -128,6 +130,8 @@ export const App: React.FC<{
   const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
   const [household, setHousehold] = useState<Household>(initialHousehold ?? defaultHousehold);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showImport, setShowImport] = useState(false);
+  const [showMerge, setShowMerge] = useState(false);
 
   // Restore authentication on mount
   useEffect(() => {
@@ -398,7 +402,15 @@ export const App: React.FC<{
           subtitle: `${people.length} on the roll · updated today`,
           actions: (
             <>
-              <ActionButton label="Import from Excel" icon={<UploadIcon size={17} />} />
+              <ActionButton
+                label="Import from Excel"
+                icon={<UploadIcon size={17} />}
+                onClick={() => setShowImport(true)}
+              />
+              <ActionButton
+                label="Review Duplicates"
+                onClick={() => setShowMerge(true)}
+              />
               <ActionButton
                 label="Add person"
                 icon={<PlusIcon size={17} />}
@@ -477,18 +489,41 @@ export const App: React.FC<{
         actions={actions}
       >
         {activeNav === 'People' ? (
-          selectedPerson ? (
+          showImport ? (
+            <WebImport
+              onClose={() => setShowImport(false)}
+              onImportComplete={(count) => {
+                setShowImport(false);
+                alert(`Successfully imported ${count} members`);
+              }}
+              apiBaseUrl={apiBaseUrl}
+            />
+          ) : showMerge ? (
+            <WebMerge
+              onDismiss={() => setShowMerge(false)}
+              onMergeComplete={(merged) => {
+                setShowMerge(false);
+                setPeople((prev) =>
+                  prev.map((p) => (p.id === merged.id ? { ...p, ...merged } : p))
+                );
+              }}
+            />
+          ) : selectedPerson ? (
             <WebPerson
               person={selectedPerson}
               onBack={() => setSelectedPerson(null)}
               onUpdateLifecycle={(st) => handleUpdateLifecycle(selectedPerson.id, st)}
             />
           ) : people.length === 0 ? (
-            <WebEmpty onAddPerson={() => setShowAddModal(true)} />
+            <WebEmpty
+              onAddPerson={() => setShowAddModal(true)}
+              onImportExcel={() => setShowImport(true)}
+            />
           ) : (
             <WebPeople
               people={people}
               onAddPerson={() => setShowAddModal(true)}
+              onImportExcel={() => setShowImport(true)}
               onSelectPerson={(p) => setSelectedPerson(p)}
             />
           )

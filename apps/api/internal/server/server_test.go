@@ -5,9 +5,11 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"jemaat/apps/api/internal/auth"
+	"jemaat/apps/api/internal/people"
 	"jemaat/apps/api/internal/server"
 )
 
@@ -134,5 +136,123 @@ func TestAdminAuth_MagicLinkAndOTP(t *testing.T) {
 
 	if meResp.Phone != "+6281234567890" {
 		t.Errorf("expected me phone '+6281234567890', got %s", meResp.Phone)
+	}
+}
+
+func TestPeopleAPI_CRUD(t *testing.T) {
+	authSvc := auth.NewService(auth.DefaultJWTSecret)
+	store := people.NewStore()
+	srv := server.NewServerWithStore(authSvc, store)
+
+	// Obtain valid admin token
+	token, code, _ := authSvc.RequestLink("+6281234567890")
+	verifyResp, err := authSvc.Verify("+6281234567890", token, code, false)
+	if err != nil {
+		t.Fatalf("failed to verify admin: %v", err)
+	}
+	bearer := "Bearer " + verifyResp.Token
+
+	// 1. Initial listing: empty
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/people", nil)
+	req.Header.Set("Authorization", bearer)
+	rec := httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 on empty people list, got %d", rec.Code)
+	}
+	var listResp struct {
+		Data  []people.Person `json:"data"`
+		Total int             `json:"total"`
+	}
+	_ = json.Unmarshal(rec.Body.Bytes(), &listResp)
+	if listResp.Total != 0 {
+		t.Errorf("expected 0 total people initially, got %d", listResp.Total)
+	}
+
+	// 2. Create person with validation (empty full name fails)
+	invalidPayload := map[string]string{"full_name": ""}
+	body, _ := json.Marshal(invalidPayload)
+	req = httptest.NewRequest(http.MethodPost, "/api/v1/people", bytes.NewReader(body))
+	req.Header.Set("Authorization", bearer)
+	req.Header.Set("Content-Type", "application/json")
+	rec = httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+	if rec.Code != http.StatusBadRequest {
+		t.Fatalf("expected 400 for empty full name, got %d", rec.Code)
+	}
+
+	// 3. Create valid person (Budi Halim)
+	validPayload := people.CreatePersonRequest{
+		FullName:        "Budi Halim",
+		Phone:           "0812-1122-3344",
+		DateOfBirth:     "12 May 1978",
+		Standing:        people.StandingRegistered,
+		HouseholdName:   "Halim household",
+		RoleInHousehold: people.RoleHead,
+		CareGroupName:   "Anugerah",
+		PrivacyOptIn:    false,
+	}
+	body, _ = json.Marshal(validPayload)
+	req = httptest.NewRequest(http.MethodPost, "/api/v1/people", bytes.NewReader(body))
+	req.Header.Set("Authorization", bearer)
+	req.Header.Set("Content-Type", "application/json")
+	rec = httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+	if rec.Code != http.StatusCreated {
+		t.Fatalf("expected 201 created, got %d: %s", rec.Code, rec.Body.String())
+	}
+	var createdPerson people.Person
+	_ = json.Unmarshal(rec.Body.Bytes(), &createdPerson)
+	if createdPerson.ID == "" || createdPerson.FullName != "Budi Halim" {
+		t.Fatalf("unexpected created person: %+v", createdPerson)
+	}
+
+	// 4. Get person without mask (full details)
+	req = httptest.NewRequest(http.MethodGet, "/api/v1/people/"+createdPerson.ID, nil)
+	req.Header.Set("Authorization", bearer)
+	rec = httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 on get person, got %d", rec.Code)
+	}
+	var gotPerson people.Person
+	_ = json.Unmarshal(rec.Body.Bytes(), &gotPerson)
+	if gotPerson.Phone != "+6281211223344" {
+		t.Errorf("expected normalized unmasked phone '+6281211223344', got %s", gotPerson.Phone)
+	}
+
+	// 5. Get person WITH privacy mask enabled (?mask=true, AD-3, BR-4)
+	req = httptest.NewRequest(http.MethodGet, "/api/v1/people/"+createdPerson.ID+"?mask=true", nil)
+	req.Header.Set("Authorization", bearer)
+	rec = httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 on get masked person, got %d", rec.Code)
+	}
+	var maskedPerson people.Person
+	_ = json.Unmarshal(rec.Body.Bytes(), &maskedPerson)
+	if !strings.Contains(maskedPerson.Phone, "••••") {
+		t.Errorf("expected masked phone with '••••', got %s", maskedPerson.Phone)
+	}
+
+	// 6. Update person
+	newName := "Budi Halim, S.T."
+	updatePayload := people.UpdatePersonRequest{
+		FullName: &newName,
+	}
+	body, _ = json.Marshal(updatePayload)
+	req = httptest.NewRequest(http.MethodPut, "/api/v1/people/"+createdPerson.ID, bytes.NewReader(body))
+	req.Header.Set("Authorization", bearer)
+	req.Header.Set("Content-Type", "application/json")
+	rec = httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 on update, got %d: %s", rec.Code, rec.Body.String())
+	}
+	var updatedPerson people.Person
+	_ = json.Unmarshal(rec.Body.Bytes(), &updatedPerson)
+	if updatedPerson.FullName != "Budi Halim, S.T." {
+		t.Errorf("expected updated name 'Budi Halim, S.T.', got %s", updatedPerson.FullName)
 	}
 }

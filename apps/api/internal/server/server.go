@@ -3,9 +3,11 @@ package server
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 	"time"
 
 	"jemaat/apps/api/internal/auth"
+	"jemaat/apps/api/internal/people"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -15,12 +17,18 @@ import (
 type Server struct {
 	router      *chi.Mux
 	authService *auth.Service
+	peopleStore *people.Store
 }
 
 func NewServer(authService *auth.Service) *Server {
+	return NewServerWithStore(authService, people.NewStore())
+}
+
+func NewServerWithStore(authService *auth.Service, peopleStore *people.Store) *Server {
 	s := &Server{
 		router:      chi.NewRouter(),
 		authService: authService,
+		peopleStore: peopleStore,
 	}
 
 	s.setupMiddleware()
@@ -66,10 +74,16 @@ func (s *Server) setupRoutes() {
 			})
 		})
 
-		// Protected church office desk routes placeholder
+		// Protected church office desk routes
 		r.Group(func(protected chi.Router) {
 			protected.Use(s.authService.Middleware)
 			protected.Get("/desk/summary", s.handleDeskSummary)
+
+			// People endpoints (SPEC-1-02)
+			protected.Get("/people", s.handleListPeople)
+			protected.Post("/people", s.handleCreatePerson)
+			protected.Get("/people/{id}", s.handleGetPerson)
+			protected.Put("/people/{id}", s.handleUpdatePerson)
 		})
 	})
 }
@@ -161,6 +175,97 @@ func (s *Server) handleDeskSummary(w http.ResponseWriter, r *http.Request) {
 			"city": "Jakarta Utara",
 		},
 		"applicants_waiting": 5,
-		"members_total":      0,
+		"members_total":      s.peopleStore.Count(),
 	})
+}
+
+func (s *Server) handleListPeople(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	q := r.URL.Query().Get("q")
+	standing := r.URL.Query().Get("standing")
+	careGroup := r.URL.Query().Get("care_group")
+	maskStr := r.URL.Query().Get("mask")
+	mask := false
+	if maskStr != "" {
+		mask, _ = strconv.ParseBool(maskStr)
+	}
+
+	filter := people.ListFilter{
+		Query:     q,
+		Standing:  standing,
+		CareGroup: careGroup,
+		Mask:      mask,
+	}
+
+	list := s.peopleStore.List(filter)
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(map[string]interface{}{
+		"data":  list,
+		"total": len(list),
+	})
+}
+
+func (s *Server) handleCreatePerson(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	var req people.CreatePersonRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": "invalid request body"})
+		return
+	}
+
+	person, err := s.peopleStore.Create(req)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	_ = json.NewEncoder(w).Encode(person)
+}
+
+func (s *Server) handleGetPerson(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	id := chi.URLParam(r, "id")
+
+	maskStr := r.URL.Query().Get("mask")
+	mask := false
+	if maskStr != "" {
+		mask, _ = strconv.ParseBool(maskStr)
+	}
+
+	person, err := s.peopleStore.Get(id, mask)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(person)
+}
+
+func (s *Server) handleUpdatePerson(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	id := chi.URLParam(r, "id")
+
+	var req people.UpdatePersonRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": "invalid request body"})
+		return
+	}
+
+	person, err := s.peopleStore.Update(id, req)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(person)
 }

@@ -33,10 +33,10 @@ rtm:
   - TestWebEmpty_RenderWhenZeroMembers
   - TestWebPeople_TableRenderWithPrivacyMasking
   - TestAdminPersonNew_FormSubmit
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-1
   CAP: CAP-1
   FR: FR-1
@@ -66,10 +66,10 @@ rtm:
   - TestWebEmpty_RenderWhenZeroMembers
   - TestWebPeople_TableRenderWithPrivacyMasking
   - TestAdminPersonNew_FormSubmit
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-3
   CAP: CAP-3
   FR: FR-10
@@ -224,10 +224,10 @@ rtm:
   - TestWebEmpty_RenderWhenZeroMembers
   - TestWebPeople_TableRenderWithPrivacyMasking
   - TestAdminPersonNew_FormSubmit
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-1
   CAP: CAP-1
   FR: FR-3

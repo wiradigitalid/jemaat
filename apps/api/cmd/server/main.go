@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"jemaat/apps/api/internal/auth"
+	"jemaat/apps/api/internal/people"
 	"jemaat/apps/api/internal/server"
 )
 
@@ -21,7 +22,12 @@ func main() {
 	}
 
 	authService := auth.NewService(jwtSecret)
-	srv := server.NewServer(authService)
+	peopleStore := people.NewStore()
+	if os.Getenv("SEED_DEMO") == "true" {
+		peopleStore.SeedInitialDemoData()
+	}
+
+	srv := server.NewServerWithStore(authService, peopleStore)
 
 	log.Printf("Jemaat API server starting on :%s ...", port)
 	if err := http.ListenAndServe(":"+port, srv.Router()); err != nil {

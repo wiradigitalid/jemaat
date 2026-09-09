@@ -1,6 +1,6 @@
 # SPEC-1-02: People Registry, First-Run Empty State & Privacy Masking
 
-**Status:** ready-for-agent
+**Status:** done
 **Component:** membership
 **Satisfies:** [UC-1, UC-5, FR-1]
 **Blocked by:** [SPEC-1-01]

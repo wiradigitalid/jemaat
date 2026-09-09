@@ -10,6 +10,7 @@ import { WebImport } from './components/WebImport.tsx';
 import { WebMerge } from './components/WebMerge.tsx';
 import { WebTransferDialog } from './components/WebTransferDialog.tsx';
 import { WebData } from './components/WebData.tsx';
+import { AdminDepartments } from './components/AdminDepartments.tsx';
 import {
   AdminUser,
   AuthResponse,
@@ -18,6 +19,7 @@ import {
   LifecycleStatus,
   Household,
   HouseholdMember,
+  MinistryTeam,
 } from './types.ts';
 import { PlusIcon, UploadIcon } from './components/Icons.tsx';
 
@@ -119,18 +121,75 @@ const defaultHousehold: Household = {
   ],
 };
 
+const defaultMinistryTeams: MinistryTeam[] = [
+  {
+    id: 'team-01',
+    name: 'Music',
+    roles_count: 6,
+    interested_count: 49,
+    roles: [
+      { id: 'role-101', team_id: 'team-01', name: 'Worship Leader', required_count: 1, interested_count: 6 },
+      { id: 'role-102', team_id: 'team-01', name: 'Acoustic Guitar', required_count: 1, interested_count: 9 },
+      { id: 'role-103', team_id: 'team-01', name: 'Keyboard / Piano', required_count: 1, interested_count: 8 },
+      { id: 'role-104', team_id: 'team-01', name: 'Bass Guitar', required_count: 1, interested_count: 5 },
+      { id: 'role-105', team_id: 'team-01', name: 'Drums', required_count: 1, interested_count: 7 },
+      { id: 'role-106', team_id: 'team-01', name: 'Vocalist / Backing', required_count: 2, interested_count: 14 },
+    ],
+  },
+  {
+    id: 'team-02',
+    name: 'Multimedia',
+    roles_count: 5,
+    interested_count: 21,
+    roles: [
+      { id: 'role-201', team_id: 'team-02', name: 'Sound Engineer (FOH)', required_count: 1, interested_count: 4 },
+      { id: 'role-202', team_id: 'team-02', name: 'Presentation Slides', required_count: 1, interested_count: 6 },
+    ],
+  },
+  {
+    id: 'team-03',
+    name: 'Prayer',
+    roles_count: 2,
+    interested_count: 12,
+    roles: [{ id: 'role-301', team_id: 'team-03', name: 'Intercessor', required_count: 4, interested_count: 12 }],
+  },
+  {
+    id: 'team-04',
+    name: 'Teaching',
+    roles_count: 4,
+    interested_count: 15,
+    roles: [{ id: 'role-401', team_id: 'team-04', name: 'Sunday School Teacher', required_count: 3, interested_count: 15 }],
+  },
+  {
+    id: 'team-05',
+    name: 'Visitation',
+    roles_count: 3,
+    interested_count: 8,
+    roles: [{ id: 'role-501', team_id: 'team-05', name: 'Pastoral Visitor', required_count: 2, interested_count: 8 }],
+  },
+  {
+    id: 'team-06',
+    name: 'Hospitality',
+    roles_count: 4,
+    interested_count: 28,
+    roles: [{ id: 'role-601', team_id: 'team-06', name: 'Usher & Welcome Desk', required_count: 4, interested_count: 28 }],
+  },
+];
+
 export const App: React.FC<{
   apiBaseUrl?: string;
   initialPeople?: Person[];
   initialAdmin?: AdminUser | null;
   initialHousehold?: Household;
-}> = ({ apiBaseUrl = '', initialPeople, initialAdmin, initialHousehold }) => {
+  initialTeams?: MinistryTeam[];
+}> = ({ apiBaseUrl = '', initialPeople, initialAdmin, initialHousehold, initialTeams }) => {
   const [admin, setAdmin] = useState<AdminUser | null>(initialAdmin ?? null);
   const [activeNav, setActiveNav] = useState<NavItemKey>('People');
   const [initializing, setInitializing] = useState(initialAdmin === undefined);
   const [people, setPeople] = useState<Person[]>(initialPeople ?? []);
   const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
   const [household, setHousehold] = useState<Household>(initialHousehold ?? defaultHousehold);
+  const [teams, setTeams] = useState<MinistryTeam[]>(initialTeams ?? defaultMinistryTeams);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showImport, setShowImport] = useState(false);
   const [showMerge, setShowMerge] = useState(false);
@@ -604,6 +663,42 @@ export const App: React.FC<{
             onUpdateAddress={handleUpdateHouseholdAddress}
             onSetHead={handleSetHouseholdHead}
             onAddMember={handleAddHouseholdMember}
+          />
+        ) : activeNav === 'Serving' ? (
+          <AdminDepartments
+            teams={teams}
+            onCreateTeam={async (name) => {
+              const newT: MinistryTeam = {
+                id: `team-${Date.now()}`,
+                name: name,
+                roles_count: 0,
+                interested_count: 0,
+                roles: [],
+              };
+              setTeams((prev) => [...prev, newT]);
+            }}
+            onAddRole={async (teamId, roleName, reqCount) => {
+              setTeams((prev) =>
+                prev.map((t) =>
+                  t.id === teamId
+                    ? {
+                        ...t,
+                        roles: [
+                          ...t.roles,
+                          {
+                            id: `role-${Date.now()}`,
+                            team_id: teamId,
+                            name: roleName,
+                            required_count: reqCount,
+                            interested_count: 0,
+                          },
+                        ],
+                        roles_count: t.roles.length + 1,
+                      }
+                    : t
+                )
+              );
+            }}
           />
         ) : activeNav === 'Settings' ? (
           <WebData

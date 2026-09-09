@@ -9,6 +9,7 @@ import (
 	"jemaat/apps/api/internal/auth"
 	"jemaat/apps/api/internal/households"
 	"jemaat/apps/api/internal/people"
+	"jemaat/apps/api/internal/serving"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -20,25 +21,34 @@ type Server struct {
 	authService    *auth.Service
 	peopleStore    *people.Store
 	householdStore *households.Store
+	servingStore   *serving.Store
 }
 
 func NewServer(authService *auth.Service) *Server {
 	pStore := people.NewStore()
 	hStore := households.NewStore(pStore)
-	return NewServerWithStores(authService, pStore, hStore)
+	sStore := serving.NewStore()
+	return NewServerWithAllStores(authService, pStore, hStore, sStore)
 }
 
 func NewServerWithStore(authService *auth.Service, peopleStore *people.Store) *Server {
 	hStore := households.NewStore(peopleStore)
-	return NewServerWithStores(authService, peopleStore, hStore)
+	sStore := serving.NewStore()
+	return NewServerWithAllStores(authService, peopleStore, hStore, sStore)
 }
 
 func NewServerWithStores(authService *auth.Service, peopleStore *people.Store, householdStore *households.Store) *Server {
+	sStore := serving.NewStore()
+	return NewServerWithAllStores(authService, peopleStore, householdStore, sStore)
+}
+
+func NewServerWithAllStores(authService *auth.Service, peopleStore *people.Store, householdStore *households.Store, servingStore *serving.Store) *Server {
 	s := &Server{
 		router:         chi.NewRouter(),
 		authService:    authService,
 		peopleStore:    peopleStore,
 		householdStore: householdStore,
+		servingStore:   servingStore,
 	}
 
 	s.setupMiddleware()
@@ -113,6 +123,13 @@ func (s *Server) setupRoutes() {
 
 			// Data Export endpoints (SPEC-1-06)
 			protected.Get("/data/export", s.handleDataExport)
+
+			// Ministry Teams & Roles endpoints (SPEC-2-01)
+			protected.Get("/ministry-teams", s.handleListMinistryTeams)
+			protected.Post("/ministry-teams", s.handleCreateMinistryTeam)
+			protected.Get("/ministry-teams/{id}/roles", s.handleListTeamRoles)
+			protected.Post("/ministry-teams/{id}/roles", s.handleAddTeamRole)
+			protected.Put("/ministry-teams/{id}", s.handleUpdateMinistryTeam)
 		})
 	})
 }
@@ -558,4 +575,98 @@ func (s *Server) handleGetPersonAudit(w http.ResponseWriter, r *http.Request) {
 		"data":  audits,
 		"total": len(audits),
 	})
+}
+
+func (s *Server) handleListMinistryTeams(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	teams := s.servingStore.List()
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(map[string]interface{}{
+		"data":  teams,
+		"total": len(teams),
+	})
+}
+
+func (s *Server) handleCreateMinistryTeam(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	var req serving.CreateTeamRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": "invalid request body"})
+		return
+	}
+
+	team, err := s.servingStore.Create(req)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	_ = json.NewEncoder(w).Encode(team)
+}
+
+func (s *Server) handleListTeamRoles(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	id := chi.URLParam(r, "id")
+
+	team, err := s.servingStore.Get(id)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(map[string]interface{}{
+		"data":  team.Roles,
+		"total": len(team.Roles),
+	})
+}
+
+func (s *Server) handleAddTeamRole(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	id := chi.URLParam(r, "id")
+
+	var req serving.CreateRoleRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": "invalid request body"})
+		return
+	}
+
+	role, err := s.servingStore.AddRole(id, req)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	_ = json.NewEncoder(w).Encode(role)
+}
+
+func (s *Server) handleUpdateMinistryTeam(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	id := chi.URLParam(r, "id")
+
+	var req struct {
+		Name string `json:"name"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": "invalid request body"})
+		return
+	}
+
+	team, err := s.servingStore.UpdateTeam(id, req.Name)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(team)
 }

@@ -8,7 +8,7 @@ Run branch: autopilot/DEC-002 (Draft PR #1 open: https://github.com/wiradigitali
 Stopped at: —
 Blocked: —
 Parked: —
-Next: SPEC-2-01 Ministry Teams & Departments
+Next: SPEC-2-02 Roster Matrix, Slot Assignment & Declines
 
 ## Decisions
 | When | Where | Decided | Instead of | Cost if wrong | Landed in |
@@ -21,3 +21,4 @@ Next: SPEC-2-01 Ministry Teams & Departments
 | Iteration 1 | SPEC-1-05 implement | Implement status transitions, church transfer attestation, audit logs, and auto-close roles (BR-MEM-4) | Unlogged status updates | Orphaned active roles for transferred members | apps/api, apps/web |
 | Iteration 1 | SPEC-1-06 implement | Implement master data export with download cards and CSV stream formatting matching WebData.dc.html | Single manual SQL dump | Inability for administrators to export data freely | apps/api, apps/web |
 | Iteration 1 | SPEC-1 close | Close SPEC-1 upon full completion and verification of all 6 vertical slices | Leaving spec open across iterations | G5 release tracking drift | .control/registry/specs.yaml |
+| Iteration 1 | SPEC-2-01 implement | Implement ministry departments and roles 3-pane layout matching AdminDepartments.dc.html | Ad-hoc roster setup without quotas | Inability to configure volunteer capacity quotas | apps/api, apps/web |

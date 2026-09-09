@@ -12,6 +12,7 @@ import (
 	"jemaat/apps/api/internal/households"
 	"jemaat/apps/api/internal/people"
 	"jemaat/apps/api/internal/server"
+	"jemaat/apps/api/internal/serving"
 )
 
 func TestHealthCheck(t *testing.T) {
@@ -750,5 +751,88 @@ func TestDataExportAPI_XLSX(t *testing.T) {
 	}
 	if !strings.Contains(recStream.Body.String(), "Andreas Wibowo") {
 		t.Errorf("expected Andreas Wibowo in CSV stream, got %s", recStream.Body.String())
+	}
+}
+
+func TestMinistryTeamsAPI_CRUD(t *testing.T) {
+	authSvc := auth.NewService(auth.DefaultJWTSecret)
+	pStore := people.NewStore()
+	hStore := households.NewStore(pStore)
+	sStore := serving.NewStore()
+	srv := server.NewServerWithAllStores(authSvc, pStore, hStore, sStore)
+
+	token, code, _ := authSvc.RequestLink("+6281234567890")
+	verifyResp, _ := authSvc.Verify("+6281234567890", token, code, false)
+	bearer := "Bearer " + verifyResp.Token
+
+	// 1. List seeded ministry teams
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/ministry-teams", nil)
+	req.Header.Set("Authorization", bearer)
+	rec := httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 on list teams, got %d", rec.Code)
+	}
+
+	var listResp struct {
+		Data  []serving.MinistryTeam `json:"data"`
+		Total int                    `json:"total"`
+	}
+	_ = json.Unmarshal(rec.Body.Bytes(), &listResp)
+	if listResp.Total == 0 {
+		t.Fatal("expected seeded ministry teams, got 0")
+	}
+
+	// 2. Create new ministry department
+	createPayload := serving.CreateTeamRequest{
+		Name:       "Youth & Campus",
+		LeaderName: "Timothy Prasetyo",
+	}
+	body, _ := json.Marshal(createPayload)
+	req = httptest.NewRequest(http.MethodPost, "/api/v1/ministry-teams", bytes.NewReader(body))
+	req.Header.Set("Authorization", bearer)
+	req.Header.Set("Content-Type", "application/json")
+	rec = httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusCreated {
+		t.Fatalf("expected 201 on create team, got %d", rec.Code)
+	}
+	var createdTeam serving.MinistryTeam
+	_ = json.Unmarshal(rec.Body.Bytes(), &createdTeam)
+
+	// 3. Add serving role to new department
+	rolePayload := serving.CreateRoleRequest{
+		Name:          "Youth Mentor",
+		RequiredCount: 3,
+	}
+	body, _ = json.Marshal(rolePayload)
+	req = httptest.NewRequest(http.MethodPost, "/api/v1/ministry-teams/"+createdTeam.ID+"/roles", bytes.NewReader(body))
+	req.Header.Set("Authorization", bearer)
+	req.Header.Set("Content-Type", "application/json")
+	rec = httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusCreated {
+		t.Fatalf("expected 201 on add role, got %d", rec.Code)
+	}
+
+	// 4. List roles for team
+	req = httptest.NewRequest(http.MethodGet, "/api/v1/ministry-teams/"+createdTeam.ID+"/roles", nil)
+	req.Header.Set("Authorization", bearer)
+	rec = httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 on list roles, got %d", rec.Code)
+	}
+	var rolesResp struct {
+		Data  []serving.ServingRole `json:"data"`
+		Total int                   `json:"total"`
+	}
+	_ = json.Unmarshal(rec.Body.Bytes(), &rolesResp)
+	if rolesResp.Total != 1 || rolesResp.Data[0].Name != "Youth Mentor" {
+		t.Errorf("expected 1 role 'Youth Mentor', got %+v", rolesResp)
 	}
 }

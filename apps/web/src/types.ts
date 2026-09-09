@@ -98,3 +98,23 @@ export interface Household {
   created_at?: string;
   updated_at?: string;
 }
+
+export interface ServingRole {
+  id: string;
+  team_id: string;
+  name: string;
+  required_count: number;
+  interested_count: number;
+  min_qualification?: string;
+  volunteers?: string[];
+}
+
+export interface MinistryTeam {
+  id: string;
+  name: string;
+  leader_person_id?: string;
+  leader_name?: string;
+  roles_count: number;
+  interested_count: number;
+  roles: ServingRole[];
+}

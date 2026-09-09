@@ -145,6 +145,10 @@ func (s *Server) setupRoutes() {
 			protected.Post("/services", s.handleCreateService)
 			protected.Get("/services/{id}/roster", s.handleGetServiceRoster)
 			protected.Delete("/roster-assignments/{id}", s.handleDeleteRosterAssignment)
+
+			// Volunteer Availability & Blockout Dates endpoints (SPEC-2-03, BR-2, AD-4)
+			protected.Get("/volunteers/availability", s.handleListAvailability)
+			protected.Post("/volunteers/availability", s.handleAddAvailability)
 		})
 	})
 }
@@ -734,8 +738,17 @@ func (s *Server) handleCreateRosterAssignment(w http.ResponseWriter, r *http.Req
 		}
 	}
 
-	asg, err := s.rosterStore.CreateAssignment(req, teamName, roleName, dateLabel, serviceDate)
+	asg, conflict, err := s.rosterStore.CreateAssignment(req, teamName, roleName, dateLabel, serviceDate)
 	if err != nil {
+		if conflict != nil && conflict.HasConflict {
+			w.WriteHeader(http.StatusConflict)
+			_ = json.NewEncoder(w).Encode(map[string]interface{}{
+				"error":    "conflict_detected",
+				"message":  err.Error(),
+				"conflict": conflict,
+			})
+			return
+		}
 		w.WriteHeader(http.StatusBadRequest)
 		_ = json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
 		return
@@ -838,4 +851,37 @@ func (s *Server) handleDeleteRosterAssignment(w http.ResponseWriter, r *http.Req
 		"status":  "deleted",
 		"message": "assignment removed",
 	})
+}
+
+func (s *Server) handleListAvailability(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	personID := r.URL.Query().Get("person_id")
+
+	list := s.rosterStore.ConflictEngine().ListAvailability(personID)
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(map[string]interface{}{
+		"data":  list,
+		"total": len(list),
+	})
+}
+
+func (s *Server) handleAddAvailability(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	var req serving.CreateAvailabilityRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": "invalid request body"})
+		return
+	}
+
+	avail, err := s.rosterStore.ConflictEngine().AddAvailability(req)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	_ = json.NewEncoder(w).Encode(avail)
 }

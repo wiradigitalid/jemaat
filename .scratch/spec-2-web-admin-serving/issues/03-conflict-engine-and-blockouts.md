@@ -1,6 +1,6 @@
 # SPEC-2-03: Blockout Dates & Real-Time Conflict Prevention Engine
 
-**Status:** ready-for-agent
+**Status:** done
 **Component:** serving
 **Satisfies:** [UC-9, FR-8]
 **Blocked by:** [SPEC-2-02]

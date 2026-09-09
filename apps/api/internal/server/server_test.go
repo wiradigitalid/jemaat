@@ -963,6 +963,23 @@ func TestSubstituteAssignment_OnDecline(t *testing.T) {
 	if subAsg.Status != serving.StatusConfirmed {
 		t.Errorf("expected status confirmed after substitute, got %s", subAsg.Status)
 	}
+
+	// Try assigning a substitute who is blocked out on 2026-03-28 (Melisa Halim)
+	conflictingSub := serving.AssignSubstituteRequest{
+		SubstitutePersonID:   "per-002",
+		SubstitutePersonName: "Melisa Halim",
+		Reason:               "Try assigning blocked-out volunteer as substitute",
+	}
+	body, _ = json.Marshal(conflictingSub)
+	req = httptest.NewRequest(http.MethodPost, "/api/v1/roster-assignments/asg-08/substitute", bytes.NewReader(body))
+	req.Header.Set("Authorization", bearer)
+	req.Header.Set("Content-Type", "application/json")
+	rec = httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusBadRequest {
+		t.Fatalf("expected 400 when substitute has scheduling conflict, got %d", rec.Code)
+	}
 }
 
 func TestServiceManagement_AndRosterDeletion(t *testing.T) {
@@ -1022,5 +1039,182 @@ func TestServiceManagement_AndRosterDeletion(t *testing.T) {
 
 	if rec.Code != http.StatusOK {
 		t.Fatalf("expected 200 on delete assignment, got %d", rec.Code)
+	}
+}
+
+func TestBlockoutDates_AvailabilityAPI(t *testing.T) {
+	authSvc := auth.NewService(auth.DefaultJWTSecret)
+	pStore := people.NewStore()
+	hStore := households.NewStore(pStore)
+	sStore := serving.NewStore()
+	rStore := serving.NewRosterStore()
+	srv := server.NewServerWithAllStores(authSvc, pStore, hStore, sStore, rStore)
+
+	token, code, _ := authSvc.RequestLink("+6281234567890")
+	verifyResp, _ := authSvc.Verify("+6281234567890", token, code, false)
+	bearer := "Bearer " + verifyResp.Token
+
+	// 1. List availability (initial seeded items)
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/volunteers/availability", nil)
+	req.Header.Set("Authorization", bearer)
+	rec := httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 on list availability, got %d", rec.Code)
+	}
+	var listResp struct {
+		Data  []serving.VolunteerAvailability `json:"data"`
+		Total int                             `json:"total"`
+	}
+	_ = json.Unmarshal(rec.Body.Bytes(), &listResp)
+	if listResp.Total < 2 {
+		t.Errorf("expected at least 2 seeded blockouts, got %d", listResp.Total)
+	}
+
+	// 2. Reject invalid dates (start_date > end_date)
+	invalidPayload := map[string]string{
+		"person_id":  "per-004",
+		"start_date": "2026-04-10",
+		"end_date":   "2026-04-05",
+		"reason":     "Typo in dates",
+	}
+	body, _ := json.Marshal(invalidPayload)
+	req = httptest.NewRequest(http.MethodPost, "/api/v1/volunteers/availability", bytes.NewReader(body))
+	req.Header.Set("Authorization", bearer)
+	req.Header.Set("Content-Type", "application/json")
+	rec = httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusBadRequest {
+		t.Fatalf("expected 400 on invalid blockout dates, got %d", rec.Code)
+	}
+
+	// 3. Successfully add blockout
+	validPayload := map[string]string{
+		"person_id":  "per-004",
+		"start_date": "2026-04-05",
+		"end_date":   "2026-04-12",
+		"reason":     "Out of town for Easter holiday",
+	}
+	body, _ = json.Marshal(validPayload)
+	req = httptest.NewRequest(http.MethodPost, "/api/v1/volunteers/availability", bytes.NewReader(body))
+	req.Header.Set("Authorization", bearer)
+	req.Header.Set("Content-Type", "application/json")
+	rec = httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusCreated {
+		t.Fatalf("expected 201 on create blockout, got %d", rec.Code)
+	}
+}
+
+func TestConflictDetection_BlockoutDateEnforcement(t *testing.T) {
+	authSvc := auth.NewService(auth.DefaultJWTSecret)
+	pStore := people.NewStore()
+	hStore := households.NewStore(pStore)
+	sStore := serving.NewStore()
+	rStore := serving.NewRosterStore()
+	srv := server.NewServerWithAllStores(authSvc, pStore, hStore, sStore, rStore)
+
+	token, code, _ := authSvc.RequestLink("+6281234567890")
+	verifyResp, _ := authSvc.Verify("+6281234567890", token, code, false)
+	bearer := "Bearer " + verifyResp.Token
+
+	// Melisa Halim (per-002) has a seeded blockout on 2026-03-27 to 2026-03-31
+	// Attempt to schedule her for service srv-04 on 2026-03-28 without override
+	asgReq := serving.CreateAssignmentRequest{
+		ServiceID:  "srv-04",
+		TeamID:     "team-01",
+		RoleID:     "role-101",
+		PersonID:   "per-002",
+		PersonName: "Melisa Halim",
+		Status:     serving.StatusPending,
+		Override:   false,
+	}
+	body, _ := json.Marshal(asgReq)
+	req := httptest.NewRequest(http.MethodPost, "/api/v1/roster-assignments", bytes.NewReader(body))
+	req.Header.Set("Authorization", bearer)
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	// Conflict engine must intercept and return HTTP 409 Conflict (BR-2, AD-4)
+	if rec.Code != http.StatusConflict {
+		t.Fatalf("expected 409 Conflict when assigning blocked-out volunteer, got %d: %s", rec.Code, rec.Body.String())
+	}
+
+	var conflictResp struct {
+		Error    string                 `json:"error"`
+		Message  string                 `json:"message"`
+		Conflict serving.ConflictResult `json:"conflict"`
+	}
+	_ = json.Unmarshal(rec.Body.Bytes(), &conflictResp)
+	if conflictResp.Conflict.Type != serving.ConflictTypeBlockout {
+		t.Errorf("expected conflict type 'blockout', got %s", conflictResp.Conflict.Type)
+	}
+
+	// Coordinator explicitly provides override reason to bypass blockout (BR-SRV-3)
+	asgReq.Override = true
+	asgReq.OverrideReason = "Volunteer confirmed availability by phone for emergency cover"
+	body, _ = json.Marshal(asgReq)
+	req = httptest.NewRequest(http.MethodPost, "/api/v1/roster-assignments", bytes.NewReader(body))
+	req.Header.Set("Authorization", bearer)
+	req.Header.Set("Content-Type", "application/json")
+	rec = httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusCreated {
+		t.Fatalf("expected 201 Created with valid override reason, got %d: %s", rec.Code, rec.Body.String())
+	}
+	var createdAsg serving.RosterAssignment
+	_ = json.Unmarshal(rec.Body.Bytes(), &createdAsg)
+	if !createdAsg.IsOverridden || createdAsg.OverrideReason == "" {
+		t.Errorf("expected is_overridden true with reason recorded, got %+v", createdAsg)
+	}
+}
+
+func TestConflictDetection_DoubleBookingPrevention(t *testing.T) {
+	authSvc := auth.NewService(auth.DefaultJWTSecret)
+	pStore := people.NewStore()
+	hStore := households.NewStore(pStore)
+	sStore := serving.NewStore()
+	rStore := serving.NewRosterStore()
+	srv := server.NewServerWithAllStores(authSvc, pStore, hStore, sStore, rStore)
+
+	token, code, _ := authSvc.RequestLink("+6281234567890")
+	verifyResp, _ := authSvc.Verify("+6281234567890", token, code, false)
+	bearer := "Bearer " + verifyResp.Token
+
+	// Andreas Wibowo (per-004) is already rostered for Slides on srv-02 (2026-03-14)
+	// Try to assign him to Sound Engineer on the same service without override
+	asgReq := serving.CreateAssignmentRequest{
+		ServiceID:  "srv-02",
+		TeamID:     "team-02",
+		RoleID:     "role-201",
+		PersonID:   "per-004",
+		PersonName: "Andreas Wibowo",
+		Status:     serving.StatusPending,
+		Override:   false,
+	}
+	body, _ := json.Marshal(asgReq)
+	req := httptest.NewRequest(http.MethodPost, "/api/v1/roster-assignments", bytes.NewReader(body))
+	req.Header.Set("Authorization", bearer)
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	// Conflict engine must detect overlapping assignment and reject (AD-4)
+	if rec.Code != http.StatusConflict {
+		t.Fatalf("expected 409 Conflict for double-booking, got %d: %s", rec.Code, rec.Body.String())
+	}
+
+	var conflictResp struct {
+		Error    string                 `json:"error"`
+		Conflict serving.ConflictResult `json:"conflict"`
+	}
+	_ = json.Unmarshal(rec.Body.Bytes(), &conflictResp)
+	if conflictResp.Conflict.Type != serving.ConflictTypeDoubleBooking {
+		t.Errorf("expected conflict type 'double_booking', got %s", conflictResp.Conflict.Type)
 	}
 }

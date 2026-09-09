@@ -44,18 +44,24 @@ type RosterAssignment struct {
 	SubstitutePersonID   string           `json:"substitute_person_id,omitempty"`
 	SubstitutePersonName string           `json:"substitute_person_name,omitempty"`
 	IsExternal           bool             `json:"is_external,omitempty"`
+	HasConflict          bool             `json:"has_conflict,omitempty"`
+	ConflictReason       string           `json:"conflict_reason,omitempty"`
+	IsOverridden         bool             `json:"is_overridden,omitempty"`
+	OverrideReason       string           `json:"override_reason,omitempty"`
 	Notes                string           `json:"notes,omitempty"`
 	CreatedAt            time.Time        `json:"created_at"`
 	UpdatedAt            time.Time        `json:"updated_at"`
 }
 
 type CreateAssignmentRequest struct {
-	ServiceID  string           `json:"service_id"`
-	TeamID     string           `json:"team_id"`
-	RoleID     string           `json:"role_id"`
-	PersonID   string           `json:"person_id"`
-	PersonName string           `json:"person_name"`
-	Status     AssignmentStatus `json:"status,omitempty"`
+	ServiceID      string           `json:"service_id"`
+	TeamID         string           `json:"team_id"`
+	RoleID         string           `json:"role_id"`
+	PersonID       string           `json:"person_id"`
+	PersonName     string           `json:"person_name"`
+	Status         AssignmentStatus `json:"status,omitempty"`
+	Override       bool             `json:"override,omitempty"`
+	OverrideReason string           `json:"override_reason,omitempty"`
 }
 
 type UpdateAssignmentStatusRequest struct {
@@ -85,25 +91,31 @@ type RosterStatusSummary struct {
 }
 
 type RosterStore struct {
-	mu          sync.RWMutex
-	services    map[string]ChurchService
-	serviceSeq  []string
-	assignments map[string]RosterAssignment
-	assignOrder []string
-	seq         int
+	mu             sync.RWMutex
+	services       map[string]ChurchService
+	serviceSeq     []string
+	assignments    map[string]RosterAssignment
+	assignOrder    []string
+	conflictEngine *ConflictEngine
+	seq            int
 }
 
 func NewRosterStore() *RosterStore {
 	r := &RosterStore{
-		services:    make(map[string]ChurchService),
-		serviceSeq:  make([]string, 0),
-		assignments: make(map[string]RosterAssignment),
-		assignOrder: make([]string, 0),
-		seq:         100,
+		services:       make(map[string]ChurchService),
+		serviceSeq:     make([]string, 0),
+		assignments:    make(map[string]RosterAssignment),
+		assignOrder:    make([]string, 0),
+		conflictEngine: NewConflictEngine(),
+		seq:            100,
 	}
 
 	r.seedDemoRoster()
 	return r
+}
+
+func (r *RosterStore) ConflictEngine() *ConflictEngine {
+	return r.conflictEngine
 }
 
 func (r *RosterStore) seedDemoRoster() {
@@ -453,6 +465,22 @@ func (r *RosterStore) GetMatrix() RosterMatrixResponse {
 
 	for _, id := range r.assignOrder {
 		a := r.assignments[id]
+
+		// Evaluate retroactive blockout and double booking flags (BR-SRV-4)
+		if a.PersonID != "" && a.Status != StatusOpen && a.Status != StatusDeclined {
+			var others []RosterAssignment
+			for _, oID := range r.assignOrder {
+				if oID != id {
+					others = append(others, r.assignments[oID])
+				}
+			}
+			conflict := r.conflictEngine.EvaluateAssignment(a.PersonID, a.ServiceID, a.ServiceDate, others)
+			if conflict.HasConflict {
+				a.HasConflict = true
+				a.ConflictReason = conflict.Reason
+			}
+		}
+
 		asgs = append(asgs, a)
 		teamMap[a.TeamName] = true
 
@@ -489,13 +517,29 @@ func (r *RosterStore) GetMatrix() RosterMatrixResponse {
 	}
 }
 
-func (r *RosterStore) CreateAssignment(req CreateAssignmentRequest, teamName, roleName, dateLabel, serviceDate string) (*RosterAssignment, error) {
+func (r *RosterStore) CreateAssignment(req CreateAssignmentRequest, teamName, roleName, dateLabel, serviceDate string) (*RosterAssignment, *ConflictResult, error) {
 	if req.ServiceID == "" || req.RoleID == "" {
-		return nil, errors.New("service_id and role_id are required")
+		return nil, nil, errors.New("service_id and role_id are required")
 	}
 
 	r.mu.Lock()
 	defer r.mu.Unlock()
+
+	// Evaluate conflict prevention engine (BR-2, AD-4)
+	var existing []RosterAssignment
+	for _, id := range r.assignOrder {
+		existing = append(existing, r.assignments[id])
+	}
+
+	conflict := r.conflictEngine.EvaluateAssignment(req.PersonID, req.ServiceID, serviceDate, existing)
+	if conflict.HasConflict {
+		if !req.Override {
+			return nil, &conflict, ErrSchedulingConflict
+		}
+		if strings.TrimSpace(req.OverrideReason) == "" {
+			return nil, &conflict, errors.New("override reason is mandatory to bypass scheduling conflict")
+		}
+	}
 
 	r.seq++
 	id := fmt.Sprintf("asg-%03d", r.seq)
@@ -528,13 +572,17 @@ func (r *RosterStore) CreateAssignment(req CreateAssignmentRequest, teamName, ro
 		PersonName:     req.PersonName,
 		PersonInitials: initials,
 		Status:         status,
+		HasConflict:    conflict.HasConflict,
+		ConflictReason: conflict.Reason,
+		IsOverridden:   req.Override,
+		OverrideReason: req.OverrideReason,
 		CreatedAt:      time.Now().UTC(),
 		UpdatedAt:      time.Now().UTC(),
 	}
 
 	r.assignments[id] = asg
 	r.assignOrder = append(r.assignOrder, id)
-	return &asg, nil
+	return &asg, &conflict, nil
 }
 
 func (r *RosterStore) UpdateStatus(id string, req UpdateAssignmentStatusRequest) (*RosterAssignment, error) {
@@ -563,6 +611,19 @@ func (r *RosterStore) AssignSubstitute(id string, req AssignSubstituteRequest) (
 	asg, exists := r.assignments[id]
 	if !exists {
 		return nil, errors.New("assignment not found")
+	}
+
+	if req.SubstitutePersonID != "" {
+		var others []RosterAssignment
+		for _, oID := range r.assignOrder {
+			if oID != id {
+				others = append(others, r.assignments[oID])
+			}
+		}
+		conflict := r.conflictEngine.EvaluateAssignment(req.SubstitutePersonID, asg.ServiceID, asg.ServiceDate, others)
+		if conflict.HasConflict {
+			return nil, fmt.Errorf("substitute volunteer has a scheduling conflict: %s", conflict.Reason)
+		}
 	}
 
 	origName := asg.PersonName

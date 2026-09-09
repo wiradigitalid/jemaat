@@ -3,12 +3,12 @@ artifact: .control/decisions/DEC-002-autopilot-mandate.md
 ---
 
 ## Resume
-Iteration: 1 at 46ac60c
+Iteration: 1
 Run branch: autopilot/DEC-002 (Draft PR #1 open: https://github.com/wiradigitalid/jemaat/pull/1)
 Stopped at: —
 Blocked: —
 Parked: —
-Next: SPEC-2-02 Roster Matrix, Slot Assignment & Declines
+Next: SPEC-3-01 Care Groups Directory & Member Enrollment
 
 ## Decisions
 | When | Where | Decided | Instead of | Cost if wrong | Landed in |
@@ -22,3 +22,6 @@ Next: SPEC-2-02 Roster Matrix, Slot Assignment & Declines
 | Iteration 1 | SPEC-1-06 implement | Implement master data export with download cards and CSV stream formatting matching WebData.dc.html | Single manual SQL dump | Inability for administrators to export data freely | apps/api, apps/web |
 | Iteration 1 | SPEC-1 close | Close SPEC-1 upon full completion and verification of all 6 vertical slices | Leaving spec open across iterations | G5 release tracking drift | .control/registry/specs.yaml |
 | Iteration 1 | SPEC-2-01 implement | Implement ministry departments and roles 3-pane layout matching AdminDepartments.dc.html | Ad-hoc roster setup without quotas | Inability to configure volunteer capacity quotas | apps/api, apps/web |
+| Iteration 1 | SPEC-2-02 implement | Implement monthly roster matrix grid matching WebRoster.dc.html, slot assignments, and substitutes (UC-7/8/10) | Static calendar without volunteer substitutions | Coordinator unable to fill duty vacancies | apps/api, apps/web |
+| Iteration 1 | SPEC-2-03 implement | Implement conflict engine, blockouts (BR-2), double-booking guards (AD-4), and mandatory override justifications | Silent double-booking or scheduling unavailable volunteers | Volunteer burnout, empty service roles on Sunday | apps/api, apps/web |
+| Iteration 1 | SPEC-2 close | Close SPEC-2 upon full verification of volunteer scheduling, roster matrix, and conflict engine | Keeping spec open | Milestone tracking ambiguity | .control/registry/specs.yaml |

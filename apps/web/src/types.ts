@@ -145,6 +145,9 @@ export interface RosterAssignment {
   decline_reason?: string;
   substitute_person_name?: string;
   is_external?: boolean;
+  has_conflict?: boolean;
+  is_overridden?: boolean;
+  override_reason?: string;
   notes?: string;
   notes_list?: string[];
 }

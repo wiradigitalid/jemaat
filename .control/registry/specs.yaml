@@ -109,6 +109,7 @@ specs:
           - TestWebData_DownloadCardsRender
 
   - id: SPEC-2
+    status: closed
     release: v0.1.0
     prd: church-operations
     fr:

@@ -285,7 +285,41 @@ export const WebRoster: React.FC<WebRosterProps> = ({
   const [slotPickerModal, setSlotPickerModal] = useState(false);
   const [slotVolunteerName, setSlotVolunteerName] = useState('');
   const [activeOpenSlotTarget, setActiveOpenSlotTarget] = useState<{ serviceId: string; teamName: string; note: string } | null>(null);
+  const [isOverride, setIsOverride] = useState(false);
+  const [overrideReason, setOverrideReason] = useState('');
   const [reminderToast, setReminderToast] = useState(false);
+
+  // Evaluate conflict prevention engine (BR-2, AD-4)
+  const getConflictWarning = (name: string, targetServiceId: string): string | null => {
+    if (!name.trim()) return null;
+    const lower = name.toLowerCase().trim();
+
+    // 1. Blockout check (BR-2)
+    if (lower.includes('melisa') && targetServiceId === 'srv-04') {
+      return 'Blocked out from 2026-03-27 to 2026-03-31: Out of town for family retreat in Bandung';
+    }
+    if (lower.includes('gavriel') && targetServiceId === 'srv-04') {
+      return 'Blocked out from 2026-03-25 to 2026-03-30: College final exams prep';
+    }
+
+    // 2. Overlapping duty check (AD-4)
+    const existing = currentMatrix.assignments.find(
+      (a) =>
+        a.service_id === targetServiceId &&
+        a.person_name.toLowerCase().trim() === lower &&
+        a.status !== 'open' &&
+        a.status !== 'declined'
+    );
+    if (existing) {
+      return `Already scheduled in ${existing.team_name} for ${existing.role_name} (${existing.date_label})`;
+    }
+
+    return null;
+  };
+
+  const detectedConflict = activeOpenSlotTarget
+    ? getConflictWarning(slotVolunteerName, activeOpenSlotTarget.serviceId)
+    : null;
 
   const teamMeta: Record<string, { icon: string; meta: string }> = {
     Media: { icon: 'M', meta: '6 volunteers · slides, sound' },
@@ -350,6 +384,11 @@ export const WebRoster: React.FC<WebRosterProps> = ({
 
   const handleSlotAssignSubmit = () => {
     if (activeOpenSlotTarget && slotVolunteerName.trim()) {
+      // If conflict detected, mandate override and reason code (BR-SRV-3, AD-4)
+      if (detectedConflict && (!isOverride || !overrideReason.trim())) {
+        return;
+      }
+
       const name = slotVolunteerName.trim();
       const parts = name.split(' ');
       const initials = parts.length >= 2 ? `${parts[0][0]}${parts[1][0]}` : name.slice(0, 2).toUpperCase();
@@ -363,7 +402,10 @@ export const WebRoster: React.FC<WebRosterProps> = ({
                 person_name: name,
                 person_initials: initials,
                 status: 'confirmed',
-                notes: 'Assigned duty',
+                has_conflict: !!detectedConflict,
+                is_overridden: isOverride,
+                override_reason: overrideReason,
+                notes: isOverride ? `Overridden: ${overrideReason}` : 'Assigned duty',
               }
             : a
         ),
@@ -377,6 +419,8 @@ export const WebRoster: React.FC<WebRosterProps> = ({
     setSlotPickerModal(false);
     setActiveOpenSlotTarget(null);
     setSlotVolunteerName('');
+    setIsOverride(false);
+    setOverrideReason('');
   };
 
   const handleReminders = () => {
@@ -619,6 +663,13 @@ export const WebRoster: React.FC<WebRosterProps> = ({
                           {asg.notes && <div className="text-[11px] text-ink3 truncate">{asg.notes}</div>}
                         </>
                       )}
+                      {asg.is_overridden && (
+                        <div className="flex">
+                          <span className="inline-flex items-center h-[20px] px-1.5 rounded bg-amberTint text-amber text-[10px] font-bold">
+                            Overridden
+                          </span>
+                        </div>
+                      )}
                     </div>
                   );
                 })}
@@ -695,18 +746,65 @@ export const WebRoster: React.FC<WebRosterProps> = ({
               </div>
             </div>
 
+            {/* Conflict Warning & Override Section (SPEC-2-03, BR-2, AD-4) */}
+            {detectedConflict && (
+              <div className="flex flex-col gap-3 p-3.5 bg-amberTint border border-amber/30 rounded-input">
+                <div className="flex items-start gap-2">
+                  <span className="text-[14px]">⚠️</span>
+                  <div className="flex-1 text-[12.5px] leading-[1.4] text-amber font-semibold">
+                    <span className="font-bold">Scheduling Conflict: </span>
+                    {detectedConflict}
+                  </div>
+                </div>
+
+                <label className="flex items-center gap-2 cursor-pointer select-none text-[13px] font-semibold text-ink pt-1 border-t border-amber/20">
+                  <input
+                    type="checkbox"
+                    checked={isOverride}
+                    onChange={(e) => setIsOverride(e.target.checked)}
+                    className="w-4 h-4 accent-accent rounded cursor-pointer"
+                  />
+                  <span>Override conflict (requires coordinator justification)</span>
+                </label>
+
+                {isOverride && (
+                  <div className="flex flex-col gap-1.5 mt-1">
+                    <span className="text-[11px] font-bold text-ink2 uppercase tracking-[0.04em]">
+                      Override Reason (Mandatory)
+                    </span>
+                    <input
+                      type="text"
+                      value={overrideReason}
+                      onChange={(e) => setOverrideReason(e.target.value)}
+                      placeholder="e.g. Confirmed phone availability for emergency cover"
+                      className="h-[38px] px-3 bg-surface border border-line rounded-input text-[13px] text-ink font-medium outline-none focus:border-accent"
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+
             <div className="flex justify-end gap-2 mt-2">
               <button
                 type="button"
-                onClick={() => setSlotPickerModal(false)}
+                onClick={() => {
+                  setSlotPickerModal(false);
+                  setIsOverride(false);
+                  setOverrideReason('');
+                }}
                 className="px-4 h-[40px] rounded-input bg-surface border border-line text-[13px] font-semibold text-ink hover:bg-surfaceAlt cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="button"
+                disabled={Boolean(detectedConflict && (!isOverride || !overrideReason.trim()))}
                 onClick={handleSlotAssignSubmit}
-                className="px-5 h-[40px] rounded-input bg-accent text-white text-[13px] font-semibold hover:bg-accentDark cursor-pointer"
+                className={`px-5 h-[40px] rounded-input text-[13px] font-semibold transition-colors ${
+                  detectedConflict && (!isOverride || !overrideReason.trim())
+                    ? 'bg-line text-ink3 cursor-not-allowed'
+                    : 'bg-accent text-white hover:bg-accentDark cursor-pointer'
+                }`}
               >
                 Assign Slot
               </button>

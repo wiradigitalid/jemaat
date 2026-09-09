@@ -4,7 +4,8 @@
 
 Decisions are no longer looked up through the memlog — the memlog goes back to being just a pass log.
 
-**0 decisions** — no decisions yet.
+**1 decisions** — accepted: 1.
 
 | id | Title | Status | Type | Touches | File |
 | --- | --- | --- | --- | --- | --- |
+| `DEC-001` | Volunteer roster and scheduling is included in v0.1.0 Web Admin | `accepted` | technical | `.scratch/spec-2-web-admin-serving/SPEC.md`, `.control/registry/specs.yaml` | `` |

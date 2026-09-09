@@ -21,6 +21,6 @@ Scaffold the foundational monorepo workspace and administrator authentication fl
 
 ## Acceptance Criteria
 1. `GET /api/v1/health` returns HTTP 200 with database connectivity status.
-2. Admin sign-in screen renders identical layout and styling to `AdminDeskSignIn.dc.html`.
+2. Admin sign-in screen renders identical layout and styling to `AdminDeskSignIn.dc.html` on desktop, and adapts cleanly to mobile viewport matching `AdminSignIn.dc.html`.
 3. Entering registered admin phone triggers OTP/link generation; verification yields valid session JWT.
 4. Protected routes enforce authentication; layout shell displays navigation items with exact colors and typography.

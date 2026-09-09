@@ -3,4 +3,12 @@
 # Numbering is GLOBAL. `status`: draft | accepted | applied | superseded | rejected.
 # A decision FREEZES at `applied`, not at `accepted`.
 
-decisions: []
+decisions:
+  - id: DEC-001
+    title: "Volunteer roster and scheduling is included in v0.1.0 Web Admin"
+    status: accepted
+    type: technical
+    accepted_by: "Product Owner, 2026-09-09"
+    touches:
+      - .scratch/spec-2-web-admin-serving/SPEC.md
+      - .control/registry/specs.yaml

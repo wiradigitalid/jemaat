@@ -51,4 +51,19 @@ REST API endpoints planned for the Go backend API container, grouped by componen
 | 33 | `PUT` | `/api/v1/church/profile` | `portal` | Update church tenant profile, service times, and contact information | draft |
 | 34 | `GET` | `/api/v1/church/qr` | `portal` | Generate vector SVG / PNG QR code for printable church welcome poster | draft |
 | 35 | `GET` | `/api/v1/church/access-roles` | `portal` | List church office access roles and assigned staff members | draft |
-| 36 | `POST` | `/api/v1/church/access-roles` | `portal` | Grant or revoke church office administrative privileges | draft |
+| 36 | `POST` | `/api/v1/church/access-roles` | `portal` | Grant church office administrative privileges | draft |
+| 37 | `DELETE` | `/api/v1/church/access-roles/:id` | `portal` | Revoke church office administrative privileges | draft |
+| 38 | `GET` | `/api/v1/people/duplicates` | `membership` | List flagged duplicate candidate pairs | draft |
+| 39 | `PUT` | `/api/v1/people/:id/status` | `membership` | Update member status with auto-closure of active roles | draft |
+| 40 | `POST` | `/api/v1/people/:id/transfer` | `membership` | Issue church transfer and attestation certificate | draft |
+| 41 | `GET` | `/api/v1/people/:id/audit` | `membership` | Retrieve chronological change history of a member record | draft |
+| 42 | `POST` | `/api/v1/church/code/regenerate` | `portal` | Regenerate church 6-digit alphanumeric joining code | draft |
+| 43 | `POST` | `/api/v1/pastoral/alerts/:id/contact` | `caregroups` | Log pastoral follow-up outreach notes for absent members | draft |
+| 44 | `POST` | `/api/v1/pastoral/alerts/:id/dismiss` | `caregroups` | Dismiss pastoral absence alert with reason | draft |
+| 45 | `GET` | `/api/v1/guests/queue/:id` | `portal` | View detailed intake card and notes for a newcomer | draft |
+| 46 | `POST` | `/api/v1/guests/queue/:id/contact` | `portal` | Record outreach contact event on guest intake queue | draft |
+| 47 | `POST` | `/api/v1/guests/queue/:id/admit` | `portal` | Convert approved guest applicant into verified member profile | draft |
+| 48 | `GET` | `/api/v1/services/:id/roster` | `serving` | Retrieve full volunteer roster assignment grid for service | draft |
+| 49 | `GET` | `/api/v1/services/:id/roster/status` | `serving` | Retrieve assignment fulfillment summary counts | draft |
+| 50 | `GET` | `/api/v1/ministry-teams/:id/roles` | `serving` | List all configured serving roles under a department | draft |
+| 51 | `POST` | `/api/v1/ministry-teams/:id/roles` | `serving` | Add a new serving role with capacity quota to department | draft |

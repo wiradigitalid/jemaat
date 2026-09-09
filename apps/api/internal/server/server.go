@@ -22,33 +22,38 @@ type Server struct {
 	peopleStore    *people.Store
 	householdStore *households.Store
 	servingStore   *serving.Store
+	rosterStore    *serving.RosterStore
 }
 
 func NewServer(authService *auth.Service) *Server {
 	pStore := people.NewStore()
 	hStore := households.NewStore(pStore)
 	sStore := serving.NewStore()
-	return NewServerWithAllStores(authService, pStore, hStore, sStore)
+	rStore := serving.NewRosterStore()
+	return NewServerWithAllStores(authService, pStore, hStore, sStore, rStore)
 }
 
 func NewServerWithStore(authService *auth.Service, peopleStore *people.Store) *Server {
 	hStore := households.NewStore(peopleStore)
 	sStore := serving.NewStore()
-	return NewServerWithAllStores(authService, peopleStore, hStore, sStore)
+	rStore := serving.NewRosterStore()
+	return NewServerWithAllStores(authService, peopleStore, hStore, sStore, rStore)
 }
 
 func NewServerWithStores(authService *auth.Service, peopleStore *people.Store, householdStore *households.Store) *Server {
 	sStore := serving.NewStore()
-	return NewServerWithAllStores(authService, peopleStore, householdStore, sStore)
+	rStore := serving.NewRosterStore()
+	return NewServerWithAllStores(authService, peopleStore, householdStore, sStore, rStore)
 }
 
-func NewServerWithAllStores(authService *auth.Service, peopleStore *people.Store, householdStore *households.Store, servingStore *serving.Store) *Server {
+func NewServerWithAllStores(authService *auth.Service, peopleStore *people.Store, householdStore *households.Store, servingStore *serving.Store, rosterStore *serving.RosterStore) *Server {
 	s := &Server{
 		router:         chi.NewRouter(),
 		authService:    authService,
 		peopleStore:    peopleStore,
 		householdStore: householdStore,
 		servingStore:   servingStore,
+		rosterStore:    rosterStore,
 	}
 
 	s.setupMiddleware()
@@ -130,6 +135,16 @@ func (s *Server) setupRoutes() {
 			protected.Get("/ministry-teams/{id}/roles", s.handleListTeamRoles)
 			protected.Post("/ministry-teams/{id}/roles", s.handleAddTeamRole)
 			protected.Put("/ministry-teams/{id}", s.handleUpdateMinistryTeam)
+
+			// Volunteer Scheduling & Roster Matrix endpoints (SPEC-2-02)
+			protected.Get("/services", s.handleListServices)
+			protected.Get("/roster-matrix", s.handleGetRosterMatrix)
+			protected.Post("/roster-assignments", s.handleCreateRosterAssignment)
+			protected.Put("/roster-assignments/{id}/status", s.handleUpdateRosterAssignmentStatus)
+			protected.Post("/roster-assignments/{id}/substitute", s.handleAssignSubstitute)
+			protected.Post("/services", s.handleCreateService)
+			protected.Get("/services/{id}/roster", s.handleGetServiceRoster)
+			protected.Delete("/roster-assignments/{id}", s.handleDeleteRosterAssignment)
 		})
 	})
 }
@@ -669,4 +684,158 @@ func (s *Server) handleUpdateMinistryTeam(w http.ResponseWriter, r *http.Request
 
 	w.WriteHeader(http.StatusOK)
 	_ = json.NewEncoder(w).Encode(team)
+}
+
+func (s *Server) handleListServices(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	srvs := s.rosterStore.ListServices()
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(map[string]interface{}{
+		"data":  srvs,
+		"total": len(srvs),
+	})
+}
+
+func (s *Server) handleGetRosterMatrix(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	matrix := s.rosterStore.GetMatrix()
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(matrix)
+}
+
+func (s *Server) handleCreateRosterAssignment(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	var req serving.CreateAssignmentRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": "invalid request body"})
+		return
+	}
+
+	teamName := "Media"
+	roleName := "Role"
+	if team, err := s.servingStore.Get(req.TeamID); err == nil {
+		teamName = team.Name
+		for _, rl := range team.Roles {
+			if rl.ID == req.RoleID {
+				roleName = rl.Name
+				break
+			}
+		}
+	}
+
+	dateLabel := "SAT 7 MAR"
+	serviceDate := "2026-03-07"
+	for _, srv := range s.rosterStore.ListServices() {
+		if srv.ID == req.ServiceID {
+			dateLabel = srv.DateLabel
+			serviceDate = srv.Date
+			break
+		}
+	}
+
+	asg, err := s.rosterStore.CreateAssignment(req, teamName, roleName, dateLabel, serviceDate)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	_ = json.NewEncoder(w).Encode(asg)
+}
+
+func (s *Server) handleUpdateRosterAssignmentStatus(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	id := chi.URLParam(r, "id")
+
+	var req serving.UpdateAssignmentStatusRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": "invalid request body"})
+		return
+	}
+
+	asg, err := s.rosterStore.UpdateStatus(id, req)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(asg)
+}
+
+func (s *Server) handleAssignSubstitute(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	id := chi.URLParam(r, "id")
+
+	var req serving.AssignSubstituteRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": "invalid request body"})
+		return
+	}
+
+	asg, err := s.rosterStore.AssignSubstitute(id, req)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(asg)
+}
+
+func (s *Server) handleCreateService(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	var req struct {
+		Name      string `json:"name"`
+		Date      string `json:"date"`
+		DateLabel string `json:"date_label"`
+		TimeSlot  string `json:"time_slot"`
+	}
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": "invalid request body"})
+		return
+	}
+
+	srv := s.rosterStore.CreateService(req.Name, req.Date, req.DateLabel, req.TimeSlot)
+	w.WriteHeader(http.StatusCreated)
+	_ = json.NewEncoder(w).Encode(srv)
+}
+
+func (s *Server) handleGetServiceRoster(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	id := chi.URLParam(r, "id")
+
+	roster := s.rosterStore.GetServiceRoster(id)
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(map[string]interface{}{
+		"service_id":  id,
+		"assignments": roster,
+		"total":       len(roster),
+	})
+}
+
+func (s *Server) handleDeleteRosterAssignment(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	id := chi.URLParam(r, "id")
+
+	if deleted := s.rosterStore.DeleteAssignment(id); !deleted {
+		w.WriteHeader(http.StatusNotFound)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": "assignment not found"})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(map[string]string{
+		"status":  "deleted",
+		"message": "assignment removed",
+	})
 }

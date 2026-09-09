@@ -759,7 +759,8 @@ func TestMinistryTeamsAPI_CRUD(t *testing.T) {
 	pStore := people.NewStore()
 	hStore := households.NewStore(pStore)
 	sStore := serving.NewStore()
-	srv := server.NewServerWithAllStores(authSvc, pStore, hStore, sStore)
+	rStore := serving.NewRosterStore()
+	srv := server.NewServerWithAllStores(authSvc, pStore, hStore, sStore, rStore)
 
 	token, code, _ := authSvc.RequestLink("+6281234567890")
 	verifyResp, _ := authSvc.Verify("+6281234567890", token, code, false)
@@ -834,5 +835,192 @@ func TestMinistryTeamsAPI_CRUD(t *testing.T) {
 	_ = json.Unmarshal(rec.Body.Bytes(), &rolesResp)
 	if rolesResp.Total != 1 || rolesResp.Data[0].Name != "Youth Mentor" {
 		t.Errorf("expected 1 role 'Youth Mentor', got %+v", rolesResp)
+	}
+}
+
+func TestRosterMatrix_SlotAssignment(t *testing.T) {
+	authSvc := auth.NewService(auth.DefaultJWTSecret)
+	pStore := people.NewStore()
+	hStore := households.NewStore(pStore)
+	sStore := serving.NewStore()
+	rStore := serving.NewRosterStore()
+	srv := server.NewServerWithAllStores(authSvc, pStore, hStore, sStore, rStore)
+
+	token, code, _ := authSvc.RequestLink("+6281234567890")
+	verifyResp, _ := authSvc.Verify("+6281234567890", token, code, false)
+	bearer := "Bearer " + verifyResp.Token
+
+	// 1. Get initial roster matrix
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/roster-matrix", nil)
+	req.Header.Set("Authorization", bearer)
+	rec := httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 on get matrix, got %d", rec.Code)
+	}
+	var matrix serving.RosterMatrixResponse
+	_ = json.Unmarshal(rec.Body.Bytes(), &matrix)
+	if len(matrix.Services) != 4 {
+		t.Errorf("expected 4 service dates in March, got %d", len(matrix.Services))
+	}
+	if matrix.Summary.Confirmed < 1 {
+		t.Errorf("expected confirmed assignments, got %d", matrix.Summary.Confirmed)
+	}
+
+	// 2. Assign volunteer to a service role
+	asgReq := serving.CreateAssignmentRequest{
+		ServiceID:  "srv-03",
+		TeamID:     "team-02",
+		RoleID:     "role-201",
+		PersonID:   "per-004",
+		PersonName: "Andreas Wibowo",
+		Status:     serving.StatusPending,
+	}
+	body, _ := json.Marshal(asgReq)
+	req = httptest.NewRequest(http.MethodPost, "/api/v1/roster-assignments", bytes.NewReader(body))
+	req.Header.Set("Authorization", bearer)
+	req.Header.Set("Content-Type", "application/json")
+	rec = httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusCreated {
+		t.Fatalf("expected 201 on create assignment, got %d: %s", rec.Code, rec.Body.String())
+	}
+	var createdAsg serving.RosterAssignment
+	_ = json.Unmarshal(rec.Body.Bytes(), &createdAsg)
+
+	// 3. Update assignment status to confirmed (UC-8, FR-7)
+	statusReq := serving.UpdateAssignmentStatusRequest{
+		Status: serving.StatusConfirmed,
+	}
+	body, _ = json.Marshal(statusReq)
+	req = httptest.NewRequest(http.MethodPut, "/api/v1/roster-assignments/"+createdAsg.ID+"/status", bytes.NewReader(body))
+	req.Header.Set("Authorization", bearer)
+	req.Header.Set("Content-Type", "application/json")
+	rec = httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 on status update, got %d", rec.Code)
+	}
+	var updatedAsg serving.RosterAssignment
+	_ = json.Unmarshal(rec.Body.Bytes(), &updatedAsg)
+	if updatedAsg.Status != serving.StatusConfirmed {
+		t.Errorf("expected status confirmed, got %s", updatedAsg.Status)
+	}
+}
+
+func TestSubstituteAssignment_OnDecline(t *testing.T) {
+	authSvc := auth.NewService(auth.DefaultJWTSecret)
+	pStore := people.NewStore()
+	hStore := households.NewStore(pStore)
+	sStore := serving.NewStore()
+	rStore := serving.NewRosterStore()
+	srv := server.NewServerWithAllStores(authSvc, pStore, hStore, sStore, rStore)
+
+	token, code, _ := authSvc.RequestLink("+6281234567890")
+	verifyResp, _ := authSvc.Verify("+6281234567890", token, code, false)
+	bearer := "Bearer " + verifyResp.Token
+
+	// Mark asg-04 as declined by volunteer
+	declineReq := serving.UpdateAssignmentStatusRequest{
+		Status:        serving.StatusDeclined,
+		DeclineReason: "Family wedding in Surabaya",
+	}
+	body, _ := json.Marshal(declineReq)
+	req := httptest.NewRequest(http.MethodPut, "/api/v1/roster-assignments/asg-04/status", bytes.NewReader(body))
+	req.Header.Set("Authorization", bearer)
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 on decline, got %d", rec.Code)
+	}
+
+	// Coordinator assigns substitute volunteer (UC-10)
+	subReq := serving.AssignSubstituteRequest{
+		SubstitutePersonID:   "per-004",
+		SubstitutePersonName: "Andreas Wibowo",
+		Reason:               "Substitute available for slides",
+	}
+	body, _ = json.Marshal(subReq)
+	req = httptest.NewRequest(http.MethodPost, "/api/v1/roster-assignments/asg-04/substitute", bytes.NewReader(body))
+	req.Header.Set("Authorization", bearer)
+	req.Header.Set("Content-Type", "application/json")
+	rec = httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 on substitute assignment, got %d: %s", rec.Code, rec.Body.String())
+	}
+
+	var subAsg serving.RosterAssignment
+	_ = json.Unmarshal(rec.Body.Bytes(), &subAsg)
+	if subAsg.SubstitutePersonName != "Andreas Wibowo" {
+		t.Errorf("expected substitute Andreas Wibowo, got %s", subAsg.SubstitutePersonName)
+	}
+	if subAsg.Status != serving.StatusConfirmed {
+		t.Errorf("expected status confirmed after substitute, got %s", subAsg.Status)
+	}
+}
+
+func TestServiceManagement_AndRosterDeletion(t *testing.T) {
+	authSvc := auth.NewService(auth.DefaultJWTSecret)
+	pStore := people.NewStore()
+	hStore := households.NewStore(pStore)
+	sStore := serving.NewStore()
+	rStore := serving.NewRosterStore()
+	srv := server.NewServerWithAllStores(authSvc, pStore, hStore, sStore, rStore)
+
+	token, code, _ := authSvc.RequestLink("+6281234567890")
+	verifyResp, _ := authSvc.Verify("+6281234567890", token, code, false)
+	bearer := "Bearer " + verifyResp.Token
+
+	// 1. Create a new service instance
+	newServicePayload := map[string]string{
+		"name":       "Good Friday Service 18:00",
+		"date":       "2026-04-03",
+		"date_label": "FRI 3 APR",
+		"time_slot":  "18:00",
+	}
+	body, _ := json.Marshal(newServicePayload)
+	req := httptest.NewRequest(http.MethodPost, "/api/v1/services", bytes.NewReader(body))
+	req.Header.Set("Authorization", bearer)
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusCreated {
+		t.Fatalf("expected 201 on create service, got %d", rec.Code)
+	}
+
+	// 2. Get service roster for srv-01
+	req = httptest.NewRequest(http.MethodGet, "/api/v1/services/srv-01/roster", nil)
+	req.Header.Set("Authorization", bearer)
+	rec = httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 on get service roster, got %d", rec.Code)
+	}
+	var rosterResp struct {
+		ServiceID   string                     `json:"service_id"`
+		Assignments []serving.RosterAssignment `json:"assignments"`
+		Total       int                        `json:"total"`
+	}
+	_ = json.Unmarshal(rec.Body.Bytes(), &rosterResp)
+	if rosterResp.Total < 1 {
+		t.Errorf("expected at least 1 assignment in srv-01 roster, got %d", rosterResp.Total)
+	}
+
+	// 3. Delete an assignment
+	req = httptest.NewRequest(http.MethodDelete, "/api/v1/roster-assignments/asg-01", nil)
+	req.Header.Set("Authorization", bearer)
+	rec = httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 on delete assignment, got %d", rec.Code)
 	}
 }

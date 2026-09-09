@@ -11,6 +11,7 @@ import { WebMerge } from './components/WebMerge.tsx';
 import { WebTransferDialog } from './components/WebTransferDialog.tsx';
 import { WebData } from './components/WebData.tsx';
 import { AdminDepartments } from './components/AdminDepartments.tsx';
+import { WebRoster } from './components/WebRoster.tsx';
 import {
   AdminUser,
   AuthResponse,
@@ -194,6 +195,7 @@ export const App: React.FC<{
   const [showImport, setShowImport] = useState(false);
   const [showMerge, setShowMerge] = useState(false);
   const [showTransferModal, setShowTransferModal] = useState(false);
+  const [servingView, setServingView] = useState<'roster' | 'departments'>('roster');
 
   // Restore authentication on mount
   useEffect(() => {
@@ -665,41 +667,76 @@ export const App: React.FC<{
             onAddMember={handleAddHouseholdMember}
           />
         ) : activeNav === 'Serving' ? (
-          <AdminDepartments
-            teams={teams}
-            onCreateTeam={async (name) => {
-              const newT: MinistryTeam = {
-                id: `team-${Date.now()}`,
-                name: name,
-                roles_count: 0,
-                interested_count: 0,
-                roles: [],
-              };
-              setTeams((prev) => [...prev, newT]);
-            }}
-            onAddRole={async (teamId, roleName, reqCount) => {
-              setTeams((prev) =>
-                prev.map((t) =>
-                  t.id === teamId
-                    ? {
-                        ...t,
-                        roles: [
-                          ...t.roles,
-                          {
-                            id: `role-${Date.now()}`,
-                            team_id: teamId,
-                            name: roleName,
-                            required_count: reqCount,
-                            interested_count: 0,
-                          },
-                        ],
-                        roles_count: t.roles.length + 1,
-                      }
-                    : t
-                )
-              );
-            }}
-          />
+          servingView === 'roster' ? (
+            <WebRoster
+              onViewDepartments={() => setServingView('departments')}
+              onAssignSlot={(srvId, tName) => {
+                alert(`Assigning slot in ${tName} on ${srvId}`);
+              }}
+              onAssignSubstitute={(asgId, subName) => {
+                const savedToken =
+                  sessionStorage.getItem(TOKEN_STORAGE_KEY) || localStorage.getItem(TOKEN_STORAGE_KEY);
+                fetch(`${apiBaseUrl}/api/v1/roster-assignments/${asgId}/substitute`, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    ...(savedToken ? { Authorization: `Bearer ${savedToken}` } : {}),
+                  },
+                  body: JSON.stringify({
+                    substitute_person_name: subName,
+                    reason: 'Volunteer replacement on decline',
+                  }),
+                }).catch(() => {});
+              }}
+            />
+          ) : (
+            <div>
+              <div className="pb-3">
+                <button
+                  type="button"
+                  onClick={() => setServingView('roster')}
+                  className="text-xs font-semibold text-accent hover:underline cursor-pointer"
+                >
+                  &larr; Back to serving roster matrix
+                </button>
+              </div>
+              <AdminDepartments
+                teams={teams}
+                onCreateTeam={async (name) => {
+                  const newT: MinistryTeam = {
+                    id: `team-${Date.now()}`,
+                    name: name,
+                    roles_count: 0,
+                    interested_count: 0,
+                    roles: [],
+                  };
+                  setTeams((prev) => [...prev, newT]);
+                }}
+                onAddRole={async (teamId, roleName, reqCount) => {
+                  setTeams((prev) =>
+                    prev.map((t) =>
+                      t.id === teamId
+                        ? {
+                            ...t,
+                            roles: [
+                              ...t.roles,
+                              {
+                                id: `role-${Date.now()}`,
+                                team_id: teamId,
+                                name: roleName,
+                                required_count: reqCount,
+                                interested_count: 0,
+                              },
+                            ],
+                            roles_count: t.roles.length + 1,
+                          }
+                        : t
+                    )
+                  );
+                }}
+              />
+            </div>
+          )
         ) : activeNav === 'Settings' ? (
           <WebData
             totalMembers={people.length || 254}

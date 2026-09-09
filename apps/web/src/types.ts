@@ -118,3 +118,46 @@ export interface MinistryTeam {
   interested_count: number;
   roles: ServingRole[];
 }
+
+export type AssignmentStatus = 'confirmed' | 'pending' | 'declined' | 'swapped' | 'open';
+
+export interface ChurchService {
+  id: string;
+  name: string;
+  date: string;
+  date_label: string;
+  time_slot: string;
+}
+
+export interface RosterAssignment {
+  id: string;
+  service_id: string;
+  service_date: string;
+  date_label: string;
+  team_id: string;
+  team_name: string;
+  role_id: string;
+  role_name: string;
+  person_id?: string;
+  person_name: string;
+  person_initials: string;
+  status: AssignmentStatus;
+  decline_reason?: string;
+  substitute_person_name?: string;
+  is_external?: boolean;
+  notes?: string;
+  notes_list?: string[];
+}
+
+export interface RosterMatrix {
+  month: string;
+  services: ChurchService[];
+  teams: string[];
+  assignments: RosterAssignment[];
+  summary: {
+    open_slots: number;
+    not_confirmed: number;
+    confirmed: number;
+    declined: number;
+  };
+}

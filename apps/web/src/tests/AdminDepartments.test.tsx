@@ -18,6 +18,10 @@ describe('SPEC-2-01 Web Admin Departments Tests', () => {
     const servingBtn = screen.getByRole('button', { name: /serving/i });
     fireEvent.click(servingBtn);
 
+    // Switch to Departments view
+    const viewDeptBtn = screen.getByRole('button', { name: /view departments/i });
+    fireEvent.click(viewDeptBtn);
+
     // Verify Title and Subtitle matching AdminDepartments.dc.html
     expect(screen.getByRole('heading', { level: 1, name: 'Departments and serving roles' })).toBeInTheDocument();
     expect(screen.getByText(/departments ·/i)).toBeInTheDocument();
@@ -45,6 +49,9 @@ describe('SPEC-2-01 Web Admin Departments Tests', () => {
 
     // Switch to Serving
     fireEvent.click(screen.getByRole('button', { name: /serving/i }));
+
+    // Switch to Departments view
+    fireEvent.click(screen.getByRole('button', { name: /view departments/i }));
 
     // Verify Empty State matching AdminDepartmentsEmpty.dc.html
     expect(screen.getByRole('heading', { level: 2, name: 'No departments yet' })).toBeInTheDocument();

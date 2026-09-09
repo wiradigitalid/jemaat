@@ -12,3 +12,18 @@ decisions:
     touches:
       - .scratch/spec-2-web-admin-serving/SPEC.md
       - .control/registry/specs.yaml
+
+  - id: DEC-002
+    title: "Autopilot execution mandate for G5 Release v0.1.0"
+    status: accepted
+    type: mandate
+    accepted_by: "Wira (Product Owner), 2026-09-09"
+    mandate:
+      from_gate: G5
+      scope: all
+      parked:
+        - ad-n
+      smoke_test: agent
+      loop: 10m
+      expires: "2026-09-16"
+    touches: []

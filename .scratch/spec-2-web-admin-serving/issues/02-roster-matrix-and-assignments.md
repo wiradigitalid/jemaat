@@ -1,6 +1,6 @@
 # SPEC-2-02: Monthly Service Roster Matrix & Volunteer Assignment
 
-**Status:** ready-for-agent
+**Status:** done
 **Component:** serving
 **Satisfies:** [UC-7, UC-8, UC-10, FR-6, FR-7]
 **Blocked by:** [SPEC-2-01, SPEC-1-02]

@@ -5,6 +5,7 @@
 
 specs:
   - id: SPEC-1
+    status: closed
     release: v0.1.0
     prd: church-operations
     fr:
@@ -108,6 +109,7 @@ specs:
           - TestWebData_DownloadCardsRender
 
   - id: SPEC-2
+    status: closed
     release: v0.1.0
     prd: church-operations
     fr:
@@ -172,6 +174,7 @@ specs:
           - TestCoordinatorOverride_ReasonCodeEnforced
 
   - id: SPEC-3
+    status: closed
     release: v0.1.0
     prd: church-operations
     fr:
@@ -221,6 +224,7 @@ specs:
           - TestPastoralAlerts_ThreeConsecutiveAbsences
 
   - id: SPEC-4
+    status: closed
     release: v0.1.0
     prd: church-operations
     fr:

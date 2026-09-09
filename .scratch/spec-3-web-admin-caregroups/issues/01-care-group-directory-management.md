@@ -1,6 +1,6 @@
 # SPEC-3-01: Care Group Directory & Member Enrollment Management
 
-**Status:** ready-for-agent
+**Status:** done
 **Component:** caregroups
 **Satisfies:** [UC-11, UC-14, FR-9]
 **Blocked by:** [SPEC-1-01, SPEC-1-02]

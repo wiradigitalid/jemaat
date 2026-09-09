@@ -1,6 +1,6 @@
 # SPEC-1-05: Membership Lifecycle Transitions, Transfer & Audit Trail
 
-**Status:** ready-for-agent
+**Status:** done
 **Component:** membership
 **Satisfies:** [UC-4, FR-4]
 **Blocked by:** [SPEC-1-02]

@@ -7,12 +7,15 @@ ratified_by: null        # the commit whose content ratifies this file
 
 **Loaded when:** writing or reviewing code.
 
-> **Born empty on purpose.** This file is filled by the first wave's distillation — `bmad-spec`'s
-> `stack.md` companion is promoted here before the wave closes.
->
-> Writing it up front means guessing at a convention no code has yet. It MUST NOT be filled before
-> code exists that ratifies it.
+## Build & Test Commands
 
-> **Status.** While `draft`, its contents MAY be read as guidance but MUST NOT be used to reject a
-> change. It rises to `accepted` when the first wave's distillation fills it from real code, and
-> `ratified_by` MUST then carry the commit holding that code.
+### Go Backend (`apps/api`)
+- Build: `cd apps/api && go build ./...`
+- Test: `cd apps/api && go test -v ./...`
+
+### React Web Admin (`apps/web`)
+- Build: `cd apps/web && npm run build`
+- Test: `cd apps/web && npm test`
+
+> **Note on Greenfield State:** Born as draft guidance for SPEC-1-01 scaffolding. It rises to `accepted` when the first wave's distillation fills it from real code, and `ratified_by` MUST then carry the commit holding that code.
+

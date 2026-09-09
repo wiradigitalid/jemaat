@@ -16,10 +16,10 @@ rtm:
   - TestHealthCheck
   - TestAdminAuth_MagicLinkAndOTP
   - TestAdminLayoutShellRender
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-1
   CAP: CAP-1
   FR: FR-1
@@ -33,10 +33,10 @@ rtm:
   - TestWebEmpty_RenderWhenZeroMembers
   - TestWebPeople_TableRenderWithPrivacyMasking
   - TestAdminPersonNew_FormSubmit
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-1
   CAP: CAP-1
   FR: FR-1
@@ -49,10 +49,10 @@ rtm:
   - TestChurchAccessRoles_ListAndGrant
   - TestEnforceMinTwoAdministrators
   - TestWebRoles_WhoCanDoWhatRender
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-1
   CAP: CAP-1
   FR: FR-1
@@ -66,10 +66,10 @@ rtm:
   - TestWebEmpty_RenderWhenZeroMembers
   - TestWebPeople_TableRenderWithPrivacyMasking
   - TestAdminPersonNew_FormSubmit
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-3
   CAP: CAP-3
   FR: FR-10
@@ -81,10 +81,10 @@ rtm:
   test:
   - TestMeetingReports_SummaryView
   - TestPastoralAlerts_ThreeConsecutiveAbsences
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-3
   CAP: CAP-3
   FR: FR-11
@@ -96,10 +96,10 @@ rtm:
   test:
   - TestMeetingReports_SummaryView
   - TestPastoralAlerts_ThreeConsecutiveAbsences
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-4
   CAP: CAP-4
   FR: FR-12
@@ -112,10 +112,10 @@ rtm:
   - TestChurchProfileAPI_GetAndUpdate
   - TestQRCodeGenerator_CanonicalDeepLink
   - TestWebChurchCode_PrintPosterRender
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-4
   CAP: CAP-4
   FR: FR-13
@@ -128,10 +128,10 @@ rtm:
   - TestChurchProfileAPI_GetAndUpdate
   - TestQRCodeGenerator_CanonicalDeepLink
   - TestWebChurchCode_PrintPosterRender
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-4
   CAP: CAP-4
   FR: FR-14
@@ -144,10 +144,10 @@ rtm:
   - TestApplicantsQueue_TriageAndContact
   - TestApplicantAdmit_PromoteToMember
   - TestWebApplicants_SplitPaneRender
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-5
   CAP: CAP-5
   FR: FR-15
@@ -160,10 +160,10 @@ rtm:
   - TestApplicantsQueue_TriageAndContact
   - TestApplicantAdmit_PromoteToMember
   - TestWebApplicants_SplitPaneRender
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-5
   CAP: CAP-5
   FR: FR-16
@@ -176,10 +176,10 @@ rtm:
   - TestApplicantsQueue_TriageAndContact
   - TestApplicantAdmit_PromoteToMember
   - TestWebApplicants_SplitPaneRender
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-5
   CAP: CAP-5
   FR: FR-17
@@ -191,10 +191,10 @@ rtm:
   test:
   - TestMeetingReports_SummaryView
   - TestPastoralAlerts_ThreeConsecutiveAbsences
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-1
   CAP: CAP-1
   FR: FR-2
@@ -207,10 +207,10 @@ rtm:
   - TestHouseholdsAPI_LinkFamily
   - TestAdminHousehold_FullPageRender
   - TestHeadOfHousehold_EnforceSingleHead
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-1
   CAP: CAP-1
   FR: FR-2
@@ -224,10 +224,10 @@ rtm:
   - TestWebEmpty_RenderWhenZeroMembers
   - TestWebPeople_TableRenderWithPrivacyMasking
   - TestAdminPersonNew_FormSubmit
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-1
   CAP: CAP-1
   FR: FR-3
@@ -240,10 +240,10 @@ rtm:
   - TestCSVImport_PreviewAndValidation
   - TestDuplicateDetection_PhoneEmail
   - TestWebMerge_ExecuteMerge
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-1
   CAP: CAP-1
   FR: FR-3
@@ -255,10 +255,10 @@ rtm:
   test:
   - TestDataExportAPI_XLSX
   - TestWebData_DownloadCardsRender
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-1
   CAP: CAP-1
   FR: FR-4
@@ -272,10 +272,10 @@ rtm:
   - TestAutoCloseRoles_OnMemberTransfer
   - TestWebTransfer_GenerateAttestation
   - TestAuditHistory_ChronologicalLog
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-2
   CAP: CAP-2
   FR: FR-5
@@ -288,10 +288,10 @@ rtm:
   - TestMinistryTeamsAPI_CRUD
   - TestAdminDepartments_CardRender
   - TestAdminDepartmentsEmpty_Render
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-2
   CAP: CAP-2
   FR: FR-6
@@ -304,10 +304,10 @@ rtm:
   - TestRosterMatrix_SlotAssignment
   - TestWebRoster_GridStatusRendering
   - TestSubstituteAssignment_OnDecline
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-2
   CAP: CAP-2
   FR: FR-6
@@ -320,10 +320,10 @@ rtm:
   - TestRosterMatrix_SlotAssignment
   - TestWebRoster_GridStatusRendering
   - TestSubstituteAssignment_OnDecline
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-2
   CAP: CAP-2
   FR: FR-7
@@ -336,10 +336,10 @@ rtm:
   - TestRosterMatrix_SlotAssignment
   - TestWebRoster_GridStatusRendering
   - TestSubstituteAssignment_OnDecline
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-2
   CAP: CAP-2
   FR: FR-7
@@ -352,10 +352,10 @@ rtm:
   - TestRosterMatrix_SlotAssignment
   - TestWebRoster_GridStatusRendering
   - TestSubstituteAssignment_OnDecline
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-2
   CAP: CAP-2
   FR: FR-8
@@ -368,10 +368,10 @@ rtm:
   - TestBlockoutDates_ConflictWarning
   - TestOverlappingService_DoubleBookingGuard
   - TestCoordinatorOverride_ReasonCodeEnforced
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-3
   CAP: CAP-3
   FR: FR-9
@@ -383,10 +383,10 @@ rtm:
   test:
   - TestCareGroupsAPI_DirectoryAndEnrollment
   - TestAdminGroups_CardListRender
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-3
   CAP: CAP-3
   FR: FR-9
@@ -398,8 +398,8 @@ rtm:
   test:
   - TestCareGroupsAPI_DirectoryAndEnrollment
   - TestAdminGroups_CardListRender
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 ```

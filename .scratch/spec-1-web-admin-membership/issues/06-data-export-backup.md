@@ -1,6 +1,6 @@
 # SPEC-1-06: Church Master Data Export & Backup ("Your Data")
 
-**Status:** ready-for-agent
+**Status:** done
 **Component:** membership
 **Satisfies:** [UC-3, FR-3]
 **Blocked by:** [SPEC-1-04]

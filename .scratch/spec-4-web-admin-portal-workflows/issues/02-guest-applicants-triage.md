@@ -1,6 +1,6 @@
 # SPEC-4-02: Guest & Member Applicants Triage Queue, Reminders & Directory Access
 
-**Status:** ready-for-agent
+**Status:** done
 **Component:** portal
 **Satisfies:** [UC-17, UC-18, UC-19, FR-14, FR-15, FR-16]
 **Blocked by:** [SPEC-4-01, SPEC-1-02]

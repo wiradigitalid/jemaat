@@ -1,6 +1,6 @@
 # SPEC-1-03: Full-Page Household Manager, Map Pin & Family Linking
 
-**Status:** ready-for-agent
+**Status:** done
 **Component:** membership
 **Satisfies:** [UC-2, FR-2]
 **Blocked by:** [SPEC-1-02]

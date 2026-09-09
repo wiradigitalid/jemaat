@@ -1,6 +1,6 @@
 # SPEC-1-01: Monorepo Scaffold, Admin Auth & Layout Shell
 
-**Status:** ready-for-agent
+**Status:** done
 **Component:** membership
 **Satisfies:** [UC-1, FR-1]
 **Blocked by:** []

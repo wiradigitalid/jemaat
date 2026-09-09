@@ -1,6 +1,6 @@
 # SPEC-2-01: Ministry Departments, Teams & Roles Configuration
 
-**Status:** ready-for-agent
+**Status:** done
 **Component:** serving
 **Satisfies:** [UC-6, FR-5]
 **Blocked by:** [SPEC-1-01]

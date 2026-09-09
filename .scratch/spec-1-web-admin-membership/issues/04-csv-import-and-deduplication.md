@@ -1,6 +1,6 @@
 # SPEC-1-04: Bulk CSV Member Import & Duplicate Merge Wizard
 
-**Status:** ready-for-agent
+**Status:** done
 **Component:** membership
 **Satisfies:** [UC-3, FR-3]
 **Blocked by:** [SPEC-1-02]

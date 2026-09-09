@@ -1,6 +1,6 @@
 # SPEC-4-03: Church Office Access Roles ("Who Can Do What")
 
-**Status:** ready-for-agent
+**Status:** done
 **Component:** portal
 **Satisfies:** [UC-1, FR-1]
 **Blocked by:** [SPEC-4-01, SPEC-1-02]

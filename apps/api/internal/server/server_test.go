@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"jemaat/apps/api/internal/auth"
+	"jemaat/apps/api/internal/households"
 	"jemaat/apps/api/internal/people"
 	"jemaat/apps/api/internal/server"
 )
@@ -254,5 +255,140 @@ func TestPeopleAPI_CRUD(t *testing.T) {
 	_ = json.Unmarshal(rec.Body.Bytes(), &updatedPerson)
 	if updatedPerson.FullName != "Budi Halim, S.T." {
 		t.Errorf("expected updated name 'Budi Halim, S.T.', got %s", updatedPerson.FullName)
+	}
+}
+
+func TestHouseholdsAPI_LinkFamily(t *testing.T) {
+	authSvc := auth.NewService(auth.DefaultJWTSecret)
+	pStore := people.NewStore()
+	hStore := households.NewStore(pStore)
+	srv := server.NewServerWithStores(authSvc, pStore, hStore)
+
+	token, code, _ := authSvc.RequestLink("+6281234567890")
+	verifyResp, _ := authSvc.Verify("+6281234567890", token, code, false)
+	bearer := "Bearer " + verifyResp.Token
+
+	// 1. List households (demo seeded Keluarga Prasetyo)
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/households", nil)
+	req.Header.Set("Authorization", bearer)
+	rec := httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 on list households, got %d", rec.Code)
+	}
+
+	// 2. Get specific household details
+	req = httptest.NewRequest(http.MethodGet, "/api/v1/households/hh-001", nil)
+	req.Header.Set("Authorization", bearer)
+	rec = httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 on get household, got %d", rec.Code)
+	}
+	var hh households.Household
+	_ = json.Unmarshal(rec.Body.Bytes(), &hh)
+	if hh.Name != "Keluarga Prasetyo" {
+		t.Errorf("expected name 'Keluarga Prasetyo', got %s", hh.Name)
+	}
+
+	// 3. Link a new family member (Rafael)
+	linkReq := households.LinkMemberRequest{
+		PersonID:     "per-new-child",
+		FullName:     "Ruth Prasetyo",
+		Standing:     "Guest",
+		Age:          8,
+		Relationship: "Grandchild",
+		Category:     households.CategoryFamily,
+	}
+	body, _ := json.Marshal(linkReq)
+	req = httptest.NewRequest(http.MethodPost, "/api/v1/households/hh-001/members", bytes.NewReader(body))
+	req.Header.Set("Authorization", bearer)
+	req.Header.Set("Content-Type", "application/json")
+	rec = httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 on link member, got %d", rec.Code)
+	}
+	var updatedHH households.Household
+	_ = json.Unmarshal(rec.Body.Bytes(), &updatedHH)
+	foundRuth := false
+	for _, m := range updatedHH.Members {
+		if m.FullName == "Ruth Prasetyo" {
+			foundRuth = true
+			break
+		}
+	}
+	if !foundRuth {
+		t.Error("expected Ruth Prasetyo to be in household members")
+	}
+
+	// 4. Update address and verify synchronization (BR-MEM-2)
+	newAddr := "Kelapa Gading Barat No. 10, Jakarta Utara"
+	addrReq := households.UpdateAddressRequest{Address: newAddr}
+	body, _ = json.Marshal(addrReq)
+	req = httptest.NewRequest(http.MethodPut, "/api/v1/households/hh-001/address", bytes.NewReader(body))
+	req.Header.Set("Authorization", bearer)
+	req.Header.Set("Content-Type", "application/json")
+	rec = httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 on update address, got %d", rec.Code)
+	}
+
+	// 5. Unlink member from household (BR-MEM-2: no cascade delete, person record remains)
+	req = httptest.NewRequest(http.MethodDelete, "/api/v1/households/hh-001/members/per-new-child", nil)
+	req.Header.Set("Authorization", bearer)
+	rec = httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 on unlink member, got %d", rec.Code)
+	}
+	var unlinkedHH households.Household
+	_ = json.Unmarshal(rec.Body.Bytes(), &unlinkedHH)
+	for _, m := range unlinkedHH.Members {
+		if m.PersonID == "per-new-child" {
+			t.Error("expected per-new-child to be removed from household")
+		}
+	}
+}
+
+func TestHeadOfHousehold_EnforceSingleHead(t *testing.T) {
+	authSvc := auth.NewService(auth.DefaultJWTSecret)
+	pStore := people.NewStore()
+	hStore := households.NewStore(pStore)
+	srv := server.NewServerWithStores(authSvc, pStore, hStore)
+
+	token, code, _ := authSvc.RequestLink("+6281234567890")
+	verifyResp, _ := authSvc.Verify("+6281234567890", token, code, false)
+	bearer := "Bearer " + verifyResp.Token
+
+	// Initial head of hh-001 is Bambang Prasetyo (per-bp)
+	// Transfer head to Sri Prasetyo (per-sp)
+	setHeadReq := households.SetHeadRequest{PersonID: "per-sp"}
+	body, _ := json.Marshal(setHeadReq)
+	req := httptest.NewRequest(http.MethodPut, "/api/v1/households/hh-001/head", bytes.NewReader(body))
+	req.Header.Set("Authorization", bearer)
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 on set head, got %d: %s", rec.Code, rec.Body.String())
+	}
+
+	var hh households.Household
+	_ = json.Unmarshal(rec.Body.Bytes(), &hh)
+	if hh.HeadPersonID != "per-sp" {
+		t.Errorf("expected head person ID 'per-sp', got %s", hh.HeadPersonID)
+	}
+
+	// Count number of heads: MUST BE EXACTLY ONE (BR-1)
+	headCount := 0
+	for _, m := range hh.Members {
+		if m.IsHead {
+			headCount++
+		}
+	}
+	if headCount != 1 {
+		t.Fatalf("expected strictly 1 head of household (BR-1), found %d", headCount)
 	}
 }

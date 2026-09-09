@@ -1,14 +1,14 @@
-promise_progress: 16%
+promise_progress: 20%
 rtm_rows:
-  green: 4
+  green: 5
   counted: 25
   excluded_no_uc: 0
 work_progress:
 - spec: SPEC-1
   status: null
-  tickets_done: 2
+  tickets_done: 3
   tickets_total: 6
-  work_progress: 33%
+  work_progress: 50%
 - spec: SPEC-2
   status: null
   tickets_done: 0

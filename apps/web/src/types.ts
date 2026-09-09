@@ -69,3 +69,32 @@ export interface CreatePersonPayload {
   notes?: string;
   privacy_opt_in?: boolean;
 }
+
+export type ResidenceCategory = 'family' | 'also_lives_here' | 'moved_out';
+
+export interface HouseholdMember {
+  person_id: string;
+  full_name: string;
+  standing: string;
+  age: number;
+  relationship: string;
+  category: ResidenceCategory;
+  phone?: string;
+  own_address_note?: string;
+  moved_out_note?: string;
+  new_household?: string;
+  is_head: boolean;
+}
+
+export interface Household {
+  id: string;
+  name: string;
+  address: string;
+  primary_contact_name: string;
+  primary_contact_phone: string;
+  head_person_id: string;
+  members: HouseholdMember[];
+  also_at_address?: string[];
+  created_at?: string;
+  updated_at?: string;
+}

@@ -5,21 +5,128 @@ import { WebEmpty } from './components/WebEmpty.tsx';
 import { WebPeople } from './components/WebPeople.tsx';
 import { WebPerson } from './components/WebPerson.tsx';
 import { AdminPersonNew } from './components/AdminPersonNew.tsx';
-import { AdminUser, AuthResponse, Person, CreatePersonPayload, LifecycleStatus } from './types.ts';
+import { AdminHousehold } from './components/AdminHousehold.tsx';
+import {
+  AdminUser,
+  AuthResponse,
+  Person,
+  CreatePersonPayload,
+  LifecycleStatus,
+  Household,
+  HouseholdMember,
+} from './types.ts';
 import { PlusIcon, UploadIcon } from './components/Icons.tsx';
 
 const TOKEN_STORAGE_KEY = 'jemaat_admin_token';
+
+const defaultHousehold: Household = {
+  id: 'hh-001',
+  name: 'Keluarga Prasetyo',
+  address: 'Sunter Agung Q4/12, Jakarta Utara',
+  primary_contact_name: 'Bambang Prasetyo',
+  primary_contact_phone: '+62 812-3344-9900',
+  head_person_id: 'per-bp',
+  members: [
+    {
+      person_id: 'per-bp',
+      full_name: 'Bambang Prasetyo',
+      standing: 'Registered Member',
+      age: 62,
+      relationship: 'Head of household',
+      category: 'family',
+      phone: '+62 812-3344-9900',
+      is_head: true,
+    },
+    {
+      person_id: 'per-sp',
+      full_name: 'Sri Prasetyo',
+      standing: 'Registered Member',
+      age: 59,
+      relationship: 'Wife',
+      category: 'family',
+      is_head: false,
+    },
+    {
+      person_id: 'per-yp',
+      full_name: 'Yosafat Prasetyo',
+      standing: 'Member',
+      age: 46,
+      relationship: 'Son',
+      category: 'family',
+      is_head: false,
+    },
+    {
+      person_id: 'per-ip',
+      full_name: 'Intan Prasetyo',
+      standing: 'Registered Member',
+      age: 44,
+      relationship: 'Daughter-in-law',
+      category: 'family',
+      is_head: false,
+    },
+    {
+      person_id: 'per-rp',
+      full_name: 'Rafael Prasetyo',
+      standing: 'Guest',
+      age: 11,
+      relationship: 'Grandchild',
+      category: 'family',
+      is_head: false,
+    },
+    {
+      person_id: 'per-kp',
+      full_name: 'Kevin Prasetyo',
+      standing: 'Member',
+      age: 20,
+      relationship: 'Grandchild',
+      category: 'family',
+      own_address_note: 'Own address',
+      is_head: false,
+    },
+    {
+      person_id: 'per-nu',
+      full_name: 'Nuraini',
+      standing: 'Guest',
+      age: 41,
+      relationship: 'Household helper',
+      category: 'also_lives_here',
+      is_head: false,
+    },
+    {
+      person_id: 'per-pt',
+      full_name: 'Petrus Tanjung',
+      standing: 'Member',
+      age: 24,
+      relationship: 'Boards here',
+      category: 'also_lives_here',
+      is_head: false,
+    },
+    {
+      person_id: 'per-mt',
+      full_name: 'Melisa Tanudjaja',
+      standing: 'Registered Member',
+      age: 32,
+      relationship: 'Daughter',
+      category: 'moved_out',
+      moved_out_note: 'married January 2024',
+      new_household: 'Keluarga Tanudjaja',
+      is_head: false,
+    },
+  ],
+};
 
 export const App: React.FC<{
   apiBaseUrl?: string;
   initialPeople?: Person[];
   initialAdmin?: AdminUser | null;
-}> = ({ apiBaseUrl = '', initialPeople, initialAdmin }) => {
+  initialHousehold?: Household;
+}> = ({ apiBaseUrl = '', initialPeople, initialAdmin, initialHousehold }) => {
   const [admin, setAdmin] = useState<AdminUser | null>(initialAdmin ?? null);
   const [activeNav, setActiveNav] = useState<NavItemKey>('People');
   const [initializing, setInitializing] = useState(initialAdmin === undefined);
   const [people, setPeople] = useState<Person[]>(initialPeople ?? []);
   const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
+  const [household, setHousehold] = useState<Household>(initialHousehold ?? defaultHousehold);
   const [showAddModal, setShowAddModal] = useState(false);
 
   // Restore authentication on mount
@@ -53,27 +160,39 @@ export const App: React.FC<{
       });
   }, [apiBaseUrl, initialAdmin]);
 
-  // Fetch people when admin logged in
+  // Fetch people and households when admin logged in
   useEffect(() => {
-    if (!admin || initialPeople !== undefined) return;
+    if (!admin) return;
 
     const savedToken =
       sessionStorage.getItem(TOKEN_STORAGE_KEY) || localStorage.getItem(TOKEN_STORAGE_KEY);
 
-    fetch(`${apiBaseUrl}/api/v1/people`, {
-      headers: savedToken ? { Authorization: `Bearer ${savedToken}` } : {},
-    })
-      .then(async (res) => {
-        if (!res.ok) return;
-        const json = await res.json();
-        if (Array.isArray(json.data)) {
-          setPeople(json.data);
-        }
+    if (initialPeople === undefined) {
+      fetch(`${apiBaseUrl}/api/v1/people`, {
+        headers: savedToken ? { Authorization: `Bearer ${savedToken}` } : {},
       })
-      .catch(() => {
-        // ignore fetch error in disconnected dev mode
-      });
-  }, [admin, apiBaseUrl, initialPeople]);
+        .then(async (res) => {
+          if (!res.ok) return;
+          const json = await res.json();
+          if (Array.isArray(json.data)) {
+            setPeople(json.data);
+          }
+        })
+        .catch(() => {});
+    }
+
+    if (initialHousehold === undefined) {
+      fetch(`${apiBaseUrl}/api/v1/households/hh-001`, {
+        headers: savedToken ? { Authorization: `Bearer ${savedToken}` } : {},
+      })
+        .then(async (res) => {
+          if (!res.ok) return;
+          const json: Household = await res.json();
+          setHousehold(json);
+        })
+        .catch(() => {});
+    }
+  }, [admin, apiBaseUrl, initialPeople, initialHousehold]);
 
   const handleAuthSuccess = (data: AuthResponse, sharedComputer: boolean) => {
     setAdmin(data.admin);
@@ -111,7 +230,6 @@ export const App: React.FC<{
         const created: Person = await res.json();
         setPeople((prev) => [...prev, created]);
       } else {
-        // Fallback local state if API offline
         const localCreated: Person = {
           id: `per-${Date.now()}`,
           full_name: payload.full_name,
@@ -128,7 +246,6 @@ export const App: React.FC<{
         setPeople((prev) => [...prev, localCreated]);
       }
     } catch {
-      // Offline fallback
       const localCreated: Person = {
         id: `per-${Date.now()}`,
         full_name: payload.full_name,
@@ -163,9 +280,7 @@ export const App: React.FC<{
         },
         body: JSON.stringify({ lifecycle: newLifecycle }),
       });
-    } catch {
-      // offline fallback
-    }
+    } catch {}
 
     setPeople((prev) =>
       prev.map((p) => (p.id === personId ? { ...p, lifecycle: newLifecycle } : p))
@@ -173,6 +288,71 @@ export const App: React.FC<{
     if (selectedPerson && selectedPerson.id === personId) {
       setSelectedPerson((prev) => (prev ? { ...prev, lifecycle: newLifecycle } : null));
     }
+  };
+
+  const handleUpdateHouseholdAddress = async (newAddress: string) => {
+    const savedToken =
+      sessionStorage.getItem(TOKEN_STORAGE_KEY) || localStorage.getItem(TOKEN_STORAGE_KEY);
+
+    try {
+      await fetch(`${apiBaseUrl}/api/v1/households/${household.id}/address`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(savedToken ? { Authorization: `Bearer ${savedToken}` } : {}),
+        },
+        body: JSON.stringify({ address: newAddress }),
+      });
+    } catch {}
+
+    setHousehold((prev) => ({ ...prev, address: newAddress }));
+  };
+
+  const handleSetHouseholdHead = async (personId: string) => {
+    const savedToken =
+      sessionStorage.getItem(TOKEN_STORAGE_KEY) || localStorage.getItem(TOKEN_STORAGE_KEY);
+
+    try {
+      await fetch(`${apiBaseUrl}/api/v1/households/${household.id}/head`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(savedToken ? { Authorization: `Bearer ${savedToken}` } : {}),
+        },
+        body: JSON.stringify({ person_id: personId }),
+      });
+    } catch {}
+
+    setHousehold((prev) => ({
+      ...prev,
+      head_person_id: personId,
+      members: prev.members.map((m) => {
+        if (m.person_id === personId) {
+          return { ...m, is_head: true, relationship: 'Head of household' };
+        }
+        if (m.is_head) {
+          return { ...m, is_head: false, relationship: 'Family Member' };
+        }
+        return m;
+      }),
+    }));
+  };
+
+  const handleAddHouseholdMember = async (memberPartial: Partial<HouseholdMember>) => {
+    const newMember: HouseholdMember = {
+      person_id: `per-${Date.now()}`,
+      full_name: memberPartial.full_name || 'New Member',
+      standing: memberPartial.standing || 'Member',
+      age: memberPartial.age || 30,
+      relationship: memberPartial.relationship || 'Family Member',
+      category: memberPartial.category || 'family',
+      is_head: false,
+    };
+
+    setHousehold((prev) => ({
+      ...prev,
+      members: [...prev.members, newMember],
+    }));
   };
 
   if (initializing) {
@@ -228,17 +408,17 @@ export const App: React.FC<{
             </>
           ),
         };
+      case 'Households':
+        return {
+          title: 'Households',
+          subtitle: 'Family groupings, residential addresses and heads of household',
+          actions: undefined,
+        };
       case 'Applicants':
         return {
           title: 'Applicants',
           subtitle: '5 waiting · oldest submitted 4 days ago',
           actions: <ActionButton label="Export list" icon={<UploadIcon size={17} />} />,
-        };
-      case 'Households':
-        return {
-          title: 'Households',
-          subtitle: 'Family groupings, residential addresses and heads of household',
-          actions: <ActionButton label="Add household" icon={<PlusIcon size={17} />} primary />,
         };
       case 'Care Groups':
         return {
@@ -312,6 +492,13 @@ export const App: React.FC<{
               onSelectPerson={(p) => setSelectedPerson(p)}
             />
           )
+        ) : activeNav === 'Households' ? (
+          <AdminHousehold
+            household={household}
+            onUpdateAddress={handleUpdateHouseholdAddress}
+            onSetHead={handleSetHouseholdHead}
+            onAddMember={handleAddHouseholdMember}
+          />
         ) : (
           <div className="w-full flex-1 bg-surface border border-line rounded-card p-6 flex flex-col items-center justify-center text-center">
             <div className="text-[15px] font-bold text-ink">{title} Workspace</div>

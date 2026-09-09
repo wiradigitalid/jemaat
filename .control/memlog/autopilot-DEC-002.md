@@ -3,7 +3,7 @@ artifact: .control/decisions/DEC-002-autopilot-mandate.md
 ---
 
 ## Resume
-Iteration: 1 at ee4ed1f
+Iteration: 1 at 19c004f
 Run branch: autopilot/DEC-002 (PR not opened yet)
 Stopped at: —
 Blocked: —

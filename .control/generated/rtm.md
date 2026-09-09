@@ -272,10 +272,10 @@ rtm:
   - TestAutoCloseRoles_OnMemberTransfer
   - TestWebTransfer_GenerateAttestation
   - TestAuditHistory_ChronologicalLog
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-2
   CAP: CAP-2
   FR: FR-5

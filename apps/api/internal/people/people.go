@@ -105,17 +105,21 @@ type ListFilter struct {
 }
 
 type Store struct {
-	mu     sync.RWMutex
-	people map[string]Person
-	order  []string
-	seq    int
+	mu        sync.RWMutex
+	people    map[string]Person
+	order     []string
+	seq       int
+	audits    map[string][]AuditEntry
+	transfers map[string][]TransferRecord
 }
 
 func NewStore() *Store {
 	return &Store{
-		people: make(map[string]Person),
-		order:  make([]string, 0),
-		seq:    100,
+		people:    make(map[string]Person),
+		order:     make([]string, 0),
+		seq:       100,
+		audits:    make(map[string][]AuditEntry),
+		transfers: make(map[string][]TransferRecord),
 	}
 }
 

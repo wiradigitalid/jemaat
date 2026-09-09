@@ -5,12 +5,14 @@ interface WebPersonProps {
   person: Person;
   onBack: () => void;
   onUpdateLifecycle?: (newLifecycle: LifecycleStatus) => void;
+  onOpenTransfer?: () => void;
 }
 
 export const WebPerson: React.FC<WebPersonProps> = ({
   person,
   onBack,
   onUpdateLifecycle,
+  onOpenTransfer,
 }) => {
   const initials = person.full_name
     .split(' ')
@@ -28,8 +30,8 @@ export const WebPerson: React.FC<WebPersonProps> = ({
 
   return (
     <div className="flex flex-col gap-[18px] flex-1 min-h-0">
-      {/* Back button link */}
-      <div>
+      {/* Back button and Action row */}
+      <div className="flex items-center justify-between gap-4 flex-wrap pb-1">
         <button
           type="button"
           onClick={onBack}
@@ -37,6 +39,16 @@ export const WebPerson: React.FC<WebPersonProps> = ({
         >
           &larr; Back to people directory
         </button>
+
+        {onOpenTransfer && (
+          <button
+            type="button"
+            onClick={onOpenTransfer}
+            className="flex items-center gap-2 h-[36px] px-3.5 rounded-input bg-surface border border-line text-[12.5px] font-semibold text-ink hover:bg-surfaceAlt transition-colors cursor-pointer"
+          >
+            <span>Transfer to another church</span>
+          </button>
+        )}
       </div>
 
       <div className="flex flex-col lg:flex-row gap-5 flex-1 min-h-0">
@@ -134,6 +146,35 @@ export const WebPerson: React.FC<WebPersonProps> = ({
                   Hospitality team &middot; Welcome Desk
                 </span>
               </div>
+            </div>
+          </div>
+
+          {/* Chronological Audit Log Card (matching WebChanges.dc.html) */}
+          <div className="bg-surface border border-line rounded-card overflow-hidden">
+            <div className="p-[14px_16px_8px]">
+              <div className="text-[11px] font-bold tracking-[0.1em] uppercase text-ink3">
+                Audit Trail & Chronological Log
+              </div>
+            </div>
+            <div className="divide-y divide-lineSoft border-t border-lineSoft">
+              <div className="flex items-baseline gap-4 p-[11px_16px]">
+                <span className="w-[130px] flex-[0_0_130px] text-[11px] font-bold tracking-[0.08em] text-ink3 uppercase">
+                  RECORD CREATED
+                </span>
+                <span className="flex-1 text-[12.5px] text-ink2">
+                  Created by Church Office Administrator (Lidya S.)
+                </span>
+              </div>
+              {person.notes && (
+                <div className="flex items-baseline gap-4 p-[11px_16px]">
+                  <span className="w-[130px] flex-[0_0_130px] text-[11px] font-bold tracking-[0.08em] text-ink3 uppercase">
+                    STATUS AUDIT
+                  </span>
+                  <span className="flex-1 text-[12.5px] text-accentDark font-mono whitespace-pre-wrap">
+                    {person.notes}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         </div>

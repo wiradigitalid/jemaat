@@ -8,6 +8,7 @@ import { AdminPersonNew } from './components/AdminPersonNew.tsx';
 import { AdminHousehold } from './components/AdminHousehold.tsx';
 import { WebImport } from './components/WebImport.tsx';
 import { WebMerge } from './components/WebMerge.tsx';
+import { WebTransferDialog } from './components/WebTransferDialog.tsx';
 import {
   AdminUser,
   AuthResponse,
@@ -132,6 +133,7 @@ export const App: React.FC<{
   const [showAddModal, setShowAddModal] = useState(false);
   const [showImport, setShowImport] = useState(false);
   const [showMerge, setShowMerge] = useState(false);
+  const [showTransferModal, setShowTransferModal] = useState(false);
 
   // Restore authentication on mount
   useEffect(() => {
@@ -276,7 +278,7 @@ export const App: React.FC<{
       sessionStorage.getItem(TOKEN_STORAGE_KEY) || localStorage.getItem(TOKEN_STORAGE_KEY);
 
     try {
-      await fetch(`${apiBaseUrl}/api/v1/people/${personId}`, {
+      await fetch(`${apiBaseUrl}/api/v1/people/${personId}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -286,11 +288,32 @@ export const App: React.FC<{
       });
     } catch {}
 
+    const shouldClearGroup =
+      newLifecycle === 'Inactive' ||
+      newLifecycle === 'Transferred out' ||
+      newLifecycle === 'Passed away';
+
     setPeople((prev) =>
-      prev.map((p) => (p.id === personId ? { ...p, lifecycle: newLifecycle } : p))
+      prev.map((p) =>
+        p.id === personId
+          ? {
+              ...p,
+              lifecycle: newLifecycle,
+              care_group_name: shouldClearGroup ? '' : p.care_group_name,
+            }
+          : p
+      )
     );
     if (selectedPerson && selectedPerson.id === personId) {
-      setSelectedPerson((prev) => (prev ? { ...prev, lifecycle: newLifecycle } : null));
+      setSelectedPerson((prev) =>
+        prev
+          ? {
+              ...prev,
+              lifecycle: newLifecycle,
+              care_group_name: shouldClearGroup ? '' : prev.care_group_name,
+            }
+          : null
+      );
     }
   };
 
@@ -340,6 +363,52 @@ export const App: React.FC<{
         return m;
       }),
     }));
+  };
+
+  const handleTransferMember = async (destChurch: string, certNumber: string, transferDate: string) => {
+    if (!selectedPerson) return;
+    const savedToken =
+      sessionStorage.getItem(TOKEN_STORAGE_KEY) || localStorage.getItem(TOKEN_STORAGE_KEY);
+
+    try {
+      await fetch(`${apiBaseUrl}/api/v1/people/${selectedPerson.id}/transfer`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(savedToken ? { Authorization: `Bearer ${savedToken}` } : {}),
+        },
+        body: JSON.stringify({
+          dest_church_name: destChurch,
+          certificate_number: certNumber,
+          transfer_date: transferDate,
+        }),
+      });
+    } catch {}
+
+    const auditNote = `Transferred to ${destChurch} (Cert: ${certNumber}, Date: ${transferDate})`;
+    setPeople((prev) =>
+      prev.map((p) =>
+        p.id === selectedPerson.id
+          ? {
+              ...p,
+              lifecycle: 'Transferred out' as LifecycleStatus,
+              care_group_name: '',
+              notes: p.notes ? `${p.notes}\n${auditNote}` : auditNote,
+            }
+          : p
+      )
+    );
+
+    setSelectedPerson((prev) =>
+      prev
+        ? {
+            ...prev,
+            lifecycle: 'Transferred out' as LifecycleStatus,
+            care_group_name: '',
+            notes: prev.notes ? `${prev.notes}\n${auditNote}` : auditNote,
+          }
+        : null
+    );
   };
 
   const handleAddHouseholdMember = async (memberPartial: Partial<HouseholdMember>) => {
@@ -513,6 +582,7 @@ export const App: React.FC<{
               person={selectedPerson}
               onBack={() => setSelectedPerson(null)}
               onUpdateLifecycle={(st) => handleUpdateLifecycle(selectedPerson.id, st)}
+              onOpenTransfer={() => setShowTransferModal(true)}
             />
           ) : people.length === 0 ? (
             <WebEmpty
@@ -549,6 +619,14 @@ export const App: React.FC<{
         <AdminPersonNew
           onClose={() => setShowAddModal(false)}
           onSave={handleSavePerson}
+        />
+      )}
+
+      {showTransferModal && selectedPerson && (
+        <WebTransferDialog
+          person={selectedPerson}
+          onClose={() => setShowTransferModal(false)}
+          onTransferComplete={handleTransferMember}
         />
       )}
     </>

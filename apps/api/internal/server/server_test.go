@@ -518,3 +518,181 @@ func TestWebMerge_ExecuteMerge(t *testing.T) {
 		t.Errorf("expected audit note on secondary record, got %s", sec.Notes)
 	}
 }
+
+func TestMembershipStatus_Transitions(t *testing.T) {
+	authSvc := auth.NewService(auth.DefaultJWTSecret)
+	pStore := people.NewStore()
+	hStore := households.NewStore(pStore)
+	srv := server.NewServerWithStores(authSvc, pStore, hStore)
+
+	token, code, _ := authSvc.RequestLink("+6281234567890")
+	verifyResp, _ := authSvc.Verify("+6281234567890", token, code, false)
+	bearer := "Bearer " + verifyResp.Token
+
+	p, _ := pStore.Create(people.CreatePersonRequest{
+		FullName: "Andreas Wibowo",
+		Phone:    "0811-2200-3311",
+		Standing: people.StandingGuest,
+	})
+
+	// Transition standing from Guest to Registered Member
+	newStanding := people.StandingRegistered
+	statusReq := people.StatusTransitionRequest{
+		Standing: &newStanding,
+		Reason:   "Completed baptism and church membership class",
+	}
+	body, _ := json.Marshal(statusReq)
+	req := httptest.NewRequest(http.MethodPut, "/api/v1/people/"+p.ID+"/status", bytes.NewReader(body))
+	req.Header.Set("Authorization", bearer)
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 on status transition, got %d: %s", rec.Code, rec.Body.String())
+	}
+
+	updated, _ := pStore.Get(p.ID, false)
+	if updated.Standing != people.StandingRegistered {
+		t.Errorf("expected Registered Member standing, got %s", updated.Standing)
+	}
+}
+
+func TestAutoCloseRoles_OnMemberTransfer(t *testing.T) {
+	authSvc := auth.NewService(auth.DefaultJWTSecret)
+	pStore := people.NewStore()
+	hStore := households.NewStore(pStore)
+	srv := server.NewServerWithStores(authSvc, pStore, hStore)
+
+	token, code, _ := authSvc.RequestLink("+6281234567890")
+	verifyResp, _ := authSvc.Verify("+6281234567890", token, code, false)
+	bearer := "Bearer " + verifyResp.Token
+
+	// Create member enrolled in a care group
+	p, _ := pStore.Create(people.CreatePersonRequest{
+		FullName:      "Melisa Halim",
+		Phone:         "0813-9080-1122",
+		Standing:      people.StandingRegistered,
+		CareGroupID:   "cg-01",
+		CareGroupName: "Anugerah",
+	})
+
+	// Transfer member to another church (BR-MEM-4)
+	trfReq := people.TransferRequest{
+		DestChurchName:    "Immanuel Church, Surabaya",
+		TransferDate:      "2026-03-12",
+		CertificateNumber: "ATT-202603-0914",
+	}
+	body, _ := json.Marshal(trfReq)
+	req := httptest.NewRequest(http.MethodPost, "/api/v1/people/"+p.ID+"/transfer", bytes.NewReader(body))
+	req.Header.Set("Authorization", bearer)
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 on transfer, got %d: %s", rec.Code, rec.Body.String())
+	}
+
+	updated, _ := pStore.Get(p.ID, false)
+	// Verify lifecycle moved to Transferred out
+	if updated.Lifecycle != people.LifecycleTransferred {
+		t.Errorf("expected lifecycle Transferred out, got %s", updated.Lifecycle)
+	}
+	// Verify active care group enrollment was auto-closed (BR-MEM-4)
+	if updated.CareGroupName != "" {
+		t.Errorf("expected care group to be auto-closed, got %s", updated.CareGroupName)
+	}
+}
+
+func TestWebTransfer_GenerateAttestation(t *testing.T) {
+	authSvc := auth.NewService(auth.DefaultJWTSecret)
+	pStore := people.NewStore()
+	hStore := households.NewStore(pStore)
+	srv := server.NewServerWithStores(authSvc, pStore, hStore)
+
+	token, code, _ := authSvc.RequestLink("+6281234567890")
+	verifyResp, _ := authSvc.Verify("+6281234567890", token, code, false)
+	bearer := "Bearer " + verifyResp.Token
+
+	p, _ := pStore.Create(people.CreatePersonRequest{
+		FullName: "Andreas Wibowo",
+		Phone:    "0811-2200-3311",
+		Standing: people.StandingRegistered,
+	})
+
+	trfReq := people.TransferRequest{
+		DestChurchName: "Bethania Church, Bandung",
+	}
+	body, _ := json.Marshal(trfReq)
+	req := httptest.NewRequest(http.MethodPost, "/api/v1/people/"+p.ID+"/transfer", bytes.NewReader(body))
+	req.Header.Set("Authorization", bearer)
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 on attestation generation, got %d", rec.Code)
+	}
+
+	var recData people.TransferRecord
+	_ = json.Unmarshal(rec.Body.Bytes(), &recData)
+	if recData.CertificateNumber == "" {
+		t.Error("expected generated certificate number, got empty")
+	}
+	if recData.DestChurchName != "Bethania Church, Bandung" {
+		t.Errorf("expected destination church 'Bethania Church, Bandung', got %s", recData.DestChurchName)
+	}
+}
+
+func TestAuditHistory_ChronologicalLog(t *testing.T) {
+	authSvc := auth.NewService(auth.DefaultJWTSecret)
+	pStore := people.NewStore()
+	hStore := households.NewStore(pStore)
+	srv := server.NewServerWithStores(authSvc, pStore, hStore)
+
+	token, code, _ := authSvc.RequestLink("+6281234567890")
+	verifyResp, _ := authSvc.Verify("+6281234567890", token, code, false)
+	bearer := "Bearer " + verifyResp.Token
+
+	p, _ := pStore.Create(people.CreatePersonRequest{
+		FullName: "Yohanes Halim",
+		Phone:    "0812-3333-4444",
+		Standing: people.StandingRegistered,
+	})
+
+	// Update status
+	inact := people.LifecycleInactive
+	_, _ = pStore.UpdateMembershipStatus(p.ID, people.StatusTransitionRequest{
+		Lifecycle: &inact,
+	}, "Lidya S.")
+
+	// Retrieve audit
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/people/"+p.ID+"/audit", nil)
+	req.Header.Set("Authorization", bearer)
+	rec := httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 on audit, got %d", rec.Code)
+	}
+
+	var auditResp struct {
+		Data  []people.AuditEntry `json:"data"`
+		Total int                 `json:"total"`
+	}
+	_ = json.Unmarshal(rec.Body.Bytes(), &auditResp)
+	if auditResp.Total == 0 {
+		t.Fatal("expected audit entries, got 0")
+	}
+	found := false
+	for _, entry := range auditResp.Data {
+		if entry.Action == "lifecycle_change" && entry.OperatorName == "Lidya S." {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Error("expected audit entry for lifecycle_change by Lidya S.")
+	}
+}

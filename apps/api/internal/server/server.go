@@ -89,11 +89,14 @@ func (s *Server) setupRoutes() {
 			protected.Use(s.authService.Middleware)
 			protected.Get("/desk/summary", s.handleDeskSummary)
 
-			// People endpoints (SPEC-1-02, SPEC-1-04)
+			// People endpoints (SPEC-1-02, SPEC-1-04, SPEC-1-05)
 			protected.Get("/people", s.handleListPeople)
 			protected.Post("/people", s.handleCreatePerson)
 			protected.Get("/people/{id}", s.handleGetPerson)
 			protected.Put("/people/{id}", s.handleUpdatePerson)
+			protected.Put("/people/{id}/status", s.handleUpdatePersonStatus)
+			protected.Post("/people/{id}/transfer", s.handleTransferPerson)
+			protected.Get("/people/{id}/audit", s.handleGetPersonAudit)
 			protected.Post("/people/import", s.handleImportPreview)
 			protected.Post("/people/import/commit", s.handleImportCommit)
 			protected.Get("/people/duplicates", s.handleGetDuplicates)
@@ -486,4 +489,70 @@ func (s *Server) handleMergePeople(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	_ = json.NewEncoder(w).Encode(merged)
+}
+
+func (s *Server) handleUpdatePersonStatus(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	id := chi.URLParam(r, "id")
+
+	var req people.StatusTransitionRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": "invalid request body"})
+		return
+	}
+
+	operator := "Lidya S."
+	if admin, ok := r.Context().Value(auth.AdminContextKey).(*auth.AdminUser); ok && admin != nil {
+		operator = admin.Name
+	}
+
+	person, err := s.peopleStore.UpdateMembershipStatus(id, req, operator)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(person)
+}
+
+func (s *Server) handleTransferPerson(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	id := chi.URLParam(r, "id")
+
+	var req people.TransferRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": "invalid request body"})
+		return
+	}
+
+	operator := "Lidya S."
+	if admin, ok := r.Context().Value(auth.AdminContextKey).(*auth.AdminUser); ok && admin != nil {
+		operator = admin.Name
+	}
+
+	transferRec, err := s.peopleStore.RecordTransfer(id, req, operator)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(transferRec)
+}
+
+func (s *Server) handleGetPersonAudit(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	id := chi.URLParam(r, "id")
+
+	audits := s.peopleStore.GetAuditHistory(id)
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(map[string]interface{}{
+		"data":  audits,
+		"total": len(audits),
+	})
 }

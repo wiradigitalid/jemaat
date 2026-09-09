@@ -3,7 +3,7 @@ artifact: .control/decisions/DEC-002-autopilot-mandate.md
 ---
 
 ## Resume
-Iteration: 1 at 09a3f2b
+Iteration: 1 at 46ac60c
 Run branch: autopilot/DEC-002 (Draft PR #1 open: https://github.com/wiradigitalid/jemaat/pull/1)
 Stopped at: —
 Blocked: —

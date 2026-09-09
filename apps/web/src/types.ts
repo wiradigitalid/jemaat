@@ -253,3 +253,16 @@ export interface GuestApplicant {
   household_action?: string;
   care_group_assignment?: string;
 }
+
+export interface AccessRoleGrant {
+  id: string;
+  person_id: string;
+  full_name: string;
+  initials: string;
+  standing: string;
+  role: 'Administrator' | 'Church office' | 'Care group leader';
+  role_label: string;
+  given_by: string;
+  given_date: string;
+  last_used: string;
+}

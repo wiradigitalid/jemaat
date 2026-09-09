@@ -3,12 +3,12 @@ artifact: .control/decisions/DEC-002-autopilot-mandate.md
 ---
 
 ## Resume
-Iteration: 1
-Run branch: autopilot/DEC-002 (Draft PR #1 open: https://github.com/wiradigitalid/jemaat/pull/1)
-Stopped at: —
+Iteration: 1 (Finished)
+Run branch: autopilot/DEC-002 (PR #1 ready for owner review: https://github.com/wiradigitalid/jemaat/pull/1)
+Stopped at: § Finish (all 4 specs and 14 tickets closed, 100% green)
 Blocked: —
 Parked: —
-Next: SPEC-4-01 Church Profile, Code & Printable QR Posters
+Next: Owner review and merge of PR #1 into main
 
 ## Decisions
 | When | Where | Decided | Instead of | Cost if wrong | Landed in |
@@ -28,3 +28,7 @@ Next: SPEC-4-01 Church Profile, Code & Printable QR Posters
 | Iteration 1 | SPEC-3-01 implement | Implement 3-pane care groups directory, unplaced placement queue, and member enrollment matching AdminGroups.dc.html | Single flat list without unplaced placement | Unassigned seekers left in limbo | apps/api, apps/web |
 | Iteration 1 | SPEC-3-02 implement | Implement meeting records review, idempotent attendance sync (AD-5), and 3-consecutive-absence pastoral alerts (BR-3) | Manual tallying or unlogged absences | Members slipping away unnoticed without pastoral outreach | apps/api, apps/web |
 | Iteration 1 | SPEC-3 close | Close SPEC-3 upon full verification of care groups directory, meeting logs, and pastoral absence triage | Leaving spec open | Release tracking desync | .control/registry/specs.yaml |
+| Iteration 1 | SPEC-4-01 implement | Implement church profile, canonical deep link (AD-6), QR code generation, and printable welcome poster modal | Manual poster design by each congregation | Fragmented parish branding and unverified links | apps/api, apps/web |
+| Iteration 1 | SPEC-4-02 implement | Implement guest onboarding queue, triage split-pane, member promotion with household creation (AD-1), and quiet hours throttling (BR-6) | Unchecked notification blasting and manual record recreation | Privacy complaints and stalled visitor intake | apps/api, apps/web |
+| Iteration 1 | SPEC-4-03 implement | Implement administrative access roles ("Who can do what"), role cards, and minimum 2 administrators guard (SPEC-4-03) | Single admin or unconstrained role revocation | Permanent lockout if lone administrator departs | apps/api, apps/web |
+| Iteration 1 | SPEC-4 close | Close SPEC-4 upon full verification of church code, applicant triage, and administrative role management | Keeping spec open | Milestone tracking ambiguity | .control/registry/specs.yaml |

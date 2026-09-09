@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strconv"
 	"strings"
@@ -30,6 +31,7 @@ type Server struct {
 	meetingStore   *caregroups.MeetingStore
 	portalStore    *portal.Store
 	applicantStore *portal.ApplicantStore
+	roleStore      *portal.RoleStore
 }
 
 func NewServer(authService *auth.Service) *Server {
@@ -75,6 +77,7 @@ func NewServerWithAllStores(authService *auth.Service, peopleStore *people.Store
 		meetingStore:   caregroups.NewMeetingStore(),
 		portalStore:    portal.NewStore(),
 		applicantStore: portal.NewApplicantStore(),
+		roleStore:      portal.NewRoleStore(),
 	}
 
 	s.setupMiddleware()
@@ -201,6 +204,11 @@ func (s *Server) setupRoutes() {
 			protected.Post("/guests/queue/{id}/admit", s.handleAdmitGuest)
 			protected.Get("/directory", s.handleDirectorySearch)
 			protected.Post("/notifications/dispatch", s.handleDispatchNotifications)
+
+			// Church Office Access Roles endpoints (SPEC-4-03, UC-1, FR-1)
+			protected.Get("/church/access-roles", s.handleListAccessRoles)
+			protected.Post("/church/access-roles", s.handleGrantAccessRole)
+			protected.Delete("/church/access-roles/{id}", s.handleRevokeAccessRole)
 		})
 	})
 }
@@ -1410,4 +1418,71 @@ func (s *Server) handleDispatchNotifications(w http.ResponseWriter, r *http.Requ
 	result := s.applicantStore.DispatchNotifications(targetTime)
 	w.WriteHeader(http.StatusOK)
 	_ = json.NewEncoder(w).Encode(result)
+}
+
+func (s *Server) handleListAccessRoles(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	grants := s.roleStore.List()
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(map[string]interface{}{
+		"data":  grants,
+		"total": len(grants),
+	})
+}
+
+func (s *Server) handleGrantAccessRole(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	var req portal.GrantRoleRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": "invalid request body"})
+		return
+	}
+
+	// Verify or enrich from people registry if person_id provided
+	if p, err := s.peopleStore.Get(req.PersonID, false); err == nil {
+		if req.FullName == "" {
+			req.FullName = p.FullName
+		}
+		if req.Standing == "" {
+			req.Standing = string(p.Standing)
+		}
+	}
+
+	givenBy := "Office Admin"
+	if admin, ok := r.Context().Value(auth.AdminContextKey).(*auth.AdminUser); ok && admin != nil {
+		givenBy = admin.Name
+	}
+
+	grant, err := s.roleStore.Grant(req, givenBy)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	_ = json.NewEncoder(w).Encode(grant)
+}
+
+func (s *Server) handleRevokeAccessRole(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	id := chi.URLParam(r, "id")
+
+	if err := s.roleStore.Revoke(id); err != nil {
+		if errors.Is(err, portal.ErrGrantNotFound) {
+			w.WriteHeader(http.StatusNotFound)
+		} else {
+			w.WriteHeader(http.StatusBadRequest)
+		}
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(map[string]string{
+		"status":  "revoked",
+		"message": "access grant successfully revoked",
+	})
 }

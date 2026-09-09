@@ -15,6 +15,7 @@ import { WebRoster } from './components/WebRoster.tsx';
 import { AdminGroups } from './components/AdminGroups.tsx';
 import { WebChurchCode } from './components/WebChurchCode.tsx';
 import { WebApplicants } from './components/WebApplicants.tsx';
+import { WebRoles } from './components/WebRoles.tsx';
 import {
   AdminUser,
   AuthResponse,
@@ -186,7 +187,8 @@ export const App: React.FC<{
   initialAdmin?: AdminUser | null;
   initialHousehold?: Household;
   initialTeams?: MinistryTeam[];
-}> = ({ apiBaseUrl = '', initialPeople, initialAdmin, initialHousehold, initialTeams }) => {
+  initialSettingsView?: 'roles' | 'data';
+}> = ({ apiBaseUrl = '', initialPeople, initialAdmin, initialHousehold, initialTeams, initialSettingsView = 'data' }) => {
   const [admin, setAdmin] = useState<AdminUser | null>(initialAdmin ?? null);
   const [activeNav, setActiveNav] = useState<NavItemKey>('People');
   const [initializing, setInitializing] = useState(initialAdmin === undefined);
@@ -199,6 +201,7 @@ export const App: React.FC<{
   const [showMerge, setShowMerge] = useState(false);
   const [showTransferModal, setShowTransferModal] = useState(false);
   const [servingView, setServingView] = useState<'roster' | 'departments'>('roster');
+  const [settingsView, setSettingsView] = useState<'roles' | 'data'>(initialSettingsView);
 
   // Restore authentication on mount
   useEffect(() => {
@@ -747,23 +750,63 @@ export const App: React.FC<{
         ) : activeNav === 'Church code' ? (
           <WebChurchCode />
         ) : activeNav === 'Settings' ? (
-          <WebData
-            totalMembers={people.length || 254}
-            onDownloadCategory={(cat, fmt) => {
-              const savedToken =
-                sessionStorage.getItem(TOKEN_STORAGE_KEY) || localStorage.getItem(TOKEN_STORAGE_KEY);
-              fetch(`${apiBaseUrl}/api/v1/data/export?category=${cat}&format=${fmt.toLowerCase()}`, {
-                headers: savedToken ? { Authorization: `Bearer ${savedToken}` } : {},
-              }).catch(() => {});
-            }}
-            onDownloadAll={() => {
-              const savedToken =
-                sessionStorage.getItem(TOKEN_STORAGE_KEY) || localStorage.getItem(TOKEN_STORAGE_KEY);
-              fetch(`${apiBaseUrl}/api/v1/data/export`, {
-                headers: savedToken ? { Authorization: `Bearer ${savedToken}` } : {},
-              }).catch(() => {});
-            }}
-          />
+          settingsView === 'roles' ? (
+            <div className="flex flex-col flex-1 min-h-0">
+              <div className="flex items-center justify-end gap-2 p-[12px_32px_0] bg-surfaceAlt border-b border-line">
+                <button
+                  type="button"
+                  onClick={() => setSettingsView('roles')}
+                  className="h-[36px] px-3.5 rounded-input text-[13px] font-bold bg-surface border border-line text-ink shadow-xs cursor-pointer"
+                >
+                  Access roles
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSettingsView('data')}
+                  className="h-[36px] px-3.5 rounded-input text-[13px] font-semibold text-ink2 hover:bg-surface cursor-pointer"
+                >
+                  Your data (exports)
+                </button>
+              </div>
+              <WebRoles />
+            </div>
+          ) : (
+            <div className="flex flex-col flex-1 min-h-0">
+              <div className="flex items-center justify-end gap-2 p-[12px_32px_0] bg-surfaceAlt border-b border-line">
+                <button
+                  type="button"
+                  onClick={() => setSettingsView('roles')}
+                  className="h-[36px] px-3.5 rounded-input text-[13px] font-semibold text-ink2 hover:bg-surface cursor-pointer"
+                >
+                  Access roles
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSettingsView('data')}
+                  className="h-[36px] px-3.5 rounded-input text-[13px] font-bold bg-surface border border-line text-ink shadow-xs cursor-pointer"
+                >
+                  Your data (exports)
+                </button>
+              </div>
+              <WebData
+                totalMembers={people.length || 254}
+                onDownloadCategory={(cat, fmt) => {
+                  const savedToken =
+                    sessionStorage.getItem(TOKEN_STORAGE_KEY) || localStorage.getItem(TOKEN_STORAGE_KEY);
+                  fetch(`${apiBaseUrl}/api/v1/data/export?category=${cat}&format=${fmt.toLowerCase()}`, {
+                    headers: savedToken ? { Authorization: `Bearer ${savedToken}` } : {},
+                  }).catch(() => {});
+                }}
+                onDownloadAll={() => {
+                  const savedToken =
+                    sessionStorage.getItem(TOKEN_STORAGE_KEY) || localStorage.getItem(TOKEN_STORAGE_KEY);
+                  fetch(`${apiBaseUrl}/api/v1/data/export`, {
+                    headers: savedToken ? { Authorization: `Bearer ${savedToken}` } : {},
+                  }).catch(() => {});
+                }}
+              />
+            </div>
+          )
         ) : (
           <div className="w-full flex-1 bg-surface border border-line rounded-card p-6 flex flex-col items-center justify-center text-center">
             <div className="text-[15px] font-bold text-ink">{title} Workspace</div>

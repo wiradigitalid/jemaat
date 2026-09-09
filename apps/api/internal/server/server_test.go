@@ -1831,3 +1831,114 @@ func TestNotificationDispatch_QuietHours(t *testing.T) {
 		t.Errorf("expected status 'dispatched' at 10:00, got %s", dispatchResp.Status)
 	}
 }
+
+func TestChurchAccessRoles_ListAndGrant(t *testing.T) {
+	authSvc := auth.NewService(auth.DefaultJWTSecret)
+	srv := server.NewServer(authSvc)
+
+	token, code, _ := authSvc.RequestLink("+6281234567890")
+	verifyResp, _ := authSvc.Verify("+6281234567890", token, code, false)
+	bearer := "Bearer " + verifyResp.Token
+
+	// 1. List current access roles (UC-1, FR-1)
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/church/access-roles", nil)
+	req.Header.Set("Authorization", bearer)
+	rec := httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 on list access roles, got %d", rec.Code)
+	}
+	var listResp struct {
+		Data  []portal.AccessRoleGrant `json:"data"`
+		Total int                      `json:"total"`
+	}
+	_ = json.Unmarshal(rec.Body.Bytes(), &listResp)
+	if listResp.Total < 6 {
+		t.Errorf("expected at least 6 seeded access role grants, got %d", listResp.Total)
+	}
+
+	// 2. Grant office access role to member
+	grantPayload := portal.GrantRoleRequest{
+		PersonID:  "per-kp",
+		FullName:  "Kevin Prasetyo",
+		Standing:  "Registered Member",
+		Role:      portal.RoleChurchOffice,
+		RoleLabel: "Church office",
+	}
+	body, _ := json.Marshal(grantPayload)
+	req = httptest.NewRequest(http.MethodPost, "/api/v1/church/access-roles", bytes.NewReader(body))
+	req.Header.Set("Authorization", bearer)
+	req.Header.Set("Content-Type", "application/json")
+	rec = httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusCreated {
+		t.Fatalf("expected 201 on grant role, got %d: %s", rec.Code, rec.Body.String())
+	}
+	var createdGrant portal.AccessRoleGrant
+	_ = json.Unmarshal(rec.Body.Bytes(), &createdGrant)
+	if createdGrant.Role != portal.RoleChurchOffice {
+		t.Errorf("expected RoleChurchOffice, got %s", createdGrant.Role)
+	}
+}
+
+func TestEnforceMinTwoAdministrators(t *testing.T) {
+	authSvc := auth.NewService(auth.DefaultJWTSecret)
+	srv := server.NewServer(authSvc)
+
+	token, code, _ := authSvc.RequestLink("+6281234567890")
+	verifyResp, _ := authSvc.Verify("+6281234567890", token, code, false)
+	bearer := "Bearer " + verifyResp.Token
+
+	// Revoke a non-administrator role (rol-03 Leads Anugerah) -> Succeeds
+	req := httptest.NewRequest(http.MethodDelete, "/api/v1/church/access-roles/rol-03", nil)
+	req.Header.Set("Authorization", bearer)
+	rec := httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 on revoke non-admin role, got %d", rec.Code)
+	}
+
+	// Seed data has exactly 2 administrators: rol-02 (Andreas Wibowo) and rol-07 (Pdt. Marulitua Hutagalung).
+	// Attempting to revoke one must be rejected to enforce minimum 2 administrators guard (SPEC-4-03, WebRoles.dc.html)
+	req = httptest.NewRequest(http.MethodDelete, "/api/v1/church/access-roles/rol-02", nil)
+	req.Header.Set("Authorization", bearer)
+	rec = httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusBadRequest {
+		t.Fatalf("expected 400 when revoking below 2 administrators, got %d: %s", rec.Code, rec.Body.String())
+	}
+	if !strings.Contains(rec.Body.String(), "at least two administrators") {
+		t.Errorf("expected error mentioning minimum two administrators, got %s", rec.Body.String())
+	}
+
+	// Revoking non-existent grant returns 404
+	req = httptest.NewRequest(http.MethodDelete, "/api/v1/church/access-roles/rol-non-existent", nil)
+	req.Header.Set("Authorization", bearer)
+	rec = httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusNotFound {
+		t.Fatalf("expected 404 when revoking non-existent grant, got %d: %s", rec.Code, rec.Body.String())
+	}
+
+	// Granting invalid role returns 400
+	badRolePayload := portal.GrantRoleRequest{
+		PersonID: "per-bad",
+		FullName: "Bad Role User",
+		Role:     portal.AccessRole("SuperUser"),
+	}
+	body, _ := json.Marshal(badRolePayload)
+	req = httptest.NewRequest(http.MethodPost, "/api/v1/church/access-roles", bytes.NewReader(body))
+	req.Header.Set("Authorization", bearer)
+	req.Header.Set("Content-Type", "application/json")
+	rec = httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusBadRequest {
+		t.Fatalf("expected 400 on invalid role grant, got %d", rec.Code)
+	}
+}

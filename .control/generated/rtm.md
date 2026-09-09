@@ -49,10 +49,10 @@ rtm:
   - TestChurchAccessRoles_ListAndGrant
   - TestEnforceMinTwoAdministrators
   - TestWebRoles_WhoCanDoWhatRender
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-1
   CAP: CAP-1
   FR: FR-1
@@ -144,10 +144,10 @@ rtm:
   - TestApplicantsQueue_TriageAndContact
   - TestApplicantAdmit_PromoteToMember
   - TestWebApplicants_SplitPaneRender
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-5
   CAP: CAP-5
   FR: FR-15
@@ -160,10 +160,10 @@ rtm:
   - TestApplicantsQueue_TriageAndContact
   - TestApplicantAdmit_PromoteToMember
   - TestWebApplicants_SplitPaneRender
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-5
   CAP: CAP-5
   FR: FR-16
@@ -176,10 +176,10 @@ rtm:
   - TestApplicantsQueue_TriageAndContact
   - TestApplicantAdmit_PromoteToMember
   - TestWebApplicants_SplitPaneRender
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-5
   CAP: CAP-5
   FR: FR-17

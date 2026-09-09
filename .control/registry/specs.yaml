@@ -224,6 +224,7 @@ specs:
           - TestPastoralAlerts_ThreeConsecutiveAbsences
 
   - id: SPEC-4
+    status: closed
     release: v0.1.0
     prd: church-operations
     fr:

@@ -236,3 +236,20 @@ export interface ChurchProfile {
   members_signed_in: number;
   applicants_waiting: number;
 }
+
+export interface GuestApplicant {
+  id: string;
+  full_name: string;
+  initials: string;
+  phone: string;
+  email?: string;
+  worshipping_duration: string;
+  current_membership: string;
+  requested_category: string;
+  status: 'pending' | 'contacted' | 'admitted' | 'rejected';
+  days_waiting: number;
+  submitted_at_label: string;
+  contact_notes?: string;
+  household_action?: string;
+  care_group_assignment?: string;
+}

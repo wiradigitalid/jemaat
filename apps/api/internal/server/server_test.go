@@ -12,6 +12,7 @@ import (
 	"jemaat/apps/api/internal/caregroups"
 	"jemaat/apps/api/internal/households"
 	"jemaat/apps/api/internal/people"
+	"jemaat/apps/api/internal/portal"
 	"jemaat/apps/api/internal/server"
 	"jemaat/apps/api/internal/serving"
 )
@@ -1625,5 +1626,208 @@ func TestQRCodeGenerator_CanonicalDeepLink(t *testing.T) {
 	}
 	if !strings.Contains(qrResp.SVG, "<svg") || !strings.Contains(qrResp.SVG, "</svg>") {
 		t.Errorf("expected valid SVG payload, got %s", qrResp.SVG)
+	}
+}
+
+func TestApplicantsQueue_TriageAndContact(t *testing.T) {
+	authSvc := auth.NewService(auth.DefaultJWTSecret)
+	pStore := people.NewStore()
+	hStore := households.NewStore(pStore)
+	sStore := serving.NewStore()
+	rStore := serving.NewRosterStore()
+	cgStore := caregroups.NewStore()
+	srv := server.NewServerWithAllStores(authSvc, pStore, hStore, sStore, rStore, cgStore)
+
+	token, code, _ := authSvc.RequestLink("+6281234567890")
+	verifyResp, _ := authSvc.Verify("+6281234567890", token, code, false)
+	bearer := "Bearer " + verifyResp.Token
+
+	// 1. List applicants in queue (FR-16, UC-19)
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/guests/queue", nil)
+	req.Header.Set("Authorization", bearer)
+	rec := httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 on list applicants queue, got %d", rec.Code)
+	}
+	var queueResp struct {
+		Data  []portal.GuestApplicant `json:"data"`
+		Total int                     `json:"total"`
+	}
+	_ = json.Unmarshal(rec.Body.Bytes(), &queueResp)
+	if queueResp.Total != 5 {
+		t.Errorf("expected 5 applicants waiting, got %d", queueResp.Total)
+	}
+
+	// 2. Get applicant detail
+	req = httptest.NewRequest(http.MethodGet, "/api/v1/guests/queue/app-01", nil)
+	req.Header.Set("Authorization", bearer)
+	rec = httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 on get applicant detail, got %d", rec.Code)
+	}
+	var appDetail portal.GuestApplicant
+	_ = json.Unmarshal(rec.Body.Bytes(), &appDetail)
+	if appDetail.FullName != "Rian Wijaya" {
+		t.Errorf("expected Rian Wijaya, got %s", appDetail.FullName)
+	}
+
+	// 3. Log contact notes
+	contactPayload := map[string]string{
+		"notes": "Sent WhatsApp message welcoming Rian and scheduling lunch conversation",
+	}
+	body, _ := json.Marshal(contactPayload)
+	req = httptest.NewRequest(http.MethodPost, "/api/v1/guests/queue/app-01/contact", bytes.NewReader(body))
+	req.Header.Set("Authorization", bearer)
+	req.Header.Set("Content-Type", "application/json")
+	rec = httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 on log contact, got %d", rec.Code)
+	}
+	_ = json.Unmarshal(rec.Body.Bytes(), &appDetail)
+	if appDetail.Status != portal.ApplicantStatusContacted {
+		t.Errorf("expected status 'contacted', got %s", appDetail.Status)
+	}
+}
+
+func TestApplicantAdmit_PromoteToMember(t *testing.T) {
+	authSvc := auth.NewService(auth.DefaultJWTSecret)
+	pStore := people.NewStore()
+	hStore := households.NewStore(pStore)
+	sStore := serving.NewStore()
+	rStore := serving.NewRosterStore()
+	cgStore := caregroups.NewStore()
+	srv := server.NewServerWithAllStores(authSvc, pStore, hStore, sStore, rStore, cgStore)
+
+	token, code, _ := authSvc.RequestLink("+6281234567890")
+	verifyResp, _ := authSvc.Verify("+6281234567890", token, code, false)
+	bearer := "Bearer " + verifyResp.Token
+
+	// Admit applicant as Community Member (AD-1, FR-14)
+	admitPayload := portal.AdmitApplicantRequest{
+		MembershipStatus: "Community Member",
+		HouseholdAction:  "Create new: Wijaya household",
+		CareGroupID:      "cg-01",
+		CareGroupName:    "Anugerah",
+	}
+	body, _ := json.Marshal(admitPayload)
+	req := httptest.NewRequest(http.MethodPost, "/api/v1/guests/queue/app-01/admit", bytes.NewReader(body))
+	req.Header.Set("Authorization", bearer)
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 on admit applicant, got %d: %s", rec.Code, rec.Body.String())
+	}
+
+	// Verify verified member was created in people registry (AD-1)
+	members := pStore.List(people.ListFilter{Query: "Rian Wijaya"})
+	if len(members) == 0 {
+		t.Fatal("expected Rian Wijaya to be created in people registry")
+	}
+	if members[0].Standing != people.StandingCommunity {
+		t.Errorf("expected StandingCommunity, got %s", members[0].Standing)
+	}
+}
+
+func TestDirectory_PrivacyMasking(t *testing.T) {
+	authSvc := auth.NewService(auth.DefaultJWTSecret)
+	pStore := people.NewStore()
+	hStore := households.NewStore(pStore)
+	sStore := serving.NewStore()
+	rStore := serving.NewRosterStore()
+	cgStore := caregroups.NewStore()
+	srv := server.NewServerWithAllStores(authSvc, pStore, hStore, sStore, rStore, cgStore)
+
+	token, code, _ := authSvc.RequestLink("+6281234567890")
+	verifyResp, _ := authSvc.Verify("+6281234567890", token, code, false)
+	bearer := "Bearer " + verifyResp.Token
+
+	// Create person with sensitive contact
+	_, _ = pStore.Create(people.CreatePersonRequest{
+		FullName: "Andreas Wibowo",
+		Phone:    "0811-2233-4455",
+		Email:    "andreas.wibowo@gmail.com",
+		Standing: people.StandingMember,
+	})
+
+	// Directory query must return masked phone and email (BR-4, AD-3, BR-POR-3)
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/directory?q=Andreas", nil)
+	req.Header.Set("Authorization", bearer)
+	rec := httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 on directory search, got %d", rec.Code)
+	}
+
+	var dirResp struct {
+		Data  []people.Person `json:"data"`
+		Total int             `json:"total"`
+	}
+	_ = json.Unmarshal(rec.Body.Bytes(), &dirResp)
+	if len(dirResp.Data) == 0 {
+		t.Fatal("expected at least 1 directory record")
+	}
+	maskedPerson := dirResp.Data[0]
+	if !strings.Contains(maskedPerson.Phone, "•") && !strings.Contains(maskedPerson.Phone, "*") {
+		t.Errorf("expected masked phone with privacy dots, got %s", maskedPerson.Phone)
+	}
+	if strings.Contains(maskedPerson.Phone, "2233") {
+		t.Errorf("expected sensitive phone number to be hidden, got %s", maskedPerson.Phone)
+	}
+}
+
+func TestNotificationDispatch_QuietHours(t *testing.T) {
+	authSvc := auth.NewService(auth.DefaultJWTSecret)
+	srv := server.NewServer(authSvc)
+
+	token, code, _ := authSvc.RequestLink("+6281234567890")
+	verifyResp, _ := authSvc.Verify("+6281234567890", token, code, false)
+	bearer := "Bearer " + verifyResp.Token
+
+	// 1. Dispatch during quiet hours (22:00) -> Throttled (BR-6, FR-15, BR-POR-4)
+	quietPayload := map[string]string{
+		"target_time": "2026-09-09T22:00:00Z",
+	}
+	body, _ := json.Marshal(quietPayload)
+	req := httptest.NewRequest(http.MethodPost, "/api/v1/notifications/dispatch", bytes.NewReader(body))
+	req.Header.Set("Authorization", bearer)
+	req.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 on dispatch, got %d", rec.Code)
+	}
+	var dispatchResp portal.DispatchResult
+	_ = json.Unmarshal(rec.Body.Bytes(), &dispatchResp)
+	if dispatchResp.Status != "throttled_quiet_hours" {
+		t.Errorf("expected status 'throttled_quiet_hours' at 22:00, got %s", dispatchResp.Status)
+	}
+
+	// 2. Dispatch during active daytime (10:00) -> Dispatched
+	dayPayload := map[string]string{
+		"target_time": "2026-09-09T10:00:00Z",
+	}
+	body, _ = json.Marshal(dayPayload)
+	req = httptest.NewRequest(http.MethodPost, "/api/v1/notifications/dispatch", bytes.NewReader(body))
+	req.Header.Set("Authorization", bearer)
+	req.Header.Set("Content-Type", "application/json")
+	rec = httptest.NewRecorder()
+	srv.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200 on dispatch, got %d", rec.Code)
+	}
+	_ = json.Unmarshal(rec.Body.Bytes(), &dispatchResp)
+	if dispatchResp.Status != "dispatched" {
+		t.Errorf("expected status 'dispatched' at 10:00, got %s", dispatchResp.Status)
 	}
 }

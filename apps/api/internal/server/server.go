@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"jemaat/apps/api/internal/auth"
@@ -28,6 +29,7 @@ type Server struct {
 	caregroupStore *caregroups.Store
 	meetingStore   *caregroups.MeetingStore
 	portalStore    *portal.Store
+	applicantStore *portal.ApplicantStore
 }
 
 func NewServer(authService *auth.Service) *Server {
@@ -72,6 +74,7 @@ func NewServerWithAllStores(authService *auth.Service, peopleStore *people.Store
 		caregroupStore: cgStore,
 		meetingStore:   caregroups.NewMeetingStore(),
 		portalStore:    portal.NewStore(),
+		applicantStore: portal.NewApplicantStore(),
 	}
 
 	s.setupMiddleware()
@@ -190,6 +193,14 @@ func (s *Server) setupRoutes() {
 			protected.Put("/church/profile", s.handleUpdateChurchProfile)
 			protected.Post("/church/code/regenerate", s.handleRegenerateChurchCode)
 			protected.Get("/church/qr", s.handleGetChurchQR)
+
+			// Guest Intake, Applicants Queue & Directory Access (SPEC-4-02, UC-17, UC-18, UC-19, FR-14, FR-15, FR-16, BR-5, BR-6)
+			protected.Get("/guests/queue", s.handleListGuestQueue)
+			protected.Get("/guests/queue/{id}", s.handleGetGuestQueue)
+			protected.Post("/guests/queue/{id}/contact", s.handleContactGuest)
+			protected.Post("/guests/queue/{id}/admit", s.handleAdmitGuest)
+			protected.Get("/directory", s.handleDirectorySearch)
+			protected.Post("/notifications/dispatch", s.handleDispatchNotifications)
 		})
 	})
 }
@@ -1241,4 +1252,162 @@ func (s *Server) handleLookupChurch(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	_ = json.NewEncoder(w).Encode(p)
+}
+
+func (s *Server) handleListGuestQueue(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	list := s.applicantStore.List()
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(map[string]interface{}{
+		"data":  list,
+		"total": len(list),
+	})
+}
+
+func (s *Server) handleGetGuestQueue(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	id := chi.URLParam(r, "id")
+
+	applicant, err := s.applicantStore.Get(id)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(applicant)
+}
+
+func (s *Server) handleContactGuest(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	id := chi.URLParam(r, "id")
+
+	var req portal.ContactApplicantRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": "invalid request body"})
+		return
+	}
+
+	applicant, err := s.applicantStore.Contact(id, req.Notes)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(applicant)
+}
+
+func (s *Server) handleAdmitGuest(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	id := chi.URLParam(r, "id")
+
+	var req portal.AdmitApplicantRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": "invalid request body"})
+		return
+	}
+
+	applicant, err := s.applicantStore.Admit(id, req)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	// Promote directly to verified member profile in people registry (AD-1, FR-14)
+	standing := people.StandingMember
+	if req.MembershipStatus == "Community Member" {
+		standing = people.StandingCommunity
+	} else if req.MembershipStatus == "Registered Member" {
+		standing = people.StandingRegistered
+	}
+
+	var hhID, hhName string
+	if strings.HasPrefix(req.HouseholdAction, "Create new:") {
+		hhName = strings.TrimPrefix(req.HouseholdAction, "Create new:")
+		hhName = strings.TrimSpace(hhName)
+		if hh, err := s.householdStore.Create(households.CreateHouseholdRequest{
+			Name:    hhName,
+			Address: "Jl. Danau Sunter",
+		}); err == nil {
+			hhID = hh.ID
+		}
+	}
+
+	createdPerson, err := s.peopleStore.Create(people.CreatePersonRequest{
+		FullName:        applicant.FullName,
+		Phone:           applicant.Phone,
+		Email:           applicant.Email,
+		Standing:        standing,
+		HouseholdName:   hhName,
+		RoleInHousehold: "Head",
+		CareGroupID:     req.CareGroupID,
+		CareGroupName:   req.CareGroupName,
+	})
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+		return
+	}
+
+	if hhID != "" {
+		_, _ = s.householdStore.SetHead(hhID, createdPerson.ID)
+	}
+
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(applicant)
+}
+
+func (s *Server) handleDirectorySearch(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	// Verify authenticated role; unverified guests cannot browse directory (BR-5)
+	admin, _ := r.Context().Value(auth.AdminContextKey).(*auth.AdminUser)
+	if admin != nil && (admin.Role == "guest" || admin.Role == "unverified") {
+		w.WriteHeader(http.StatusForbidden)
+		_ = json.NewEncoder(w).Encode(map[string]string{
+			"error":   "forbidden",
+			"message": "unverified guests cannot browse member directory (BR-5)",
+		})
+		return
+	}
+
+	q := r.URL.Query().Get("q")
+	// Enforce field-level masking at database/API boundary (AD-3, BR-4, BR-POR-3)
+	filter := people.ListFilter{
+		Query: q,
+		Mask:  true,
+	}
+
+	members := s.peopleStore.List(filter)
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(map[string]interface{}{
+		"data":  members,
+		"total": len(members),
+	})
+}
+
+func (s *Server) handleDispatchNotifications(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	var req struct {
+		TargetTime string `json:"target_time"`
+	}
+	_ = json.NewDecoder(r.Body).Decode(&req)
+
+	targetTime := time.Now().UTC()
+	if req.TargetTime != "" {
+		if parsed, err := time.Parse(time.RFC3339, req.TargetTime); err == nil {
+			targetTime = parsed
+		}
+	}
+
+	result := s.applicantStore.DispatchNotifications(targetTime)
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(result)
 }

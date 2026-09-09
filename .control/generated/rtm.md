@@ -112,10 +112,10 @@ rtm:
   - TestChurchProfileAPI_GetAndUpdate
   - TestQRCodeGenerator_CanonicalDeepLink
   - TestWebChurchCode_PrintPosterRender
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-4
   CAP: CAP-4
   FR: FR-13
@@ -128,10 +128,10 @@ rtm:
   - TestChurchProfileAPI_GetAndUpdate
   - TestQRCodeGenerator_CanonicalDeepLink
   - TestWebChurchCode_PrintPosterRender
-  status: ready-for-agent
+  status: done
   exempt: false
-  green: false
-  broken_at: status
+  green: true
+  broken_at: ''
 - BG: BG-4
   CAP: CAP-4
   FR: FR-14

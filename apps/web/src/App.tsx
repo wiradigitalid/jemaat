@@ -14,6 +14,7 @@ import { AdminDepartments } from './components/AdminDepartments.tsx';
 import { WebRoster } from './components/WebRoster.tsx';
 import { AdminGroups } from './components/AdminGroups.tsx';
 import { WebChurchCode } from './components/WebChurchCode.tsx';
+import { WebApplicants } from './components/WebApplicants.tsx';
 import {
   AdminUser,
   AuthResponse,
@@ -661,6 +662,8 @@ export const App: React.FC<{
               onSelectPerson={(p) => setSelectedPerson(p)}
             />
           )
+        ) : activeNav === 'Applicants' ? (
+          <WebApplicants />
         ) : activeNav === 'Households' ? (
           <AdminHousehold
             household={household}

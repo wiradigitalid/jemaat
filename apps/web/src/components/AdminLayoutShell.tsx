@@ -68,7 +68,7 @@ export const AdminLayoutShell: React.FC<AdminLayoutShellProps> = ({
   ];
 
   return (
-    <div className="w-full min-h-screen bg-bg flex" style={{ minHeight: '900px' }}>
+    <div className="w-full min-h-screen bg-bg flex flex-1">
       {/* 246px Persistent Left Sidebar */}
       <aside className="w-[246px] flex-[0_0_246px] bg-surfaceAlt border-r border-line flex flex-col p-[26px_16px_20px]">
         {/* Brand header */}
